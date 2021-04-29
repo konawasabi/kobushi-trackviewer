@@ -7,7 +7,7 @@ variable = {'distance':0.0}
 
 rule = open('map-grammer.lark').read()
 
-parser = Lark(rule, parser='lalr')
+parser = Lark(rule, parser='lalr', maybe_placeholders=True)
 
 class ParseMap(InlineTransformer):
     from operator import sub, mul, truediv as div, mod
@@ -66,7 +66,7 @@ def main():
             print("Bye")
             break
         tree = parser.parse(s)
-        #print(tree)
+        print(tree)
         print(tree.pretty())
         print(ParseMap().transform(tree))
     
