@@ -1,0 +1,127 @@
+BveTs Map 2.02
+BveTs Map 2.02:shift_jis
+BveTs Map 2.02:utf-8
+
+Curve.SetGauge(value) [旧] Curve.Gauge(value)
+Curve.SetCenter(x)
+Curve.SetFunction(id)
+Curve.BeginTransition()
+Curve.Begin(radius, cant) [旧] Curve.BeginCircular(radius, cant)
+Curve.Begin(radius) NEW
+Curve.End()
+Curve.Interpolate(radius, cant) NEW
+Curve.Interpolate(radius) NEW
+Curve.Interpolate() NEW
+Curve.Change(radius)
+
+Gradient.BeginTransition()
+Gradient.Begin(gradient) [旧] Gradient.BeginConst(gradient)
+Gradient.End()
+Gradient.Interpolate(gradient) NEW
+Gradient.Interpolate() NEW
+
+Track[trackKey].X.Interpolate(x, radius) NEW
+Track[trackKey].X.Interpolate(x) NEW
+Track[trackKey].X.Interpolate() NEW
+Track[trackKey].Y.Interpolate(y, radius) NEW
+Track[trackKey].Y.Interpolate(y) NEW
+Track[trackKey].Y.Interpolate() NEW
+Track[trackKey].Position(x, y, radiusH, radiusV)
+Track[trackKey].Position(x, y, radiusH)
+Track[trackKey].Position(x, y)
+Track[trackKey].Cant.SetGauge(gauge) [旧] Track[trackKey].Gauge(gauge)
+Track[trackKey].Cant.SetCenter(x) NEW
+Track[trackKey].Cant.SetFunction(id) NEW
+Track[trackKey].Cant.BeginTransition() NEW
+Track[trackKey].Cant.Begin(cant) NEW
+Track[trackKey].Cant.End() NEW
+Track[trackKey].Cant.Interpolate(cant) [旧] Track[trackKey].Cant(cant)
+Track[trackKey].Cant.Interpolate() NEW
+
+Structure.Load(filePath)
+Structure[structureKey].Put(trackKey, x, y, z, rx, ry, rz, tilt, span)
+Structure[structureKey].Put0(trackKey, tilt, span)
+Structure[structureKey].PutBetween(trackKey1, trackKey2, flag) NEW
+Structure[structureKey].PutBetween(trackKey1, trackKey2)
+
+Repeater[repeaterKey].Begin(trackKey, x, y, z, rx, ry, rz, tilt, span, interval, structureKey1, structureKey2, ... , structureKeyN)
+Repeater[repeaterKey].Begin0(trackKey, tilt, span, interval, structureKey1, structureKey2, ... , structureKeyN)
+Repeater[repeaterKey].End()
+
+Background.Change(structureKey)
+
+Station.Load(filePath)
+Station[stationKey].Put(door, margin1, margin2)
+
+Section.Begin(signal0, signal1, ... , signalN) [旧] Section.BeginNew(signal0, signal1, ... , signalN)
+Section.SetSpeedLimit(v0, v1, ... , vn) [旧] Signal.SpeedLimit(v0, v1, ... , vn)
+
+Signal.Load(filePath)
+Signal[signalAspectKey].Put(section, trackKey, x, y)
+Signal[signalAspectKey].Put(section, trackKey, x, y, z, rx, ry, rz, tilt, span)
+
+Beacon.Put(type, section, sendData)
+
+SpeedLimit.Begin(v)
+SpeedLimit.End()
+
+PreTrain.Pass(time)
+PreTrain.Pass(second)
+
+Light.Ambient(red, green, blue)
+Light.Diffuse(red, green, blue)
+Light.Direction(pitch, yaw)
+
+Fog.Interpolate(density, red, green, blue) [旧] Fog.Set(density, red, green, blue)
+Fog.Interpolate(density) NEW
+Fog.Interpolate() NEW
+
+DrawDistance.Change(value)
+
+CabIlluminance.Interpolate(value) [旧] CabIlluminance.Set(value)
+CabIlluminance.Interpolate() NEW
+
+Irregularity.Change(x, y, r, lx, ly, lr)
+
+Adhesion.Change(a)
+Adhesion.Change(a, b, c)
+
+Sound.Load(filePath)
+Sound[soundKey].Play()
+
+Sound3D.Load(filePath)
+Sound3D[soundKey].Put(x, y)
+
+RollingNoise.Change(index)
+
+FlangeNoise.Change(index)
+
+JointNoise.Play(index)
+
+Train.Add(trainKey, filePath, trackKey, direction)
+Train[trainKey].Load(filePath, trackKey, direction) NEW
+Train[trainKey].Stop(decelerate, stopTime, accelerate, speed)
+
+abs(value)     value の絶対値を返します。
+atan2(y, x)    4 象限逆正接 (アークタンジェント) を返します。
+ceil(value)    value 以上の最小の整数を返します (value の切り上げ)。
+cos(value)    value の余弦 (コサイン) を返します。
+exp(value)    自然対数の底 (e) の value 乗を返します。
+floor(value)    value 以下の最大の整数を返します (value の切り捨て)。
+log(value)    value の自然対数を返します。
+pow(x, y)    x の y 乗を返します。
+rand(value)
+rand()    0 以上 value 未満の乱数を返します。引数を省略した場合、0 以上 1 未満の乱数を返します。
+sin(value)    value の正弦 (サイン) を返します。
+sqrt(value)    value の平方根を返します。
+
+include 'submap.txt';
+
+
+Legacy構文（BVE2-4）
+Track.Turn(Slope) tangentを指定する +:右, -:左
+Track.Curve(Radius; Cant)
+Track.Pitch(Rate)
+
+加算演算子
+文字列+数値の場合、数値を文字列に変換して結合する

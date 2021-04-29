@@ -1,0 +1,60 @@
+?start: expression ";"                   -> set_distance
+      | "$" label "=" parameter ";"      -> set_variable
+      | map_object ";"  -> map_element
+//      | (map_object "." )* map_function "(" [parameter ("," parameter)*] ")" ";"  -> map_element
+      | "include" expression ";"             -> include_files
+ //     | SH_COMMENT -> ignore_comment
+      
+//?parameter: expression | strings
+?parameter: expression
+
+?expression: term
+           | term  "+" expression -> add
+           | term  "-" expression -> sub
+
+?term: factor
+     | factor "*" factor -> mul
+     | factor "/" factor -> div
+     | factor "%" factor -> mod
+
+?factor: SIGNED_NUMBER -> number
+       | string
+       | "(" expression ")"
+       | "$" label -> call_variable
+       | "distance" -> call_distance
+       | label "(" [expression ("," expression)*] ")" -> call_function
+
+//?map_object: label "[" parameter "]" -> object
+//           | label -> object
+           
+//?map_function: label -> mapfunc
+
+?map_object: parentobj ("." childobj)*
+
+?parentobj: label "[" parameter "]"
+          | label
+          
+?childobj: label "(" [expression ("," expression)*] ")" -> mapfunc
+         | label //"."
+
+?label: CNAME
+//?key: strings
+//    | factor
+
+//?strings: /'[^']*'/
+//        | /'[^']*'/ "+" strings -> concatenate
+
+string: /'[^']*'/ -> remquote
+
+//string : "\'" _STRING_ESC_INNER "\'"
+//string : "'" /("a".."z"|"A".."Z"|"0".."9"|"_")("a".."z"|"A".."Z"|"0".."9"|"_")*/ "'"
+//string: ESCAPED_STRING
+
+%import common.CNAME
+%import common._STRING_ESC_INNER
+%import common.ESCAPED_STRING
+%import common.SIGNED_NUMBER
+%import common.WS
+%import common.SH_COMMENT
+%ignore WS
+%ignore SH_COMMENT
