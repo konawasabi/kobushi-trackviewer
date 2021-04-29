@@ -30,7 +30,7 @@ class ParseMap(InlineTransformer):
     def call_function(self, *argument): #数学関数呼び出し
         label = argument[0].lower()
         if (label == 'rand'):
-            if(len(argument) == 1): #引数なしrandかどうか
+            if(argument[1] == None): #引数なしrandかどうか
                 return random.random()
             else:
                 return random.uniform(0,argument[1])

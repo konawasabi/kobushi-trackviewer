@@ -15,17 +15,16 @@
      | factor "/" factor -> div
      | factor "%" factor -> mod
 
-?factor: SIGNED_NUMBER -> number
+?factor: SIGNED_NUMBER          -> number
        | string
        | "(" expression ")"
-       | "$" label -> call_variable
-       | "distance" -> call_distance
+       | "$" label              -> call_variable
+       | "distance"             -> call_distance
        | label "(" [expression ("," expression)*] ")" -> call_function
           
 ?mapfunc: label "(" [expression ("," expression)*] ")"
         
-?mapobject: label ["[" parameter "]"]
-
+?mapobject: label ["[" parameter "]"] // [key]が存在しない場合もNoneを返す
 
 ?label: CNAME
 
