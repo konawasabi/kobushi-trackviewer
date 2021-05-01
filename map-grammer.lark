@@ -1,8 +1,9 @@
-?start: expression ";"                   -> set_distance
-      | "$" label "=" parameter ";"      -> set_variable
-      | (mapobject ".")+ mapfunc ";"     -> map_element
-      | "include" expression ";"         -> include_files
-//     | SH_COMMENT -> ignore_comment
+?start: [(statement)+]
+?statement: expression ";"                   -> set_distance
+          | "$" label "=" parameter ";"      -> set_variable
+          | (mapobject ".")+ mapfunc ";"     -> map_element
+          | "include" expression ";"         -> include_files
+//        | SH_COMMENT -> ignore_comment
       
 ?parameter: expression
 
@@ -24,7 +25,7 @@
           
 ?mapfunc: label "(" [expression ("," expression)*] ")"
         
-?mapobject: label ["[" parameter "]"] // [key]が存在しない場合もNoneを返す
+?mapobject: label ["[" parameter "]"] // [key]が指定されていない場合もNoneを返す
 
 ?label: CNAME
 

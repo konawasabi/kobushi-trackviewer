@@ -1,5 +1,5 @@
 import lark
-from lark import Lark, InlineTransformer, v_args
+from lark import Lark, Transformer, v_args
 import math
 import random
 
@@ -9,11 +9,13 @@ rule = open('map-grammer.lark').read()
 
 parser = Lark(rule, parser='lalr', maybe_placeholders=True)
 
-class ParseMap(InlineTransformer):
+@v_args(inline=True)
+class ParseMap(Transformer):
     from operator import sub, mul, truediv as div, mod
-    number = v_args(inline=True)(float)
+    #number = v_args(inline=True)(float)
+    number = float
 
-    @v_args(inline=True)
+    #@v_args(inline=True)
     def set_distance(self, value): #距離程設定
         global variable
         #print(distance_g, value)
@@ -63,8 +65,9 @@ def main():
             #print(tree)
             print(tree.pretty())
             print(ParseMap().transform(tree))
-        except:
+        except Exception as other:
             print('incorrect input')
+            print(other)
             continue
     
 if __name__ == '__main__':
