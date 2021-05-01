@@ -17,7 +17,8 @@ class ParseMap(InlineTransformer):
     def set_distance(self, value): #距離程設定
         global variable
         #print(distance_g, value)
-        variable['distance'] = value
+        variable['distance'] = float(value)
+        return variable['distance']
     def call_distance(self): #距離程呼び出し
         global variable
         return variable['distance']
@@ -49,14 +50,6 @@ class ParseMap(InlineTransformer):
             else:
                 return str(int(argument[0]))+argument[1]
         return 0
-    '''
-    def object(self, *argument):
-        obj_result={}
-        obj_result['element']=argument[0].value.lower()
-        if(len(argument)==2):
-            obj_result['key']=argument[1]
-        return obj_result
-    '''
 
 def main():
     while True:
@@ -65,10 +58,14 @@ def main():
         except EOFError:
             print("Bye")
             break
-        tree = parser.parse(s)
-        print(tree)
-        print(tree.pretty())
-        print(ParseMap().transform(tree))
+        try:
+            tree = parser.parse(s)
+            #print(tree)
+            print(tree.pretty())
+            print(ParseMap().transform(tree))
+        except:
+            print('incorrect input')
+            continue
     
 if __name__ == '__main__':
     # test()
