@@ -10,6 +10,7 @@
 ?expression: term
            | term  "+" expression -> add
            | term  "-" expression -> sub
+           | "null"               -> null_value
 
 ?term: factor
      | factor "*" factor -> mul
@@ -23,7 +24,8 @@
        | "distance"             -> call_distance
        | label "(" [expression ("," expression)*] ")" -> call_function
           
-?mapfunc: label "(" [expression ("," expression)*] ")"
+//?mapfunc: label "(" [expression ("," expression)*] ")"
+?mapfunc: label "(" [expression] ("," [expression])* ")"
         
 ?mapobject: label ["[" parameter "]"] // [key]が指定されていない場合もNoneを返す
 
@@ -35,5 +37,7 @@ string: /'[^']*'/ -> remquote
 %import common.SIGNED_NUMBER
 %import common.WS
 %import common.SH_COMMENT
+%import common.CPP_COMMENT
 %ignore WS
 %ignore SH_COMMENT
+%ignore CPP_COMMENT

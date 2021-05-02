@@ -14,6 +14,7 @@ class ParseMap(Transformer):
     from operator import sub, mul, truediv as div, mod
     #number = v_args(inline=True)(float)
     number = float
+    null_value = type(None)
 
     #@v_args(inline=True)
     def set_distance(self, value): #距離程設定
