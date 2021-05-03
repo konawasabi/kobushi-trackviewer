@@ -123,5 +123,7 @@ Track.Turn(Slope) tangentを指定する +:右, -:左
 Track.Curve(Radius; Cant)
 Track.Pitch(Rate)
 
+Legacy.Fog(0, 30000, 150, 150, 150);
+
 加算演算子
 文字列+数値の場合、数値を文字列に変換して結合する
