@@ -5,26 +5,26 @@ https://mackoy.exblog.jp/23325011/
 Gradient も同様です。
 
 従来の記述方法
-100; Curve.BeginTransition(); Track['foo'].Cant(0);
-200; Curve.BeginCircular(600, 0.1); Track['foo'].Cant(0.1);
-300; Curve.BeginTransition(); Track['foo'].Cant(0.1);
-400; Curve.End(); Track['foo'].Cant(0);
+100; Curve.BeginTransition();		Track['foo'].Cant(0);
+200; Curve.BeginCircular(600, 0.1);	Track['foo'].Cant(0.1);
+300; Curve.BeginTransition();		Track['foo'].Cant(0.1);
+400; Curve.End();			Track['foo'].Cant(0);
 1000; Curve.BeginCircular(200, 0);
 1020; Curve.End();
 
 新しい記述方法 1
-100; Curve.BeginTransition(); Track['foo'].Cant.BeginTransition();
-200; Curve.Begin(600, 0.1); Track['foo'].Cant.Begin(0.1);
-300; Curve.BeginTransition(); Track['foo'].Cant.BeginTransition();
-400; Curve.End(); Track['foo'].Cant.End();
+100; Curve.BeginTransition();		Track['foo'].Cant.BeginTransition();
+200; Curve.Begin(600, 0.1);		Track['foo'].Cant.Begin(0.1);
+300; Curve.BeginTransition();		Track['foo'].Cant.BeginTransition();
+400; Curve.End();			Track['foo'].Cant.End();
 1000; Curve.Begin(200);
 1020; Curve.End();
 
 新しい記述方法 2
-100; Curve.Interpolate(); Track['foo'].Cant.Interpolate();
-200; Curve.Interpolate(600, 0.1); Track['foo'].Cant.Interpolate(0.1);
-300; Curve.Interpolate(); Track['foo'].Cant.Interpolate();
-400; Curve.Interpolate(0, 0); Track['foo'].Cant.Interpolate(0);
+100; Curve.Interpolate();		Track['foo'].Cant.Interpolate();
+200; Curve.Interpolate(600, 0.1);	Track['foo'].Cant.Interpolate(0.1);
+300; Curve.Interpolate();		Track['foo'].Cant.Interpolate();
+400; Curve.Interpolate(0, 0);		Track['foo'].Cant.Interpolate(0);
 1000; Curve.Change(200);
 1020; Curve.Change(0);
 
@@ -33,4 +33,7 @@ Gradient も同様です。
 こういう対応関係か？
 BeginTransition() = Interpolate()
 BeginCircular(hoge, fuga) = Begin(hoge, fuga) = Interpolate(hoge, fuga)
-End() = Interpolate()
+End() = Interpolate(0,0)
+
+↑は微妙に違う。
+Beginは緩和曲線・縦曲線を指定しない場合に使う。

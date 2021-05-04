@@ -53,7 +53,8 @@ if __name__ == '__main__':
     
     argvs = sys.argv
     
-    #print(load_map(argvs[1]))
     tree = parser.parse(load_map(argvs[1]), on_error=error_handle)
-    #print(tree.pretty())
-    print(interpreter.transform(tree))
+    result = interpreter.transform(tree)
+    
+    print(result.own_track.data)
+    

@@ -20,7 +20,7 @@ def main():
             tree = parser.parse(s)
             print(tree)
             print(tree.pretty())
-            print(interpreter.transform(tree))
+            #print(interpreter.transform(tree))
         except Exception as other:
             print('incorrect input')
             print(other)

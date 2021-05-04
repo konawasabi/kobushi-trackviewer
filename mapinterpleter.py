@@ -60,3 +60,15 @@ class ParseMap(Transformer):
                     f_arg = i.children[1:]
                     print('mapfunc: label=',label,', args=',f_arg)
             print()
+        else:
+            first_obj = argument[0].children[0].lower()
+            if(first_obj in ['curve','gradient']):
+                temp = getattr(self.environment.own_track, first_obj)
+                for elem in argument[1:]:
+                    if(elem.data == 'mapfunc'):
+                        break
+                    temp = getattr(temp, elem.children[0].lower())
+                getattr(temp, argument[-1].children[0].lower())(*argument[-1].children[1:])
+    def start(self, *argument):
+        if(all(elem == None for elem in argument)):
+            return self.environment
