@@ -37,3 +37,9 @@ End() = Interpolate(0,0)
 
 ↑は微妙に違う。
 Beginは緩和曲線・縦曲線を指定しない場合に使う。
+↑も間違い。新しい記述方法1と矛盾する。
+
+Interpolateは一つ前のInterpolate or changeで指定した点から現時点までを補間する。
+
+begintransitionなしにbegin構文を連続して指定した場合、begin同士の間は補間されるかどうか？
+されない場合は条件に応じてchange/interpolateいずれかの振る舞いに変化することになる。

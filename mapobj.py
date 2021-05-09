@@ -8,13 +8,13 @@ class Owntrack():
         def __init__(self,p):
             self.parent = p
         def setgauge(self, *a):
-            self.parent.data['gauge'].append([self.parent.environment.variable['distance'], a[0]])
+            self.parent.putdata('gauge',a[0])
         def gauge(self, *a):
             self.setgauge(*a)
         def setcenter(self, *a):
-            self.parent.data['center'].append([self.parent.environment.variable['distance'], a[0]])
+            self.parent.putdata('center',a[0])
         def setfunction(self, *a):
-            self.parent.data['interpolate_func'].append([self.parent.environment.variable['distance'], 'sin' if a[0] == 0 else 'line'])
+            self.parent.putdata('interpolate_func','sin' if a[0] == 0 else 'line')
         def begintransition(self, *a):
             self.interpolate(None)
         def begincircular(self, *a):
@@ -25,27 +25,32 @@ class Owntrack():
             self.interpolate(0,0)
         def interpolate(self, *a):
             if(len(a) == 2):
-                self.parent.data['radius'].append([self.parent.environment.variable['distance'], 'i' if a[0] == None else a[0]])
-                self.parent.data['cant'].append([self.parent.environment.variable['distance'],   'i' if a[1] == None else a[1]])
+                self.parent.putdata('radius',a[0],'i')
+                self.parent.putdata('cant',a[1],'i')
             elif(len(a) == 1):
-                self.parent.data['radius'].append([self.parent.environment.variable['distance'], 'i' if a[0] == None else a[0]])
-                self.parent.data['cant'].append([self.parent.environment.variable['distance'],   'i'])
+                self.parent.putdata('radius',a[0],'i')
+                self.parent.putdata('cant',None,'i')
         def change(self, *a):
-            self.begin(*a)
+            if(len(a) == 2):
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',a[1])
+            elif(len(a) == 1):
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',0)
     class legacyfunc():
         def __init__(self,p):
             self.parent = p
         def turn(self, *a):
-            self.parent.data['turn'].append([self.parent.environment.variable['distance'], a[0]])
+            self.parent.putdata('turn',a[0])
         def curve(self, *a):
             if(len(a) == 2):
-                self.parent.data['radius'].append([self.parent.environment.variable['distance'], a[0]])
-                self.parent.data['cant'].append([self.parent.environment.variable['distance'],   0 if a[1] == None else a[1]])
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',a[1])
             elif(len(a) == 1):
-                self.parent.data['radius'].append([self.parent.environment.variable['distance'], a[0]])
-                self.parent.data['cant'].append([self.parent.environment.variable['distance'],   0])
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',0)
         def pitch(self, *a):
-            self.parent.data['gradient'].append([self.parent.environment.variable['distance'], a[0]])
+            self.parent.putdata('gradient',a[0])
         def fog(self, *a):
             return None
     class gradientfunc():
@@ -60,7 +65,7 @@ class Owntrack():
         def end(self, *a):
             self.interpolate(0)
         def interpolate(self, *a):
-            self.parent.data['gradient'].append([self.parent.environment.variable['distance'], 'i' if a[0] == None else a[0]])
+            self.parent.putdata('gradient',a[0],'i')
     
     def __init__(self, p):
         self.data = {}
@@ -81,4 +86,9 @@ class Owntrack():
         self.legacy = self.legacyfunc(self)
         self.gradient = self.gradientfunc(self)
     
-    
+    def putdata(self,key,value,type=''):
+        """
+        valueについて、'c':直前のコマンドで指定された値と同一
+        typeについて、'':change, 'i':interpolate
+        """
+        self.data[key].append([self.environment.variable['distance'], 'c' if value == None else value, type])
