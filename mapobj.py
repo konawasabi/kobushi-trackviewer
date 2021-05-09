@@ -46,6 +46,8 @@ class Owntrack():
                 self.parent.data['cant'].append([self.parent.environment.variable['distance'],   0])
         def pitch(self, *a):
             self.parent.data['gradient'].append([self.parent.environment.variable['distance'], a[0]])
+        def fog(self, *a):
+            return None
     class gradientfunc():
         def __init__(self,p):
             self.parent = p

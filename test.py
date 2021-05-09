@@ -9,7 +9,7 @@ rule = open('map-grammer.lark').read()
 parser = Lark(rule, parser='lalr', maybe_placeholders=True)
 
 def main():
-    interpreter = interp.ParseMap(None,prompt=True)
+    interpreter = interp.ParseMap(None,parser,prompt=True)
     while True:
         try:
             s = input('> ')

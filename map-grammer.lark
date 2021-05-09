@@ -2,7 +2,7 @@
 ?statement: expression ";"                   -> set_distance
           | "$" label "=" parameter ";"      -> set_variable
           | (mapobject ".")+ mapfunc ";"     -> map_element
-          | "include" expression ";"         -> include_files
+          | "include" expression ";"         -> include_file
 //        | ESCAPED_STRING -> ignore_comment
       
 ?parameter: expression
@@ -13,9 +13,9 @@
            | "null"               -> null_value
 
 ?term: factor
-     | factor "*" factor -> mul
-     | factor "/" factor -> div
-     | factor "%" factor -> mod
+     | term "*" factor -> mul
+     | term "/" factor -> div
+     | term "%" factor -> mod
 
 ?factor: SIGNED_NUMBER          -> number
        | string
@@ -36,10 +36,11 @@ string: /'[^']*'/ -> remquote
 %import common.CNAME
 %import common.SIGNED_NUMBER
 %import common.WS
-%import common.ESCAPED_STRING
+//%import common.ESCAPED_STRING
 %import common.SH_COMMENT
 %import common.CPP_COMMENT
 %ignore WS
 %ignore SH_COMMENT
 %ignore CPP_COMMENT
-%ignore ESCAPED_STRING
+%ignore "\""
+//%ignore ESCAPED_STRING

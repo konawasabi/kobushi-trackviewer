@@ -1,6 +1,7 @@
 from lark import Lark, Transformer, v_args
 import math
 import random
+import pathlib
 
 import mapobj
 
@@ -11,8 +12,9 @@ class ParseMap(Transformer):
     number = float
     null_value = type(None)
 
-    def __init__(self,env,prompt=False):
+    def __init__(self,env,parser,prompt=False):
         self.promptmode = prompt
+        self.parser = parser
         if(env==None):
             self.environment = mapobj.Environment()
         else:
@@ -62,13 +64,59 @@ class ParseMap(Transformer):
             print()
         else:
             first_obj = argument[0].children[0].lower()
-            if(first_obj in ['curve','gradient']):
+            if(first_obj in ['curve','gradient','legacy']):
                 temp = getattr(self.environment.own_track, first_obj)
                 for elem in argument[1:]:
                     if(elem.data == 'mapfunc'):
                         break
                     temp = getattr(temp, elem.children[0].lower())
                 getattr(temp, argument[-1].children[0].lower())(*argument[-1].children[1:])
+    def include_file(self, path): #外部ファイルインクルード
+        input = self.rootpath.joinpath(pathlib.Path(path))
+        interpreter = ParseMap(self.environment,self.parser)
+        interpreter.load_files(input)
     def start(self, *argument):
         if(all(elem == None for elem in argument)):
             return self.environment
+    def load_files(self, path):
+        input = pathlib.Path(path)
+        self.rootpath = input.resolve().parent
+        try:
+            f = open(input,'rb') #文字コードが不明なのでバイナリで読み込む
+            header = f.readline().decode('utf-8') #一行目をutf-8でデコード。日本語コメントが一行目にあると詰む
+            f.close()
+        except Exception as e:
+            raise
+
+        HEAD_STR='BveTs Map '
+
+        if(HEAD_STR not in header):
+            raise
+        ix = header.find(HEAD_STR)
+        header_directive = header[ix+len(HEAD_STR):-1]
+        if(':' in header_directive):
+            header_version = float(header_directive.split(':')[0])
+            header_encoding = header_directive.split(':')[1]
+        else:
+            header_version = float(header_directive)
+            header_encoding = 'utf-8'
+        if(header_version < 2):
+            raise
+
+        f = open(input,'r',encoding=header_encoding)
+        f.readline() #ヘッダー行空読み
+        linecount = 1
+        while True:
+            linecount += 1
+            buffer = f.readline()
+            if(buffer == ''):
+                break
+            try:
+                tree = self.parser.parse(buffer)
+                self.transform(tree)
+            except Exception as e:
+                print('in file '+str(input)+', line '+str(linecount))
+                raise
+        f.close()
+        print(str(input)+' loaded.')
+        return self.environment

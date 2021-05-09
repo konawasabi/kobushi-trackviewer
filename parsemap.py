@@ -49,12 +49,14 @@ def error_handle(er):
 if __name__ == '__main__':
     rule = open('map-grammer.lark').read()
     parser = Lark(rule, parser='lalr', maybe_placeholders=True)
-    interpreter = interp.ParseMap(None)
+    interpreter = interp.ParseMap(None,parser)
     
     argvs = sys.argv
     
-    tree = parser.parse(load_map(argvs[1]), on_error=error_handle)
-    result = interpreter.transform(tree)
+    #tree = parser.parse(load_map(argvs[1]), on_error=error_handle)
+    #result = interpreter.transform(tree)
+    
+    result = interpreter.load_files(argvs[1])
     
     print(result.own_track.data)
     
