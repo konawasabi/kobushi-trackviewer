@@ -16,13 +16,19 @@ class Owntrack():
         def setfunction(self, *a):
             self.parent.putdata('interpolate_func','sin' if a[0] == 0 else 'line')
         def begintransition(self, *a):
-            self.interpolate(None)
+            self.parent.putdata('radius',None,'bt')
+            self.parent.putdata('cant',None,'bt')
         def begincircular(self, *a):
             self.begin(*a)
         def begin(self, *a):
-            self.interpolate(*a)
+            if(len(a) == 2):
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',a[1])
+            elif(len(a) == 1):
+                self.parent.putdata('radius',a[0])
+                self.parent.putdata('cant',0)
         def end(self, *a):
-            self.interpolate(0,0)
+            self.begin(0,0)
         def interpolate(self, *a):
             if(len(a) == 2):
                 self.parent.putdata('radius',a[0],'i')
@@ -31,12 +37,7 @@ class Owntrack():
                 self.parent.putdata('radius',a[0],'i')
                 self.parent.putdata('cant',None,'i')
         def change(self, *a):
-            if(len(a) == 2):
-                self.parent.putdata('radius',a[0])
-                self.parent.putdata('cant',a[1])
-            elif(len(a) == 1):
-                self.parent.putdata('radius',a[0])
-                self.parent.putdata('cant',0)
+            self.begin(*a)
     class legacyfunc():
         def __init__(self,p):
             self.parent = p
@@ -57,18 +58,21 @@ class Owntrack():
         def __init__(self,p):
             self.parent = p
         def begintransition(self, *a):
-            self.interpolate(None)
+            self.parent.putdata('gradient',None,'bt')
         def begin(self, *a):
-            self.interpolate(*a)
+            self.parent.putdata('gradient',a[0])
         def beginconst(self, *a):
             self.begin(*a)
         def end(self, *a):
-            self.interpolate(0)
+            self.begin(0)
         def interpolate(self, *a):
             self.parent.putdata('gradient',a[0],'i')
     
     def __init__(self, p):
+        self.data = []
+        '''
         self.data = {}
+        
         self.data['gradient'] = []
         self.data['radius'] = []
         self.data['cant'] = []
@@ -76,6 +80,7 @@ class Owntrack():
         self.data['center'] = []
         self.data['interpolate_func'] = []
         self.data['turn'] = []
+        '''
         
         self.x = []
         self.y = []
@@ -86,9 +91,9 @@ class Owntrack():
         self.legacy = self.legacyfunc(self)
         self.gradient = self.gradientfunc(self)
     
-    def putdata(self,key,value,type=''):
+    def putdata(self,key,value,flag=''):
         """
         valueについて、'c':直前のコマンドで指定された値と同一
-        typeについて、'':change, 'i':interpolate
+        typeについて、'':change, 'i':interpolate, 'bt':begintransition
         """
-        self.data[key].append([self.environment.variable['distance'], 'c' if value == None else value, type])
+        self.data.append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':key, 'flag':flag})
