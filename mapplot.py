@@ -29,7 +29,7 @@ def circular_curve(L, R, theta, n=10):
     tau = L/R
     return np.dot(rotate(theta), res).T, tau
 
-def transition_linear(L, r1, r2, theta, n=10):
+def transition_linear(L, r1, r2, theta, n=5):
     r1 = np.inf if r1==0 else r1
     r2 = np.inf if r2==0 else r2
 
@@ -41,14 +41,15 @@ def transition_linear(L, r1, r2, theta, n=10):
         A = np.sqrt(np.fabs(L-L0)*np.fabs(r2))
 
     if (1/r1 < 1/r2):
-        dist = np.linspace(A**2/r1,A**2/r2,10)
+        dist = np.linspace(A**2/r1,A**2/r2,n)
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
         tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
+        turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
     else:
-        dist = np.linspace(-A**2/r1,-A**2/r2,10)
+        dist = np.linspace(-A**2/r1,-A**2/r2,n)
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
         tau1 = -(A/r1)**2/2
-    turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
+        turn = -((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
     
     return np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T, turn
 
@@ -119,6 +120,6 @@ def plot_planer_map(input_d, ax):
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
-    #ax.scatter(output[:,0],output[:,1])
+    #ax.scatter(output[:,0],output[:,1],marker='+')
     ax.set_aspect('equal')
     ax.invert_yaxis()
