@@ -33,7 +33,7 @@ def transition_linear(L, r1, r2, theta, n=10):
     r1 = np.inf if r1==0 else r1
     r2 = np.inf if r2==0 else r2
 
-    L0 = L*(1-(1/(1-(r2)/(r1))))
+    L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
 
     if(r1 != np.inf):
         A = np.sqrt(np.fabs(L0)*np.fabs(r1))
@@ -43,15 +43,14 @@ def transition_linear(L, r1, r2, theta, n=10):
     if (1/r1 < 1/r2):
         dist = np.linspace(A**2/r1,A**2/r2,10)
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
-        tau1= -(A/r1)**2/2
+        tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
     else:
         dist = np.linspace(-A**2/r1,-A**2/r2,10)
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
-        tau1= (A/r1)**2/2
+        tau1 = -(A/r1)**2/2
+    turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
     
-    tau2 = (A/r2)**2/2
-    
-    return np.dot(rotate(theta), np.dot(rotate(tau1),(result-result[0]).T)).T, tau2 - tau1
+    return np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T, turn
 
 def plot_vetical_crosssection(input_d, ax):
     previous_pos = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0, 'gradient':0}
@@ -120,5 +119,6 @@ def plot_planer_map(input_d, ax):
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
+    #ax.scatter(output[:,0],output[:,1])
     ax.set_aspect('equal')
     ax.invert_yaxis()
