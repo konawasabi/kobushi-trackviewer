@@ -67,18 +67,19 @@ def plot_vetical_crosssection(input_d, ax):
                 if(previous_pos['is_bt']):
                     res = gradient_transition(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'],input_d[ix]['value'])
                 else:
-                     res = gradient_straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'])
+                    res = gradient_straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'])
                 gradient = input_d[ix]['value']
                 
-                output = np.vstack((output,res+output[-1]))
+            output = np.vstack((output,res+output[-1]))
                 
-                previous_pos['distance'] = input_d[ix]['distance']
-                previous_pos['y'] = output[-1][1]
-                previous_pos['is_bt'] = True if input_d[ix]['flag']=='bt' else False
-                previous_pos['gradient'] = gradient
+            previous_pos['distance'] = input_d[ix]['distance']
+            previous_pos['y'] = output[-1][1]
+            previous_pos['is_bt'] = True if input_d[ix]['flag']=='bt' else False
+            previous_pos['gradient'] = gradient
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
+    #ax.scatter(output[:,0],output[:,1],marker='+')
 
 
 def plot_planer_map(input_d, ax):
