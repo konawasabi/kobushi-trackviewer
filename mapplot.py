@@ -53,32 +53,52 @@ def transition_linear(L, r1, r2, theta, n=5):
     
     return np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T, turn
 
-def plot_vetical_crosssection(input_d, ax):
-    previous_pos = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0, 'gradient':0}
+def plot_vetical_profile(input_d, ax_g, ax_r):
+    previous_pos_gradient = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'gradient':0}
+    previous_pos_radius   = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0}
     ix = 0
-    output = np.array([0,0])
+    output_gradient = np.array([0,0])
+    output_radius = np.array([0,0])
     while (ix < len(input_d)):
         #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'gradient'):
             if (input_d[ix]['value']=='c'):
-                res = gradient_straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'])
-                gradient = previous_pos['gradient']
+                res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                gradient = previous_pos_gradient['gradient']
             else:
-                if(previous_pos['is_bt']):
-                    res = gradient_transition(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'],input_d[ix]['value'])
+                if(previous_pos_gradient['is_bt']):
+                    res = gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                 else:
-                    res = gradient_straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['gradient'])
+                    res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                 gradient = input_d[ix]['value']
                 
-            output = np.vstack((output,res+output[-1]))
+            output_gradient = np.vstack((output_gradient,res+output_gradient[-1]))
                 
-            previous_pos['distance'] = input_d[ix]['distance']
-            previous_pos['y'] = output[-1][1]
-            previous_pos['is_bt'] = True if input_d[ix]['flag']=='bt' else False
-            previous_pos['gradient'] = gradient
+            previous_pos_gradient['distance'] = input_d[ix]['distance']
+            previous_pos_gradient['y']        = output_gradient[-1][1]
+            previous_pos_gradient['is_bt']    = True if input_d[ix]['flag']=='bt' else False
+            previous_pos_gradient['gradient'] = gradient
+        elif(input_d[ix]['key'] == 'radius'):
+            if (input_d[ix]['value']=='c'):
+                new_radius = previous_pos_radius['radius']
+                result = np.array([input_d[ix]['distance'],new_radius])
+            else:
+                new_radius = np.sign(input_d[ix]['value'])
+                if(previous_pos_radius['is_bt']):
+                    result = np.array([input_d[ix]['distance'],new_radius])
+                else:
+                    result = np.vstack((np.array([input_d[ix]['distance'],previous_pos_radius['radius']]),np.array([input_d[ix]['distance'],new_radius])))
+            
+            output_radius = np.vstack((output_radius,result))
+            
+            previous_pos_radius['distance'] = input_d[ix]['distance']
+            previous_pos_radius['y']        = output_radius[-1][1]
+            previous_pos_radius['is_bt']    = True if input_d[ix]['flag']=='bt' else False
+            previous_pos_radius['radius']   = new_radius
         ix+=1
-        
-    ax.plot(output[:,0],output[:,1])
+    
+    ax_g.plot(output_gradient[:,0],output_gradient[:,1])
+    ax_r.plot(output_radius[:,0],output_radius[:,1])
     #ax.scatter(output[:,0],output[:,1],marker='+')
 
 

@@ -70,17 +70,6 @@ class Owntrack():
     
     def __init__(self, p):
         self.data = []
-        '''
-        self.data = {}
-        
-        self.data['gradient'] = []
-        self.data['radius'] = []
-        self.data['cant'] = []
-        self.data['gauge'] = []
-        self.data['center'] = []
-        self.data['interpolate_func'] = []
-        self.data['turn'] = []
-        '''
         
         self.x = []
         self.y = []

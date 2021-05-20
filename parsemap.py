@@ -18,8 +18,9 @@ if __name__ == '__main__':
     print(result.own_track.data)
     
     fig = plt.figure()
-    ax1 = fig.add_subplot(2,1,1)
-    ax2 = fig.add_subplot(2,1,2)
+    ax1 = fig.add_subplot(3,1,1)
+    ax2 = fig.add_subplot(3,1,2)
+    ax3 = fig.add_subplot(3,1,3)
     mapplot.plot_planer_map(result.own_track.data, ax1)
-    mapplot.plot_vetical_crosssection(result.own_track.data, ax2)
+    mapplot.plot_vetical_profile(result.own_track.data, ax2, ax3)
     plt.show()
