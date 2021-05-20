@@ -99,10 +99,17 @@ def plot_planer_map(input_d, ax):
                 radius = previous_pos['radius']
             else:
                 if(previous_pos['is_bt']):
-                    res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
-                    theta += previous_pos['theta']
+                    if(previous_pos['radius'] != input_d[ix]['value']):
+                        res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
+                        theta += previous_pos['theta']
+                    elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）
+                        res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                        theta += previous_pos['theta']
+                    else:
+                        res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                        theta = previous_pos['theta']
                 else:
-                    if(previous_pos['radius']==0):
+                    if(previous_pos['radius']==0): #曲線半径が0のままのTransition
                         res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                         theta = previous_pos['theta']
                     else:
@@ -121,14 +128,15 @@ def plot_planer_map(input_d, ax):
         elif(input_d[ix]['key'] == 'turn'):
             if(previous_pos['is_bt']):
                 raise
-            if(previous_pos['radius']==0):
+            if(previous_pos['radius']==0.0):
                 res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                 theta = previous_pos['theta']
             else:
                 res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                 theta += previous_pos['theta']
             radius = previous_pos['radius']
-            theta += np.atan(input_d[ix]['value'])
+            theta += np.arctan(input_d[ix]['value'])
+            output = np.vstack((output,res+output[-1]))
             
             previous_pos['distance'] = input_d[ix]['distance']
             previous_pos['x'] = output[-1][0]
