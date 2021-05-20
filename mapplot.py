@@ -118,6 +118,23 @@ def plot_planer_map(input_d, ax):
             previous_pos['theta'] = theta
             previous_pos['is_bt'] = True if input_d[ix]['flag']=='bt' else False
             previous_pos['radius'] = radius
+        elif(input_d[ix]['key'] == 'turn'):
+            if(previous_pos['is_bt']):
+                raise
+            if(previous_pos['radius']==0):
+                res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                theta = previous_pos['theta']
+            else:
+                res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                theta += previous_pos['theta']
+            radius = previous_pos['radius']
+            theta += np.atan(input_d[ix]['value'])
+            
+            previous_pos['distance'] = input_d[ix]['distance']
+            previous_pos['x'] = output[-1][0]
+            previous_pos['y'] = output[-1][1]
+            previous_pos['theta'] = theta
+            previous_pos['radius'] = radius
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
