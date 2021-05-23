@@ -17,6 +17,7 @@ if __name__ == '__main__':
     
     #print(result.own_track.data)
     print(result.station.position)
+    print(result.station.stationkey)
     
     planer_fig = plt.figure()
     profile_fig = plt.figure()

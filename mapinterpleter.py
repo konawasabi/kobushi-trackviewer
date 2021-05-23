@@ -1,7 +1,6 @@
 from lark import Lark, Transformer, v_args
 import math
 import random
-import pathlib
 
 import loadheader
 import mapobj
@@ -87,14 +86,16 @@ class ParseMap(Transformer):
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
                 #print(getattr(temp, argument[-1].children[0].lower()),*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
-        input = loadheader.joinpath(self.rootpath, path)
+        input = loadheader.joinpath(self.environment.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)
         interpreter.load_files(input)
     def start(self, *argument):
         if(all(elem == None for elem in argument)):
             return self.environment
     def load_files(self, path):
-        f, filename, self.rootpath = loadheader.loadheader(path,'BveTs Map ',2)
+        f, filename, rootpath_tmp = loadheader.loadheader(path,'BveTs Map ',2)
+        if(self.environment.rootpath == ''):
+            self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
         f.readline() #ヘッダー行空読み
         linecount = 1
         while True:

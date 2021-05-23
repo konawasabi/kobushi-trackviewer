@@ -1,5 +1,9 @@
+import loadheader
+import re
+
 class Environment():
     def __init__(self):
+        self.rootpath = ''
         self.variable = {'distance':0.0}
         self.own_track = Owntrack(self)
         self.station = Station(self)
@@ -90,7 +94,19 @@ class Owntrack():
         
 class Station():
     def load(self, *argvs):
-        pass
+        input = loadheader.joinpath(self.environment.rootpath, argvs[0])
+        f, filename, rootpath_tmp = loadheader.loadheader(input,'BveTs Station List ',2)
+        f.readline() #ヘッダー行空読み
+        while True:
+            buff = f.readline()
+            if(buff==''):
+                break
+            buff = re.sub('#.*\n','\n',buff)
+            if(buff=='\n'):
+                continue
+            buff = buff.split(',')
+            self.stationkey[buff[0]]=buff[1]
+        f.close()
     def put(self, *argvs):
         self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0]})
     def __init__(self, parent):
