@@ -105,10 +105,10 @@ class Station():
             if(buff=='\n'):
                 continue
             buff = buff.split(',')
-            self.stationkey[buff[0]]=buff[1]
+            self.stationkey[buff[0].lower()]=buff[1]
         f.close()
     def put(self, *argvs):
-        self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0]})
+        self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
     def __init__(self, parent):
         self.position = []
         self.stationkey = {}

@@ -16,8 +16,10 @@ if __name__ == '__main__':
     result = interpreter.load_files(argvs[1])
     
     #print(result.own_track.data)
-    print(result.station.position)
-    print(result.station.stationkey)
+    
+    print('station list')
+    for i in result.station.position:
+        print(i['distance'],result.station.stationkey[i['stationkey']])
     
     planer_fig = plt.figure()
     profile_fig = plt.figure()
