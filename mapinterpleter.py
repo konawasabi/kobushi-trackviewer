@@ -87,7 +87,7 @@ class ParseMap(Transformer):
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
                 #print(getattr(temp, argument[-1].children[0].lower()),*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
-        input = self.rootpath.joinpath(pathlib.Path(path))
+        input = loadheader.joinpath(self.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)
         interpreter.load_files(input)
     def start(self, *argument):

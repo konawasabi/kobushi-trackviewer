@@ -1,6 +1,11 @@
 import pathlib
 
 def loadheader(path,HEAD_STR,HEAD_VER):
+    '''ファイルヘッダー・バージョン・エンコードを確認して、問題なければオープンする
+    path: ファイルフルパス
+    HEAD_STR: ヘッダー文字列
+    HEAD_VER: 許容するバージョン下限値
+    '''
     input = pathlib.Path(path)
     rootpath = input.resolve().parent
     try:
@@ -24,3 +29,10 @@ def loadheader(path,HEAD_STR,HEAD_VER):
         raise
 
     return open(input,'r',encoding=header_encoding), str(input), rootpath
+
+def joinpath(rootpath, filepath):
+    '''includeするファイルの相対パスを絶対パスに変換。
+    rootpath: 呼び出し元ファイルの親ディレクトリ
+    filepath: 呼び出すファイルの相対パス
+    '''
+    return rootpath.joinpath(pathlib.Path(filepath))
