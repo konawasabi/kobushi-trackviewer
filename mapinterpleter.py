@@ -3,6 +3,7 @@ import math
 import random
 import pathlib
 
+import loadheader
 import mapobj
 
 @v_args(inline=True)
@@ -71,6 +72,20 @@ class ParseMap(Transformer):
                         break
                     temp = getattr(temp, elem.children[0].lower())
                 getattr(temp, argument[-1].children[0].lower())(*argument[-1].children[1:])
+            elif(first_obj in ['station']):
+                key = argument[0].children[1]
+                temp = getattr(self.environment, first_obj)
+                for elem in argument[1:]:
+                    if(elem.data == 'mapfunc'):
+                        break
+                    temp = getattr(temp, elem.children[0].lower())
+                if(key == None):
+                    temp_argv=argument[-1].children[1:]
+                else:
+                    temp_argv = [key]
+                    temp_argv.extend(argument[-1].children[1:])
+                getattr(temp, argument[-1].children[0].lower())(*temp_argv)
+                #print(getattr(temp, argument[-1].children[0].lower()),*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
         input = self.rootpath.joinpath(pathlib.Path(path))
         interpreter = ParseMap(self.environment,self.parser)
@@ -79,31 +94,7 @@ class ParseMap(Transformer):
         if(all(elem == None for elem in argument)):
             return self.environment
     def load_files(self, path):
-        input = pathlib.Path(path)
-        self.rootpath = input.resolve().parent
-        try:
-            f = open(input,'rb') #文字コードが不明なのでバイナリで読み込む
-            header = f.readline().decode('utf-8') #一行目をutf-8でデコード。日本語コメントが一行目にあると詰む
-            f.close()
-        except Exception as e:
-            raise
-
-        HEAD_STR='BveTs Map '
-
-        if(HEAD_STR not in header):
-            raise
-        ix = header.find(HEAD_STR)
-        header_directive = header[ix+len(HEAD_STR):-1]
-        if(':' in header_directive):
-            header_version = float(header_directive.split(':')[0])
-            header_encoding = header_directive.split(':')[1]
-        else:
-            header_version = float(header_directive)
-            header_encoding = 'utf-8'
-        if(header_version < 2):
-            raise
-
-        f = open(input,'r',encoding=header_encoding)
+        f, filename, self.rootpath = loadheader.loadheader(path,'BveTs Map ',2)
         f.readline() #ヘッダー行空読み
         linecount = 1
         while True:
@@ -115,8 +106,8 @@ class ParseMap(Transformer):
                 tree = self.parser.parse(buffer)
                 self.transform(tree)
             except Exception as e:
-                print('in file '+str(input)+', line '+str(linecount))
+                print('in file '+filename+', line '+str(linecount))
                 raise
         f.close()
-        print(str(input)+' loaded.')
+        print(filename+' loaded.')
         return self.environment

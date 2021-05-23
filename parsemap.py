@@ -15,7 +15,8 @@ if __name__ == '__main__':
     
     result = interpreter.load_files(argvs[1])
     
-    print(result.own_track.data)
+    #print(result.own_track.data)
+    print(result.station.position)
     
     planer_fig = plt.figure()
     profile_fig = plt.figure()

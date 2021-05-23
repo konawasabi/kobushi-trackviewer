@@ -2,6 +2,7 @@ class Environment():
     def __init__(self):
         self.variable = {'distance':0.0}
         self.own_track = Owntrack(self)
+        self.station = Station(self)
 
 class Owntrack():
     class curvefunc():
@@ -86,3 +87,13 @@ class Owntrack():
         typeについて、'':change, 'i':interpolate, 'bt':begintransition
         """
         self.data.append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':key, 'flag':flag})
+        
+class Station():
+    def load(self, *argvs):
+        pass
+    def put(self, *argvs):
+        self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0]})
+    def __init__(self, parent):
+        self.position = []
+        self.stationkey = {}
+        self.environment = parent
