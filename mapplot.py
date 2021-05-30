@@ -36,27 +36,31 @@ def rotate(tau1):
     '''
     return np.array([[np.cos(tau1), -np.sin(tau1)], [np.sin(tau1),  np.cos(tau1)]])
 
-def straight(L, theta):
+def straight(L, theta, l_intermediate = None):
     '''直線軌道の平面座標を返す。
     L: 直線長さ [m]
     theta: 始点での軌道方位角 [rad]
     '''
-    res=np.array([[0,0],[L,0]]).T
+    dist = L if l_intermediate == None else l_intermediate
+    res=np.array([dist,0]).T
     return np.dot(rotate(theta), res).T
 
-def circular_curve(L, R, theta, n=10):
+def circular_curve(L, R, theta, n=10, l_intermediate = None):
     '''円軌道の平面座標を返す。
     L: 軌道長さ [m]
     R: 曲線半径 [m]
     theta: 始点での軌道方位角 [rad]
     n: 中間点の分割数
     '''
-    dist = np.linspace(0,L,n)
+    if(l_intermediate == None):
+        dist = np.linspace(0,L,n)
+    else:
+        dist = l_intermediate
     res = [np.fabs(R)*np.sin(dist/np.fabs(R)),R*(1-np.cos(dist/np.fabs(R)))]
     tau = L/R
     return np.dot(rotate(theta), res).T, tau
 
-def transition_linear(L, r1, r2, theta, n=5):
+def transition_linear(L, r1, r2, theta, n=5, l_intermediate = None):
     '''緩和曲線(直線逓減)の平面座標を返す。
     L: 軌道長さ [m]
     r1: 始点の曲線半径 [m]
@@ -75,24 +79,31 @@ def transition_linear(L, r1, r2, theta, n=5):
         A = np.sqrt(np.fabs(L-L0)*np.fabs(r2))
 
     if (1/r1 < 1/r2):
-        dist = np.linspace(A**2/r1,A**2/r2,n)
+        if(l_intermediate == None):
+            dist = np.linspace(A**2/r1,A**2/r2,n)
+        else:
+            dist = np.array([0,l_intermediate])+A**2/r1
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
         tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
         turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
     else:
-        dist = np.linspace(-A**2/r1,-A**2/r2,n)
+        if(l_intermediate == None):
+            dist = np.linspace(-A**2/r1,-A**2/r2,n)
+        else:
+            dist = np.array([0,l_intermediate])+(-A**2/r1)
         result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
         tau1 = -(A/r1)**2/2
         turn = -((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
     
     return np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T, turn
 
-def plot_vetical_profile(input_d, ax_g, ax_r):
+def plot_vetical_profile(environment, ax_g, ax_r):
     '''線路縦断面図を作成する。
-    input_d: Owntrackオブジェクト
+    environment: Environmentオブジェクト
     ax_g: 勾配図を格納するaxes
     ax_r: 曲線図を格納するaxes
     '''
+    input_d = environment.own_track.data
     previous_pos_gradient = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'gradient':0}
     previous_pos_radius   = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0}
     ix = 0
@@ -141,14 +152,16 @@ def plot_vetical_profile(input_d, ax_g, ax_r):
     #ax.scatter(output[:,0],output[:,1],marker='+')
 
 
-def plot_planer_map(input_d, ax):
+def plot_planer_map(environment, ax):
     '''線路平面図を作成する。
-    input_d: owntrackオブジェクト
+    environment: Environmentオブジェクト
     ax: 描画結果を格納するaxesオブジェクト
     '''
+    input_d = environment.own_track.data
     previous_pos = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0}
     ix = 0
-    output = np.array([0,0])
+    output = np.array([[0,0]])
+    #track_coarse = np.array([[0,0,0]])
     while (ix < len(input_d)):
         #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'radius'):
@@ -206,9 +219,13 @@ def plot_planer_map(input_d, ax):
             previous_pos['y'] = output[-1][1]
             previous_pos['theta'] = theta
             previous_pos['radius'] = radius
+        #if(track_coarse[-1][2] != input_d[ix]['distance']):
+        #    track_coarse = np.vstack((track_coarse,np.array([output[-1][0],output[-1][1],input_d[ix]['distance']])))
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
     #ax.scatter(output[:,0],output[:,1],marker='+')
+    #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
+    #print(track_coarse)
     ax.set_aspect('equal')
     ax.invert_yaxis()

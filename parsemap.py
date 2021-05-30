@@ -26,6 +26,6 @@ if __name__ == '__main__':
     ax1 = planer_fig.add_subplot(1,1,1)
     ax2 = profile_fig.add_subplot(2,1,1)
     ax3 = profile_fig.add_subplot(2,1,2)
-    mapplot.plot_planer_map(result.own_track.data, ax1)
-    mapplot.plot_vetical_profile(result.own_track.data, ax2, ax3)
+    mapplot.plot_planer_map(result, ax1)
+    mapplot.plot_vetical_profile(result, ax2, ax3)
     plt.show()
