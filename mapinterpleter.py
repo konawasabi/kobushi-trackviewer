@@ -103,6 +103,11 @@ class ParseMap(Transformer):
             self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
         f.readline() #ヘッダー行空読み
         linecount = 1
+        
+        filebuffer = f.read()
+        f.close()
+        
+        '''
         while True:
             linecount += 1
             buffer = f.readline()
@@ -115,6 +120,14 @@ class ParseMap(Transformer):
                 print('in file '+filename+', line '+str(linecount))
                 raise
         f.close()
+        '''
+        try:
+            tree = self.parser.parse(filebuffer)
+            self.transform(tree)
+        except Exception as e:
+            print('in file '+filename)
+            raise
+        
         if(self.isroot):
             self.environment.controlpoints.relocate()
         print(filename+' loaded.')

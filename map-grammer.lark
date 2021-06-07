@@ -38,10 +38,14 @@ string: /'[^']*'/ -> remquote
 %import common.LETTER
 %import common.DIGIT
 %import common.SIGNED_NUMBER
-%import common.WS
+
+%import common.WS_INLINE
 %import common.SH_COMMENT
 %import common.CPP_COMMENT
-%ignore WS
+%import common.NEWLINE
+
+%ignore WS_INLINE
 %ignore SH_COMMENT
 %ignore CPP_COMMENT
+%ignore NEWLINE
 %ignore "\""
