@@ -7,7 +7,7 @@ import mapobj
 
 @v_args(inline=True)
 class ParseMap(Transformer):
-    from operator import sub, mul, truediv as div, mod
+    from operator import sub, mul, truediv as div, mod, neg
     
     number = float
     null_value = type(None)
@@ -17,16 +17,21 @@ class ParseMap(Transformer):
         self.parser = parser
         if(env==None):
             self.environment = mapobj.Environment()
+            self.isroot=True
         else:
             self.environment = env
+            self.isroot=False
     def set_distance(self, value): #距離程設定
         self.environment.variable['distance'] = float(value)
+        self.environment.controlpoints.add(float(value))
     def call_distance(self): #距離程呼び出し
         return self.environment.variable['distance']
+    def call_predefined_variable(self, argument): #規定変数呼び出し（現実的にはdistanceのみ）
+        return self.environment.variable[argument.lower()]
     def set_variable(self, *argument): #変数設定
-        self.environment.variable[argument[0]]=argument[1]
+        self.environment.variable[argument[0].lower()]=argument[1]
     def call_variable(self, argument): #変数呼び出し
-        return self.environment.variable[argument]
+        return self.environment.variable[argument.lower()]
     def call_function(self, *argument): #数学関数呼び出し
         label = argument[0].lower()
         if (label == 'rand'):
@@ -110,5 +115,7 @@ class ParseMap(Transformer):
                 print('in file '+filename+', line '+str(linecount))
                 raise
         f.close()
+        if(self.isroot):
+            self.environment.controlpoints.relocate()
         print(filename+' loaded.')
         return self.environment
