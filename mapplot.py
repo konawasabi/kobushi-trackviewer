@@ -147,7 +147,7 @@ def plot_vetical_profile(environment, ax_g, ax_r):
             previous_pos_radius['radius']   = new_radius
         ix+=1
     
-    ax_g.plot(output_gradient[:,0],output_gradient[:,1])
+    ax_g.plot(output_gradient[:,0],output_gradient[:,1]) #勾配が存在しないmapだとoutput_gradientが空->エラーになる
     ax_r.plot(output_radius[:,0],output_radius[:,1])
     #ax.scatter(output[:,0],output[:,1],marker='+')
 

@@ -7,7 +7,7 @@ import mapinterpleter as interp
 import mapplot
 
 if __name__ == '__main__':
-    rule = open('map-grammer.lark').read()
+    rule = open('map-grammer.lark', encoding='utf-8').read()
     parser = Lark(rule, parser='lalr', maybe_placeholders=True)
     interpreter = interp.ParseMap(None,parser)
     
@@ -16,6 +16,7 @@ if __name__ == '__main__':
     result = interpreter.load_files(argvs[1])
     
     #print(result.own_track.data)
+    #print(result.controlpoints.list_cp)
     
     print('station list')
     for i in result.station.position:
