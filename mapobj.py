@@ -115,6 +115,8 @@ class Owntrack():
             '':change, 'i':interpolate, 'bt':begintransition
         '''
         self.data.append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':key, 'flag':flag})
+    def relocate(self):
+        self.data = sorted(self.data, key=lambda x: x['distance'])
         
 class Station():
     def load(self, *argvs):

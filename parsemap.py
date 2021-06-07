@@ -15,8 +15,14 @@ if __name__ == '__main__':
     
     result = interpreter.load_files(argvs[1])
     
-    #print(result.own_track.data)
-    #print(result.controlpoints.list_cp)
+    if False:
+        print('own_track data')
+        for i in result.own_track.data:
+            print(i)
+            
+        print('controlpoints list')
+        for i in result.controlpoints.list_cp:
+            print(i)
     
     print('station list')
     for i in result.station.position:

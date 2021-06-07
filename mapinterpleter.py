@@ -130,5 +130,6 @@ class ParseMap(Transformer):
         
         if(self.isroot):
             self.environment.controlpoints.relocate()
+            self.environment.own_track.relocate()
         print(filename+' loaded.')
         return self.environment
