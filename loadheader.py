@@ -7,6 +7,7 @@ def loadheader(path,HEAD_STR,HEAD_VER):
     HEAD_STR: ヘッダー文字列
     HEAD_VER: 許容するバージョン下限値
     '''
+    #input = pathlib.Path(re.sub(r'\\','/',path))
     input = pathlib.Path(path)
     rootpath = input.resolve().parent
     try:
@@ -31,4 +32,4 @@ def joinpath(rootpath, filepath):
     rootpath: 呼び出し元ファイルの親ディレクトリ
     filepath: 呼び出すファイルの相対パス
     '''
-    return rootpath.joinpath(pathlib.Path(filepath))
+    return rootpath.joinpath(pathlib.Path(re.sub(r'\\','/',filepath))) # パス文字列にバックスラッシュが含まれている場合置き換える
