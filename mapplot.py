@@ -112,15 +112,15 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     while (ix < len(input_d)):
         #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'gradient'):
-            if (input_d[ix]['value']=='c'):
+            if (input_d[ix]['value']=='c'): # 現在点の勾配 = 直前点の勾配なら、直線スロープを出力
                 res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                 gradient = previous_pos_gradient['gradient']
             else:
-                if(previous_pos_gradient['is_bt']):
+                if(previous_pos_gradient['is_bt']): # 直前点がbegin_transitionなら、縦曲線を出力
                     res = gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                 else:
-                    if(input_d[ix]['flag'] == 'i'):
-                        if(input_d[ix]['value'] != previous_pos_gradient['gradient']):
+                    if(input_d[ix]['flag'] == 'i'): # 現在点はinterpolateか？　Falseなら直前点の勾配の直線スロープを出力
+                        if(input_d[ix]['value'] != previous_pos_gradient['gradient']): # 現在点がinterpolateで、直前点と異なる勾配なら、縦曲線を出力
                             res = gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                         else:
                             res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
@@ -139,13 +139,13 @@ def plot_vetical_profile(environment, ax_g, ax_r):
                 new_radius = previous_pos_radius['radius']
                 result = np.array([input_d[ix]['distance'],new_radius])
             else:
-                new_radius = np.sign(input_d[ix]['value'])
-                if(previous_pos_radius['is_bt']):
+                new_radius = np.sign(input_d[ix]['value']) # 曲線半径の符号を取り出す
+                if(previous_pos_radius['is_bt']): # 直前点がbegin_transitionなら、緩和曲線を出力
                     result = np.array([input_d[ix]['distance'],new_radius])
                 else:
-                    if(input_d[ix]['flag'] == 'i'):
+                    if(input_d[ix]['flag'] == 'i'): # 現在点がinterpolateなら、緩和曲線を出力
                         result = np.array([input_d[ix]['distance'],new_radius])
-                    else:
+                    else: # 現在点で階段状に変化する半径を出力
                         result = np.vstack((np.array([input_d[ix]['distance'],previous_pos_radius['radius']]),np.array([input_d[ix]['distance'],new_radius])))
             
             output_radius = np.vstack((output_radius,result))
@@ -186,7 +186,7 @@ def plot_planer_map(environment, ax):
                     theta += previous_pos['theta']
                 radius = previous_pos['radius']
             else:
-                if(previous_pos['is_bt']):
+                if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'):
                     if(previous_pos['radius'] != input_d[ix]['value']):
                         res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
                         theta += previous_pos['theta']
