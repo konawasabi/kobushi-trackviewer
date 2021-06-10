@@ -119,7 +119,13 @@ def plot_vetical_profile(environment, ax_g, ax_r):
                 if(previous_pos_gradient['is_bt']):
                     res = gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                 else:
-                    res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                    if(input_d[ix]['flag'] == 'i'):
+                        if(input_d[ix]['value'] != previous_pos_gradient['gradient']):
+                            res = gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                        else:
+                            res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                    else:
+                        res = gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                 gradient = input_d[ix]['value']
                 
             output_gradient = np.vstack((output_gradient,res+output_gradient[-1]))
@@ -137,7 +143,10 @@ def plot_vetical_profile(environment, ax_g, ax_r):
                 if(previous_pos_radius['is_bt']):
                     result = np.array([input_d[ix]['distance'],new_radius])
                 else:
-                    result = np.vstack((np.array([input_d[ix]['distance'],previous_pos_radius['radius']]),np.array([input_d[ix]['distance'],new_radius])))
+                    if(input_d[ix]['flag'] == 'i'):
+                        result = np.array([input_d[ix]['distance'],new_radius])
+                    else:
+                        result = np.vstack((np.array([input_d[ix]['distance'],previous_pos_radius['radius']]),np.array([input_d[ix]['distance'],new_radius])))
             
             output_radius = np.vstack((output_radius,result))
             
@@ -149,6 +158,9 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     
     ax_g.plot(output_gradient[:,0],output_gradient[:,1]) #勾配が存在しないmapだとoutput_gradientが空->エラーになる
     ax_r.plot(output_radius[:,0],output_radius[:,1])
+    
+    #ax_r.set_xlim([0,5000])
+    #ax_g.set_xlim([0,5000])
     #ax.scatter(output[:,0],output[:,1],marker='+')
 
 
