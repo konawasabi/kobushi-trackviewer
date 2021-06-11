@@ -176,31 +176,31 @@ def plot_planer_map(environment, ax):
     #track_coarse = np.array([[0,0,0]])
     while (ix < len(input_d)):
         #from IPython.core.debugger import Pdb; Pdb().set_trace()
-        if(input_d[ix]['key'] == 'radius'):
-            if (input_d[ix]['value']=='c'):
-                if(previous_pos['radius']==0):
+        if(input_d[ix]['key'] == 'radius'): # 現在点がradiusかどうか
+            if (input_d[ix]['value']=='c'): # 現在点の半径 = 直前点の半径かどうか
+                if(previous_pos['radius']==0): # 直前点の半径 = 0 なら直線軌道を出力
                     res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                     theta = previous_pos['theta']
-                else:
+                else: # 円軌道を出力
                     res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                     theta += previous_pos['theta']
                 radius = previous_pos['radius']
             else:
-                if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'):
+                if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'): # 直前点がbegin_transition or 現在点がinterpolateなら、緩和曲線を出力
                     if(previous_pos['radius'] != input_d[ix]['value']):
                         res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
                         theta += previous_pos['theta']
-                    elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）
+                    elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）では、円軌道(value!=0)or直線軌道(value==0)を出力
                         res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                         theta += previous_pos['theta']
                     else:
                         res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                         theta = previous_pos['theta']
-                else:
-                    if(previous_pos['radius']==0): #曲線半径が0のままのTransition
+                else: # interpolateしない場合
+                    if(previous_pos['radius']==0): # 直前点の半径が0の場合、現在点までの直線軌道を出力
                         res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                         theta = previous_pos['theta']
-                    else:
+                    else: # 現在点までの円軌道を出力
                         res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                         theta += previous_pos['theta']
                 radius = input_d[ix]['value']
@@ -213,17 +213,17 @@ def plot_planer_map(environment, ax):
             previous_pos['theta'] = theta
             previous_pos['is_bt'] = True if input_d[ix]['flag']=='bt' else False
             previous_pos['radius'] = radius
-        elif(input_d[ix]['key'] == 'turn'):
-            if(previous_pos['is_bt']):
+        elif(input_d[ix]['key'] == 'turn'): # 現在点がturnか
+            if(previous_pos['is_bt']): # 直前点がbegin transitionなら例外送出（緩和曲線中のturn）
                 raise
-            if(previous_pos['radius']==0.0):
+            if(previous_pos['radius']==0.0): # 直線軌道上のturnなら、現在点までの直線軌道を出力
                 res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                 theta = previous_pos['theta']
-            else:
+            else: # 円軌道上なら、現在点までの円軌道を出力
                 res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                 theta += previous_pos['theta']
             radius = previous_pos['radius']
-            theta += np.arctan(input_d[ix]['value'])
+            theta += np.arctan(input_d[ix]['value']) # valueに相当する角度だけ方位角を増減する
             output = np.vstack((output,res+output[-1]))
             
             previous_pos['distance'] = input_d[ix]['distance']
