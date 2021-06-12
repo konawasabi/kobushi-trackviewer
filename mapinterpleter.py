@@ -107,7 +107,7 @@ class ParseMap(Transformer):
             filebuffer = f.read()
             f.close()
             return filebuffer
-        if(self.environment.rootpath == ''):
+        if(self.isroot):
             self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
         
         try:
@@ -126,7 +126,7 @@ class ParseMap(Transformer):
             print('in file '+str(f_path))
             raise
         
-        if(self.isroot):
+        if(self.isroot): # 最上層のマップファイルのロードが完了したら、データを距離でソート
             self.environment.controlpoints.relocate()
             self.environment.own_track.relocate()
         print(str(f_path)+' loaded.')
