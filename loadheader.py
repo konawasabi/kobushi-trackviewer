@@ -25,7 +25,8 @@ def loadheader(path,HEAD_STR,HEAD_VER):
     if(header_version < HEAD_VER):
         raise
 
-    return open(input,'r',encoding=header_encoding), str(input), rootpath
+    return input, rootpath, header_encoding
+    #return open(input,'r',encoding=header_encoding), str(input), rootpath
 
 def joinpath(rootpath, filepath):
     '''includeするファイルの相対パスを絶対パスに変換。

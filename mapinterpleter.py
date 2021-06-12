@@ -98,38 +98,38 @@ class ParseMap(Transformer):
         if(all(elem == None for elem in argument)):
             return self.environment
     def load_files(self, path):
-        f, filename, rootpath_tmp = loadheader.loadheader(path,'BveTs Map ',2)
+        f_path, rootpath_tmp, f_encoding = loadheader.loadheader(path,'BveTs Map ',2)
         if(self.environment.rootpath == ''):
             self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
-        f.readline() #ヘッダー行空読み
-        linecount = 1
         
-        filebuffer = f.read()
-        f.close()
-        
-        '''
-        while True:
-            linecount += 1
-            buffer = f.readline()
-            if(buffer == ''):
-                break
-            try:
-                tree = self.parser.parse(buffer)
-                self.transform(tree)
-            except Exception as e:
-                print('in file '+filename+', line '+str(linecount))
-                raise
-        f.close()
-        '''
+        try:
+            f=open(f_path,'r',encoding=f_encoding)
+            f.readline() #ヘッダー行空読み
+            linecount = 1
+            
+            filebuffer = f.read()
+            f.close()
+        except UnicodeDecodeError as e:
+            if f_encoding.casefold() == 'utf-8':
+                encode_retry = 'shift_jis'
+            else:
+                encode_retry = 'utf-8'
+            print('Warning: '+str(f_path)+' cannot be decoded with '+f_encoding+'. Try to decode with '+encode_retry)
+            f=open(f_path,'r',encoding=encode_retry)
+            f.readline() #ヘッダー行空読み
+            linecount = 1
+            
+            filebuffer = f.read()
+            f.close()
         try:
             tree = self.parser.parse(filebuffer)
             self.transform(tree)
         except Exception as e:
-            print('in file '+filename)
+            print('in file '+str(f_path))
             raise
         
         if(self.isroot):
             self.environment.controlpoints.relocate()
             self.environment.own_track.relocate()
-        print(filename+' loaded.')
+        print(str(f_path)+' loaded.')
         return self.environment
