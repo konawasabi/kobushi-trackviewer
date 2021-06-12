@@ -123,8 +123,9 @@ class Station():
         input = loadheader.joinpath(self.environment.rootpath, argvs[0]) #与えられたファイル名とrootpathから絶対パスを作成する。
         f_path, rootpath_tmp, f_encoding = loadheader.loadheader(input,'BveTs Station List ',1) #station listファイルかどうか判定する。
         
-        try:
-            f=open(f_path,'r',encoding=f_encoding)
+        def read_stationlist(path,file_encoding):
+            result_stations = {}
+            f=open(f_path,'r',encoding=file_encoding)
             f.readline() #ヘッダー行空読み
             while True:
                 buff = f.readline()
@@ -134,25 +135,17 @@ class Station():
                 if(buff=='\n'):#空白行（コメントのみの行だったもの）なら次の行に進む。
                     continue
                 buff = buff.split(',')
-                self.stationkey[buff[0].lower()]=buff[1]
+                result_stations[buff[0].lower()]=buff[1]
             f.close()
+            return result_stations
+        try:
+            self.stationkey = read_stationlist(f_path,f_encoding)
         except UnicodeDecodeError as e:
             if f_encoding.casefold() == 'utf-8':
                 encode_retry = 'shift_jis'
             else:
                 encode_retry = 'utf-8'
-            f=open(f_path,'r',encoding=encode_retry)
-            f.readline() #ヘッダー行空読み
-            while True:
-                buff = f.readline()
-                if(buff==''):# EOF?
-                    break
-                buff = re.sub('#.*\n','\n',buff) #コメントを除去する
-                if(buff=='\n'):#空白行（コメントのみの行だったもの）なら次の行に進む。
-                    continue
-                buff = buff.split(',')
-                self.stationkey[buff[0].lower()]=buff[1]
-            f.close()
+            self.stationkey = read_stationlist(f_path,encode_retry)
     def put(self, *argvs):
         self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
     def __init__(self, parent):

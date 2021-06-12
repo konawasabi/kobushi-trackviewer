@@ -99,28 +99,26 @@ class ParseMap(Transformer):
             return self.environment
     def load_files(self, path):
         f_path, rootpath_tmp, f_encoding = loadheader.loadheader(path,'BveTs Map ',2)
-        if(self.environment.rootpath == ''):
-            self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
-        
-        try:
-            f=open(f_path,'r',encoding=f_encoding)
+        def readfile(filepath,fileencode):
+            f=open(filepath,'r',encoding=fileencode)
             f.readline() #ヘッダー行空読み
             linecount = 1
             
             filebuffer = f.read()
             f.close()
+            return filebuffer
+        if(self.environment.rootpath == ''):
+            self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
+        
+        try:
+            filebuffer = readfile(f_path,f_encoding)
         except UnicodeDecodeError as e:
             if f_encoding.casefold() == 'utf-8':
                 encode_retry = 'shift_jis'
             else:
                 encode_retry = 'utf-8'
             print('Warning: '+str(f_path)+' cannot be decoded with '+f_encoding+'. Try to decode with '+encode_retry)
-            f=open(f_path,'r',encoding=encode_retry)
-            f.readline() #ヘッダー行空読み
-            linecount = 1
-            
-            filebuffer = f.read()
-            f.close()
+            filebuffer = readfile(f_path,encode_retry)
         try:
             tree = self.parser.parse(filebuffer)
             self.transform(tree)
