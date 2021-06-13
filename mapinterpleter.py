@@ -7,7 +7,7 @@ import mapobj
 
 @v_args(inline=True)
 class ParseMap(Transformer):
-    from operator import sub, mul, truediv as div, mod, neg
+    from operator import sub, mul, truediv as mod, neg
     
     number = float
     null_value = type(None)
@@ -53,6 +53,10 @@ class ParseMap(Transformer):
                 return argument[0]+str(int(argument[1]))
             else:
                 return str(int(argument[0]))+argument[1]
+        return 0
+    def div(self, *argument): #div演算子
+        if(len(argument) == 2):
+            return argument[0] / argument[1] if argument[1] != 0 else math.copysign(math.inf,argument[0])
         return 0
     def map_element(self, *argument):
         if(self.promptmode):
