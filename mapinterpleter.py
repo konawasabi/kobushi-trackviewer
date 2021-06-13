@@ -110,17 +110,24 @@ class ParseMap(Transformer):
         if(self.isroot):
             self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
         
-        try:
+        try: #ファイルオープン
             filebuffer = readfile(f_path,f_encoding)
-        except UnicodeDecodeError as e:
+        except UnicodeDecodeError as e: #ファイル指定のエンコードでオープンできない時
             if f_encoding.casefold() == 'utf-8':
-                encode_retry = 'shift_jis'
+                encode_retry = 'CP932'
             else:
                 encode_retry = 'utf-8'
-            print('Warning: '+str(f_path)+' cannot be decoded with '+f_encoding+'. Try to decode with '+encode_retry)
+            print('Warning: '+str(f_path.name)+' cannot be decoded with '+f_encoding+'. Kobushi tries to decode with '+encode_retry+'.')
             filebuffer = readfile(f_path,encode_retry)
-        try:
+            
+            
+        try: #トークナイズ
             tree = self.parser.parse(filebuffer)
+        except Exception as e:
+            print('in file '+str(f_path))
+            raise
+
+        try: #ツリー処理
             self.transform(tree)
         except Exception as e:
             print('in file '+str(f_path))
@@ -129,5 +136,5 @@ class ParseMap(Transformer):
         if(self.isroot): # 最上層のマップファイルのロードが完了したら、データを距離でソート
             self.environment.controlpoints.relocate()
             self.environment.own_track.relocate()
-        print(str(f_path)+' loaded.')
+        print(str(f_path.name)+' loaded.')
         return self.environment
