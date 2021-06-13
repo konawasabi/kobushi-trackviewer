@@ -104,12 +104,16 @@ class ParseMap(Transformer):
     def load_files(self, path):
         f_path, rootpath_tmp, f_encoding = loadheader.loadheader(path,'BveTs Map ',2)
         def readfile(filepath,fileencode):
-            f=open(filepath,'r',encoding=fileencode)
-            f.readline() #ヘッダー行空読み
-            linecount = 1
-            
-            filebuffer = f.read()
-            f.close()
+            try:
+                f=open(filepath,'r',encoding=fileencode)
+                f.readline() #ヘッダー行空読み
+                linecount = 1
+                
+                filebuffer = f.read()
+                f.close()
+            except:
+                f.close()
+                raise
             return filebuffer
         if(self.isroot):
             self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録

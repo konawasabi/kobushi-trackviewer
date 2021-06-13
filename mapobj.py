@@ -125,18 +125,22 @@ class Station():
         
         def read_stationlist(path,file_encoding):
             result_stations = {}
-            f=open(f_path,'r',encoding=file_encoding)
-            f.readline() #ヘッダー行空読み
-            while True:
-                buff = f.readline()
-                if(buff==''):# EOF?
-                    break
-                buff = re.sub('#.*\n','\n',buff) #コメントを除去する
-                if(buff=='\n'):#空白行（コメントのみの行だったもの）なら次の行に進む。
-                    continue
-                buff = buff.split(',')
-                result_stations[buff[0].lower()]=buff[1]
-            f.close()
+            try:
+                f=open(f_path,'r',encoding=file_encoding)
+                f.readline() #ヘッダー行空読み
+                while True:
+                    buff = f.readline()
+                    if(buff==''):# EOF?
+                        break
+                    buff = re.sub('#.*\n','\n',buff) #コメントを除去する
+                    if(buff=='\n'):#空白行（コメントのみの行だったもの）なら次の行に進む。
+                        continue
+                    buff = buff.split(',')
+                    result_stations[buff[0].lower()]=buff[1]
+                f.close()
+            except:
+                f.close()
+                raise
             return result_stations
         try:
             self.stationkey = read_stationlist(f_path,f_encoding)
