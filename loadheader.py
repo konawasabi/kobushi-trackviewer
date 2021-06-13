@@ -17,7 +17,7 @@ def loadheader(path,HEAD_STR,HEAD_VER):
     except Exception as e:
         raise
 
-    if(HEAD_STR not in header):
+    if(HEAD_STR.casefold() not in header.casefold()):
         raise
 
     header_version = float(re.findall(r'\d+.\d+',header)[0]) # 入力文字列からバージョン番号'xxxx.xxxxx'に最初に一致する部分を取り出す
