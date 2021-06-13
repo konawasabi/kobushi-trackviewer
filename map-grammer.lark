@@ -3,7 +3,7 @@
           | "$" VALNAME "=" parameter ";"    -> set_variable
           | (mapobject ".")+ mapfunc ";"     -> map_element
           | "include" expression ";"         -> include_file
-//          | ";"                              -> null_statement
+          | ";"                              -> null_statement
       
 ?parameter: expression
 
