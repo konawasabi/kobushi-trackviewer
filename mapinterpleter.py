@@ -1,4 +1,4 @@
-from lark import Lark, Transformer, v_args
+from lark import Lark, Transformer, v_args, exceptions
 import math
 import random
 
@@ -120,17 +120,17 @@ class ParseMap(Transformer):
             print('Warning: '+str(f_path.name)+' cannot be decoded with '+f_encoding+'. Kobushi tries to decode with '+encode_retry+'.')
             filebuffer = readfile(f_path,encode_retry)
             
-            
         try: #トークナイズ
             tree = self.parser.parse(filebuffer)
         except Exception as e:
-            print('in file '+str(f_path))
+            print('ParseError: in file '+str(f_path))
             raise
 
         try: #ツリー処理
             self.transform(tree)
         except Exception as e:
-            print('in file '+str(f_path))
+            print('IntepretationError: in file '+str(f_path)+', distance='+str(self.environment.variable['distance']))
+            #print(self.environment.variable)
             raise
         
         if(self.isroot): # 最上層のマップファイルのロードが完了したら、データを距離でソート

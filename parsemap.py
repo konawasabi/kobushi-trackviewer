@@ -1,5 +1,5 @@
 import lark
-from lark import Lark, Transformer, v_args
+from lark import Lark, Transformer, v_args, exceptions
 import sys
 import matplotlib.pyplot as plt
 
@@ -13,7 +13,18 @@ if __name__ == '__main__':
     
     argvs = sys.argv
     
-    result = interpreter.load_files(argvs[1])
+    try:
+        result = interpreter.load_files(argvs[1])
+    except exceptions.VisitError as e:
+        print(e.orig_exc)
+        #print(vars(e))
+        #print(e)
+        sys.exit()
+    except Exception as e:
+        print('Unexpected error.')
+        #print(type(e))
+        print(e)
+        sys.exit()
     
     if not __debug__:
         print('own_track data')
