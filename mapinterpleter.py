@@ -128,7 +128,7 @@ class ParseMap(Transformer):
             print('Warning: '+str(f_path.name)+' cannot be decoded with '+f_encoding+'. Kobushi tries to decode with '+encode_retry+'.')
             filebuffer = readfile(f_path,encode_retry)
             
-        try: #トークナイズ
+        try: #構文解析
             tree = self.parser.parse(filebuffer)
         except Exception as e:
             print('ParseError: in file '+str(f_path))
