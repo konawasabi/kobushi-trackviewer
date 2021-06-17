@@ -175,28 +175,28 @@ def plot_planer_map(environment, ax):
     output = np.array([[0,0]])
     #track_coarse = np.array([[0,0,0]])
     
-    # numpy RuntimeWarning発生時に当該点の距離程を印字
-    def print_warning_position(err,flag):
-        print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(input_d[ix]['distance']))
-    np.seterr(all='call')
-    np.seterrcall(print_warning_position)
-    
-    # エラーが発生した場合、デバッガを起動
-    def info(type, value, tb):
-        if hasattr(sys, "ps1") or not sys.stderr.isatty():
-            # You are in interactive mode or don't have a tty-like
-            # device, so call the default hook
-            sys.__excepthook__(type, value, tb)
-        else:
-            import traceback, pdb
+    if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
+        # numpy RuntimeWarning発生時に当該点の距離程を印字
+        def print_warning_position(err,flag):
+            print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(input_d[ix]['distance']))
+        np.seterr(all='call')
+        np.seterrcall(print_warning_position)
+        
+        # エラーが発生した場合、デバッガを起動
+        def info(type, value, tb):
+            if hasattr(sys, "ps1") or not sys.stderr.isatty():
+                # You are in interactive mode or don't have a tty-like
+                # device, so call the default hook
+                sys.__excepthook__(type, value, tb)
+            else:
+                import traceback, pdb
 
-            # You are NOT in interactive mode; print the exception...
-            traceback.print_exception(type, value, tb)
-            # ...then start the debugger in post-mortem mode
-            pdb.pm()
-    import sys
-    sys.excepthook = info
-    # ここまでざ
+                # You are NOT in interactive mode; print the exception...
+                traceback.print_exception(type, value, tb)
+                # ...then start the debugger in post-mortem mode
+                pdb.pm()
+        import sys
+        sys.excepthook = info
     
     while (ix < len(input_d)):
         if(input_d[ix]['key'] == 'radius'): # 現在点がradiusかどうか
