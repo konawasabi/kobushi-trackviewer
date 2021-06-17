@@ -228,11 +228,10 @@ def plot_planer_map(environment, ax):
                             res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                             theta += previous_pos['theta']
                     radius = input_d[ix]['value']
+                output = np.vstack((output,res+output[-1]))
             else: # 現在点が直前点と同じ距離程の場合、軌道座標を出力せずに曲線半径だけ更新する
                 radius = previous_pos['radius'] if input_d[ix]['value'] == 'c' else input_d[ix]['value']
                 theta = previous_pos['theta']
-            
-            output = np.vstack((output,res+output[-1]))
             
             previous_pos['distance'] = input_d[ix]['distance']
             previous_pos['x'] = output[-1][0]
