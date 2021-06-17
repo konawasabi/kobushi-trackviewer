@@ -182,7 +182,7 @@ def plot_planer_map(environment, ax):
         np.seterr(all='call')
         np.seterrcall(print_warning_position)
         
-        # エラーが発生した場合、デバッガを起動
+        # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
         def info(type, value, tb):
             if hasattr(sys, "ps1") or not sys.stderr.isatty():
                 # You are in interactive mode or don't have a tty-like
