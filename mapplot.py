@@ -175,41 +175,62 @@ def plot_planer_map(environment, ax):
     output = np.array([[0,0]])
     #track_coarse = np.array([[0,0,0]])
     
+    # numpy RuntimeWarning発生時に当該点の距離程を印字
     def print_warning_position(err,flag):
         print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(input_d[ix]['distance']))
     np.seterr(all='call')
     np.seterrcall(print_warning_position)
     
+    # エラーが発生した場合、デバッガを起動
+    def info(type, value, tb):
+        if hasattr(sys, "ps1") or not sys.stderr.isatty():
+            # You are in interactive mode or don't have a tty-like
+            # device, so call the default hook
+            sys.__excepthook__(type, value, tb)
+        else:
+            import traceback, pdb
+
+            # You are NOT in interactive mode; print the exception...
+            traceback.print_exception(type, value, tb)
+            # ...then start the debugger in post-mortem mode
+            pdb.pm()
+    import sys
+    sys.excepthook = info
+    # ここまでざ
+    
     while (ix < len(input_d)):
-        #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'radius'): # 現在点がradiusかどうか
-            if (input_d[ix]['value']=='c'): # 現在点の半径 = 直前点の半径かどうか
-                if(previous_pos['radius']==0): # 直前点の半径 = 0 なら直線軌道を出力
-                    res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
-                    theta = previous_pos['theta']
-                else: # 円軌道を出力
-                    res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
-                    theta += previous_pos['theta']
-                radius = previous_pos['radius']
-            else:
-                if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'): # 直前点がbegin_transition or 現在点がinterpolateなら、緩和曲線を出力
-                    if(previous_pos['radius'] != input_d[ix]['value']):
-                        res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
-                        theta += previous_pos['theta']
-                    elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）では、円軌道(value!=0)or直線軌道(value==0)を出力
-                        res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
-                        theta += previous_pos['theta']
-                    else:
+            if(input_d[ix]['distance'] != previous_pos['distance']):
+                if (input_d[ix]['value']=='c'): # 現在点の半径 = 直前点の半径かどうか
+                    if(previous_pos['radius']==0): # 直前点の半径 = 0 なら直線軌道を出力
                         res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                         theta = previous_pos['theta']
-                else: # interpolateしない場合
-                    if(previous_pos['radius']==0): # 直前点の半径が0の場合、現在点までの直線軌道を出力
-                        res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
-                        theta = previous_pos['theta']
-                    else: # 現在点までの円軌道を出力
+                    else: # 円軌道を出力
                         res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                         theta += previous_pos['theta']
-                radius = input_d[ix]['value']
+                    radius = previous_pos['radius']
+                else:
+                    if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'): # 直前点がbegin_transition or 現在点がinterpolateなら、緩和曲線を出力
+                        if(previous_pos['radius'] != input_d[ix]['value']):
+                            res, theta = transition_linear(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'])
+                            theta += previous_pos['theta']
+                        elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）では、円軌道(value!=0)or直線軌道(value==0)を出力
+                            res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                            theta += previous_pos['theta']
+                        else:
+                            res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                            theta = previous_pos['theta']
+                    else: # interpolateしない場合
+                        if(previous_pos['radius']==0): # 直前点の半径が0の場合、現在点までの直線軌道を出力
+                            res = straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                            theta = previous_pos['theta']
+                        else: # 現在点までの円軌道を出力
+                            res, theta = circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                            theta += previous_pos['theta']
+                    radius = input_d[ix]['value']
+            else: # 現在点が直前点と同じ距離程の場合、軌道座標を出力せずに曲線半径だけ更新する
+                radius = previous_pos['radius'] if input_d[ix]['value'] == 'c' else input_d[ix]['value']
+                theta = previous_pos['theta']
             
             output = np.vstack((output,res+output[-1]))
             
