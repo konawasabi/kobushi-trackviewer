@@ -60,12 +60,13 @@ def circular_curve(L, R, theta, n=10, l_intermediate = None):
     tau = L/R
     return np.dot(rotate(theta), res).T, tau
 
-def transition_linear(L, r1, r2, theta, n=5, l_intermediate = None):
-    '''緩和曲線(直線逓減)の平面座標を返す。
+def transition_curve(L, r1, r2, theta, func, n=5, l_intermediate = None):
+    '''緩和曲線の平面座標を返す。
     L: 軌道長さ [m]
     r1: 始点の曲線半径 [m]
     r2: 終点の曲線半径 [m]
     theta: 始点での軌道方位角 [rad]
+    func: 逓減関数('line': 直線逓減, 'sin':sin半波長逓減)
     n: 中間点の分割数
     '''
     r1 = np.inf if r1==0 else r1
