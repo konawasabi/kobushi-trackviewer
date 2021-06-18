@@ -145,7 +145,7 @@ def plot_planer_map(environment, ax):
             previous_pos['radius'] = radius
         elif(input_d[ix]['key'] == 'turn'): # 現在点がturnか
             if(previous_pos['is_bt']): # 直前点がbegin transitionなら例外送出（緩和曲線中のturn）
-                raise
+                raise RuntimeError('legacy.turn appeared within the transition curve.')
             if(previous_pos['radius']==0.0): # 直線軌道上のturnなら、現在点までの直線軌道を出力
                 res = tc.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                 theta = previous_pos['theta']
