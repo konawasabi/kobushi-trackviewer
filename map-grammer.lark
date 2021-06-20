@@ -21,9 +21,8 @@
        | "-" factor             -> neg
        | string
        | "(" expression ")"
-       | "$" VALNAME              -> call_variable
+       | "$" VALNAME            -> call_variable
        | label                  -> call_predefined_variable
-//       | "distance"             -> call_distance
        | label "(" [expression ("," expression)*] ")" -> call_function
           
 ?mapfunc: label "(" [expression] ("," [expression])* ")"

@@ -24,8 +24,6 @@ class ParseMap(Transformer):
     def set_distance(self, value): #距離程設定
         self.environment.variable['distance'] = float(value)
         self.environment.controlpoints.add(float(value))
-    def call_distance(self): #距離程呼び出し
-        return self.environment.variable['distance']
     def call_predefined_variable(self, argument): #規定変数呼び出し（現実的にはdistanceのみ）
         return self.environment.variable[argument.lower()]
     def set_variable(self, *argument): #変数設定
@@ -59,6 +57,8 @@ class ParseMap(Transformer):
             return argument[0] / argument[1] if argument[1] != 0 else math.copysign(math.inf,argument[0])
         return 0
     def map_element(self, *argument):
+        #import pdb
+        #pdb.set_trace()
         if(self.promptmode):
             a = 1
             for i in argument:
@@ -93,7 +93,6 @@ class ParseMap(Transformer):
                     temp_argv = [key]
                     temp_argv.extend(argument[-1].children[1:])
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
-                #print(getattr(temp, argument[-1].children[0].lower()),*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
         input = loadheader.joinpath(self.environment.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)
@@ -134,6 +133,9 @@ class ParseMap(Transformer):
             print('ParseError: in file '+str(f_path))
             raise
 
+        #print(tree)
+        #import pdb
+        #pdb.set_trace()
         try: #ツリー処理
             self.transform(tree)
         except Exception as e:

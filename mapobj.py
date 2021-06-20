@@ -97,6 +97,8 @@ class Owntrack():
         self.x = []
         self.y = []
         
+        self.position = []
+        
         self.environment = p
         
         self.curve = self.curvefunc(self)
@@ -133,7 +135,8 @@ class Station():
                     if(buff==''):# EOF?
                         break
                     buff = re.sub('#.*\n','\n',buff) #コメントを除去する
-                    if(buff=='\n'):#空白行（コメントのみの行だったもの）なら次の行に進む。
+                    buff = re.sub('\t', '', buff) #tabを除去する
+                    if(buff=='\n'):#空白行（コメントのみの行など）なら次の行に進む。
                         continue
                     buff = buff.split(',')
                     result_stations[buff[0].lower()]=buff[1]
