@@ -123,7 +123,7 @@ class Owntrack():
 class Station():
     def load(self, *argvs):
         input = loadheader.joinpath(self.environment.rootpath, argvs[0]) #与えられたファイル名とrootpathから絶対パスを作成する。
-        f_path, rootpath_tmp, f_encoding = loadheader.loadheader(input,'BveTs Station List ',1) #station listファイルかどうか判定する。
+        f_path, rootpath_tmp, f_encoding = loadheader.loadheader(input,'BveTs Station List ',0.04) #station listファイルかどうか判定する。
         
         def read_stationlist(path,file_encoding):
             result_stations = {}

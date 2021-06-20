@@ -2,7 +2,7 @@
 ?statement: expression ";"                   -> set_distance
           | "$" VALNAME "=" parameter ";"    -> set_variable
           | (mapobject ".")+ mapfunc ";"     -> map_element
-          | "include" expression ";"         -> include_file
+          | ("include"|"Include") expression ";"         -> include_file
           | ";"                              -> null_statement
       
 ?parameter: expression
