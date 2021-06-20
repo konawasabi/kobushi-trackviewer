@@ -136,7 +136,7 @@ class Station():
                         break
                     buff = re.sub('#.*\n','\n',buff) #コメントを除去する
                     buff = re.sub('\t', '', buff) #tabを除去する
-                    if(buff=='\n'):#空白行（コメントのみの行など）なら次の行に進む。
+                    if(buff=='\n' or buff.count(',')<1):#空白行（コメントのみの行など）、コンマ区切りが存在しない行なら次の行に進む。
                         continue
                     buff = buff.split(',')
                     result_stations[buff[0].lower()]=buff[1]
