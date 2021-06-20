@@ -16,24 +16,24 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     while (ix < len(input_d)):
         #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'gradient'):
-            if (input_d[ix]['value']=='c'): # 現在点の勾配 = 直前点の勾配なら、直線スロープを出力
-                res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
-                gradient = previous_pos_gradient['gradient']
-            else:
-                if(previous_pos_gradient['is_bt']): # 直前点がbegin_transitionなら、縦曲線を出力
-                    res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+            if(input_d[ix]['distance'] != previous_pos_gradient['distance']):
+                if (input_d[ix]['value']=='c'): # 現在点の勾配 = 直前点の勾配なら、直線スロープを出力
+                    res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                    gradient = previous_pos_gradient['gradient']
                 else:
-                    if(input_d[ix]['flag'] == 'i'): # 現在点はinterpolateか？　Falseなら直前点の勾配の直線スロープを出力
-                        if(input_d[ix]['value'] != previous_pos_gradient['gradient']): # 現在点がinterpolateで、直前点と異なる勾配なら、縦曲線を出力
-                            res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                    if(previous_pos_gradient['is_bt']): # 直前点がbegin_transitionなら、縦曲線を出力
+                        res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                    else:
+                        if(input_d[ix]['flag'] == 'i'): # 現在点はinterpolateか？　Falseなら直前点の勾配の直線スロープを出力
+                            if(input_d[ix]['value'] != previous_pos_gradient['gradient']): # 現在点がinterpolateで、直前点と異なる勾配なら、縦曲線を出力
+                                res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                            else:
+                                res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                         else:
                             res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
-                    else:
-                        res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
-                gradient = input_d[ix]['value']
-                
-            output_gradient = np.vstack((output_gradient,res+output_gradient[-1]))
-                
+                    gradient = input_d[ix]['value']
+                    
+                output_gradient = np.vstack((output_gradient,res+output_gradient[-1]))
             previous_pos_gradient['distance'] = input_d[ix]['distance']
             previous_pos_gradient['y']        = output_gradient[-1][1]
             previous_pos_gradient['is_bt']    = True if input_d[ix]['flag']=='bt' else False
