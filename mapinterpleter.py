@@ -56,10 +56,10 @@ class ParseMap(Transformer):
         if(len(argument) == 2):
             return argument[0] / argument[1] if argument[1] != 0 else math.copysign(math.inf,argument[0])
         return 0
-    def map_element(self, *argument):
+    def map_element(self, *argument): #マップ要素
         #import pdb
         #pdb.set_trace()
-        if(self.promptmode):
+        if(self.promptmode): #プロンプトモード（テスト時のみ使用）のとき、マップ要素の構文解析だけ行う
             a = 1
             for i in argument:
                 if(i.data == 'mapobject'):
@@ -72,25 +72,25 @@ class ParseMap(Transformer):
                     print('mapfunc: label=',label,', args=',f_arg)
             print()
         else:
-            first_obj = argument[0].children[0].lower()
-            if(first_obj in ['curve','gradient','legacy']):
-                temp = getattr(self.environment.own_track, first_obj)
-                for elem in argument[1:]:
+            first_obj = argument[0].children[0].lower() # 先頭のマップ要素名を抽出して小文字に変換
+            if(first_obj in ['curve','gradient','legacy']): # 自軌道に関係する要素か？
+                temp = getattr(self.environment.own_track, first_obj) # 対応するオブジェクトを取得する
+                for elem in argument[1:]: # 2番目以降もマップ要素かどうか(例: Track.X.Interpolate(...) or Track.Position(...) )
+                    if(elem.data == 'mapfunc'): # 関数なら探索中止
+                        break
+                    temp = getattr(temp, elem.children[0].lower()) # 対応するオブジェクトを取得
+                getattr(temp, argument[-1].children[0].lower())(*argument[-1].children[1:]) # 対応するマップ関数を呼び出す
+            elif(first_obj in ['station']): # station要素
+                key = argument[0].children[1] # stationKeyを取得
+                temp = getattr(self.environment, first_obj) # stationオブジェクトを取得
+                for elem in argument[1:]: # 子要素があるかどうか？
                     if(elem.data == 'mapfunc'):
                         break
                     temp = getattr(temp, elem.children[0].lower())
-                getattr(temp, argument[-1].children[0].lower())(*argument[-1].children[1:])
-            elif(first_obj in ['station']):
-                key = argument[0].children[1]
-                temp = getattr(self.environment, first_obj)
-                for elem in argument[1:]:
-                    if(elem.data == 'mapfunc'):
-                        break
-                    temp = getattr(temp, elem.children[0].lower())
-                if(key == None):
-                    temp_argv=argument[-1].children[1:]
+                if(key == None): # マップ関数に渡す引数を設定
+                    temp_argv=argument[-1].children[1:] # stationKeyが指定されていない場合、マップファイルで指定された引数をそのまま渡す
                 else:
-                    temp_argv = [key]
+                    temp_argv = [key] # stationKeyがある場合、マップファイル指定の引数の先頭にkeyを追加する
                     temp_argv.extend(argument[-1].children[1:])
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
