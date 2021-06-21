@@ -1,20 +1,21 @@
 import numpy as np
 
-def gradient_straight(L, gr):
+def gradient_straight(L, gr, l_intermediate = None):
     '''一定勾配に対する高度変化を返す。
     L: 勾配長 [m]
     gr: 勾配 [‰]
     '''
+    dist = L if l_intermediate == None else l_intermediate
     theta = np.arctan(gr/1000)
-    return np.array([L,L*np.sin(theta)]).T
+    return np.array([dist,dist*np.sin(theta)]).T
 
-def gradient_transition(L, gr1, gr2, y0=0, n=5):
+def gradient_transition(L, gr1, gr2, y0=0, n=5, l_intermediate = None):
     '''縦曲線に対する高度変化を返す。
     L: 勾配長 [m]
     gr1: 始点の勾配 [‰]
     gr2: 終点の勾配 [‰]。
     '''
-    dist = np.linspace(0,L,n)
+    dist = np.linspace(0,L,n) if l_intermediate == None else l_intermediate
     theta1 = np.arctan(gr1/1000)
     theta2 = np.arctan(gr2/1000)
     return np.vstack((dist,y0+L/(theta2-theta1)*np.cos(theta1)-L/(theta2-theta1)*np.cos((theta2-theta1)/L*dist+theta1))).T
@@ -40,6 +41,9 @@ def straight(L, theta, l_intermediate = None):
     '''直線軌道の平面座標を返す。
     L: 直線長さ [m]
     theta: 始点での軌道方位角 [rad]
+    l_intermediate: 座標を出力する区間を指定する
+        None: 0 ~ L まで出力
+        指定あり: l_intermediateでの座標を出力
     '''
     dist = L if l_intermediate == None else l_intermediate
     res=np.array([dist,0]).T
@@ -51,14 +55,18 @@ def circular_curve(L, R, theta, n=10, l_intermediate = None):
     R: 曲線半径 [m]
     theta: 始点での軌道方位角 [rad]
     n: 中間点の分割数
+    l_intermediate: 座標を出力する区間を指定する
+        None: 0 ~ L まで出力
+        指定あり: l_intermediateでの座標を出力
     '''
     if(l_intermediate == None):
         dist = np.linspace(0,L,n)
+        tau = L/R
     else:
-        dist = l_intermediate
+        dist = np.array([0,l_intermediate])
+        tau = l_intermediate/R
     res = [np.fabs(R)*np.sin(dist/np.fabs(R)),R*(1-np.cos(dist/np.fabs(R)))]
-    tau = L/R
-    return np.dot(rotate(theta), res).T, tau
+    return (np.dot(rotate(theta), res).T)[1:], tau
 
 def transition_curve(L, r1, r2, theta, func, n=5, l_intermediate = None):
     '''緩和曲線の平面座標を返す。
@@ -68,32 +76,38 @@ def transition_curve(L, r1, r2, theta, func, n=5, l_intermediate = None):
     theta: 始点での軌道方位角 [rad]
     func: 逓減関数('line': 直線逓減, 'sin':sin半波長逓減)
     n: 中間点の分割数
+    l_intermediate: 座標を出力する区間を指定する
+        None: 0 ~ L まで出力
+        指定あり: l_intermediateでの座標を出力
     '''
     r1 = np.inf if r1==0 else r1
     r2 = np.inf if r2==0 else r2
 
-    L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
-
-    if(r1 != np.inf):
-        A = np.sqrt(np.fabs(L0)*np.fabs(r1))
-    else:
-        A = np.sqrt(np.fabs(L-L0)*np.fabs(r2))
-
-    if (1/r1 < 1/r2):
-        if(l_intermediate == None):
-            dist = np.linspace(A**2/r1,A**2/r2,n)
+    if True: # 直線逓減の場合
+        L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
+        
+        # クロソイドパラメータAの決定
+        if(r1 != np.inf):
+            A = np.sqrt(np.fabs(L0)*np.fabs(r1))
         else:
-            dist = np.array([0,l_intermediate])+A**2/r1
-        result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
-        tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
-        turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
-    else:
-        if(l_intermediate == None):
-            dist = np.linspace(-A**2/r1,-A**2/r2,n)
-        else:
-            dist = np.array([0,l_intermediate])+(-A**2/r1)
-        result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
-        tau1 = -(A/r1)**2/2
-        turn = -((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
-    
-    return np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T, turn
+            A = np.sqrt(np.fabs(L-L0)*np.fabs(r2))
+
+        if (1/r1 < 1/r2): # 右向きに曲率が増加する場合
+            tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
+            if(l_intermediate == None):
+                dist = np.linspace(A**2/r1,A**2/r2,n)
+                turn = ((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化。クロソイド曲線の接線角τは、原点(L0)からの距離lに対してτ=l^2/(2A^2)。
+            else:
+                dist = np.array([0,l_intermediate])+A**2/r1
+                turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2)
+            result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
+        else: # 左向きに曲率が増加する場合
+            tau1 = -(A/r1)**2/2
+            if(l_intermediate == None):
+                dist = np.linspace(-A**2/r1,-A**2/r2,n)
+                turn = -((L-L0)**2-L0**2)/(2*A**2) #緩和曲線通過前後での方位角変化
+            else:
+                dist = np.array([0,l_intermediate])+(-A**2/r1)
+                turn = (-(l_intermediate-L0)**2-L0**2)/(2*A**2)
+            result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
+    return (np.dot(rotate(theta), np.dot(rotate(-tau1),(result-result[0]).T)).T)[1:], turn
