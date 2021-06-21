@@ -119,7 +119,7 @@ class curve():
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[1:], turn
         
 class curve_intermediate(curve):
-    def straight(L, theta, l_intermediate):
+    def straight(self,L, theta, l_intermediate):
         '''直線軌道の平面座標を返す。
         L: 直線長さ [m]
         theta: 始点での軌道方位角 [rad]
@@ -129,7 +129,7 @@ class curve_intermediate(curve):
         res=np.array([dist,0]).T
         return np.dot(self.rotate(theta), res).T
 
-    def circular_curve(L, R, theta, l_intermediate):
+    def circular_curve(self,L, R, theta, l_intermediate):
         '''全長Lの円曲線について、l_intermediateでの座標、方位を返す。
         L: 軌道長さ [m]
         R: 曲線半径 [m]
@@ -141,7 +141,7 @@ class curve_intermediate(curve):
         res = [np.fabs(R)*np.sin(dist/np.fabs(R)),R*(1-np.cos(dist/np.fabs(R)))]
         return (np.dot(self.rotate(theta), res).T)[1:], tau
 
-    def transition_curve(L, r1, r2, theta, func, l_intermediate):
+    def transition_curve(self,L, r1, r2, theta, func, l_intermediate):
         '''全長Lの緩和曲線について、l_intermediateでの座標、方位、曲線半径を返す。
         L: 軌道長さ [m]
         r1: 始点の曲線半径 [m]
@@ -167,10 +167,10 @@ class curve_intermediate(curve):
                 tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
                 dist = np.array([0,l_intermediate])+A**2/r1
                 turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2)
-                result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y'))).T
+                result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y'))).T
             else: # 左向きに曲率が増加する場合
                 tau1 = -(A/r1)**2/2
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
                 turn = (-(l_intermediate-L0)**2-L0**2)/(2*A**2)
-                result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
+                result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[1:], turn, rl
