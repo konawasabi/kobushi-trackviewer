@@ -26,7 +26,7 @@ class gradient_intermediate(gradient):
     def __init__(self):
         pass
     def straight(self, L, gr, l_intermediate):
-        '''一定勾配に対する高度変化を返す。
+        '''全長Lの一定勾配について、l_intermediateでの高度変化を返す。
         L: 勾配長 [m]
         gr: 勾配 [‰]
         '''
@@ -34,15 +34,15 @@ class gradient_intermediate(gradient):
         theta = np.arctan(gr/1000)
         return np.array([dist,dist*np.sin(theta)]).T
     def transition(self, L, gr1, gr2, l_intermediate, y0=0):
-        '''縦曲線に対する高度変化を返す。
-        L: 勾配長 [m]
+        '''全長Lの縦曲線について、l_intermediateでの高度変化、勾配を返す。
+        L: 縦曲線長 [m]
         gr1: 始点の勾配 [‰]
         gr2: 終点の勾配 [‰]。
         '''
         dist = l_intermediate
         theta1 = np.arctan(gr1/1000)
         theta2 = np.arctan(gr2/1000)
-        return np.vstack((dist,y0+L/(theta2-theta1)*np.cos(theta1)-L/(theta2-theta1)*np.cos((theta2-theta1)/L*dist+theta1))).T
+        return np.vstack((dist,y0+L/(theta2-theta1)*np.cos(theta1)-L/(theta2-theta1)*np.cos((theta2-theta1)/L*dist+theta1))).T, 1000*np.tan((theta2 - theta1)/L*l_intermediate + theta1)
     
 class curve():
     def __init__(self):
@@ -123,18 +123,18 @@ class curve_intermediate(curve):
         '''直線軌道の平面座標を返す。
         L: 直線長さ [m]
         theta: 始点での軌道方位角 [rad]
-        l_intermediate: l_intermediateでの座標を出力
+        l_intermediate: 座標を出力する原点からの距離
         '''
         dist = l_intermediate
         res=np.array([dist,0]).T
         return np.dot(self.rotate(theta), res).T
 
     def circular_curve(L, R, theta, l_intermediate):
-        '''円軌道の平面座標を返す。
+        '''全長Lの円曲線について、l_intermediateでの座標、方位を返す。
         L: 軌道長さ [m]
         R: 曲線半径 [m]
         theta: 始点での軌道方位角 [rad]
-        l_intermediate: l_intermediateでの座標を出力
+        l_intermediate: 座標を出力する原点からの距離
         '''
         dist = np.array([0,l_intermediate])
         tau = l_intermediate/R
@@ -142,19 +142,20 @@ class curve_intermediate(curve):
         return (np.dot(self.rotate(theta), res).T)[1:], tau
 
     def transition_curve(L, r1, r2, theta, func, l_intermediate):
-        '''緩和曲線の平面座標を返す。
+        '''全長Lの緩和曲線について、l_intermediateでの座標、方位、曲線半径を返す。
         L: 軌道長さ [m]
         r1: 始点の曲線半径 [m]
         r2: 終点の曲線半径 [m]
         theta: 始点での軌道方位角 [rad]
         func: 逓減関数('line': 直線逓減, 'sin':sin半波長逓減)
-        l_intermediate: l_intermediateでの座標を出力
+        l_intermediate: 座標を出力する原点からの距離
         '''
         r1 = np.inf if r1==0 else r1
         r2 = np.inf if r2==0 else r2
 
         if True: # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
+            rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate)
             
             # クロソイドパラメータAの決定
             if(r1 != np.inf):
@@ -172,4 +173,4 @@ class curve_intermediate(curve):
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
                 turn = (-(l_intermediate-L0)**2-L0**2)/(2*A**2)
                 result=np.vstack((clothoid_dist(A,dist,'X'),clothoid_dist(A,dist,'Y')*(-1))).T
-        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[1:], turn
+        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[1:], turn, rl
