@@ -11,6 +11,10 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     previous_pos_gradient = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'gradient':0}
     previous_pos_radius   = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0}
     ix = 0
+    
+    gradient_gen = tc.gradient()
+    curve_gen = tc.curve()
+    
     output_gradient = np.array([0,0])
     output_radius = np.array([0,0])
     while (ix < len(input_d)):
@@ -18,19 +22,19 @@ def plot_vetical_profile(environment, ax_g, ax_r):
         if(input_d[ix]['key'] == 'gradient'):
             if(input_d[ix]['distance'] != previous_pos_gradient['distance']):
                 if (input_d[ix]['value']=='c'): # 現在点の勾配 = 直前点の勾配なら、直線スロープを出力
-                    res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                    res = gradient_gen.straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                     gradient = previous_pos_gradient['gradient']
                 else:
                     if(previous_pos_gradient['is_bt']): # 直前点がbegin_transitionなら、縦曲線を出力
-                        res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                        res = gradient_gen.transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                     else:
                         if(input_d[ix]['flag'] == 'i'): # 現在点はinterpolateか？　Falseなら直前点の勾配の直線スロープを出力
                             if(input_d[ix]['value'] != previous_pos_gradient['gradient']): # 現在点がinterpolateで、直前点と異なる勾配なら、縦曲線を出力
-                                res = tc.gradient_transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
+                                res = gradient_gen.transition(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'],input_d[ix]['value'])
                             else:
-                                res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                                res = gradient_gen.straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                         else:
-                            res = tc.gradient_straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
+                            res = gradient_gen.straight(input_d[ix]['distance']-previous_pos_gradient['distance'],previous_pos_gradient['gradient'])
                     gradient = input_d[ix]['value']
                     
                 output_gradient = np.vstack((output_gradient,res+output_gradient[-1]))
@@ -76,6 +80,10 @@ def plot_planer_map(environment, ax):
     input_d = environment.own_track.data
     previous_pos = {'distance':0, 'x':0, 'y':0, 'theta':0, 'is_bt':False, 'radius':0}
     ix = 0
+    
+    gradient_gen = tc.gradient()
+    curve_gen = tc.curve()
+    
     output = np.array([[0,0]])
     #track_coarse = np.array([[0,0,0]])
     
@@ -107,29 +115,29 @@ def plot_planer_map(environment, ax):
             if(input_d[ix]['distance'] != previous_pos['distance']):
                 if (input_d[ix]['value']=='c'): # 現在点の半径 = 直前点の半径かどうか
                     if(previous_pos['radius']==0): # 直前点の半径 = 0 なら直線軌道を出力
-                        res = tc.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                        res = curve_gen.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                         theta = previous_pos['theta']
                     else: # 円軌道を出力
-                        res, theta = tc.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                        res, theta = curve_gen.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                         theta += previous_pos['theta']
                     radius = previous_pos['radius']
                 else:
                     if(previous_pos['is_bt'] or input_d[ix]['flag'] == 'i'): # 直前点がbegin_transition or 現在点がinterpolateなら、緩和曲線を出力
                         if(previous_pos['radius'] != input_d[ix]['value']):
-                            res, theta = tc.transition_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'], 'line')
+                            res, theta = curve_gen.transition_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],input_d[ix]['value'],previous_pos['theta'], 'line')
                             theta += previous_pos['theta']
                         elif(input_d[ix]['value'] != 0): #曲線半径が変化しないTransition（カントのみ変化するような場合）では、円軌道(value!=0)or直線軌道(value==0)を出力
-                            res, theta = tc.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                            res, theta = curve_gen.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                             theta += previous_pos['theta']
                         else:
-                            res = tc.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                            res = curve_gen.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                             theta = previous_pos['theta']
                     else: # interpolateしない場合
                         if(previous_pos['radius']==0): # 直前点の半径が0の場合、現在点までの直線軌道を出力
-                            res = tc.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                            res = curve_gen.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                             theta = previous_pos['theta']
                         else: # 現在点までの円軌道を出力
-                            res, theta = tc.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                            res, theta = curve_gen.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                             theta += previous_pos['theta']
                     radius = input_d[ix]['value']
                 output = np.vstack((output,res+output[-1]))
@@ -147,10 +155,10 @@ def plot_planer_map(environment, ax):
             if(previous_pos['is_bt']): # 直前点がbegin transitionなら例外送出（緩和曲線中のturn）
                 raise RuntimeError('legacy.turn appeared within the transition curve.')
             if(previous_pos['radius']==0.0): # 直線軌道上のturnなら、現在点までの直線軌道を出力
-                res = tc.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
+                res = curve_gen.straight(input_d[ix]['distance']-previous_pos['distance'],previous_pos['theta'])
                 theta = previous_pos['theta']
             else: # 円軌道上なら、現在点までの円軌道を出力
-                res, theta = tc.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
+                res, theta = curve_gen.circular_curve(input_d[ix]['distance']-previous_pos['distance'],previous_pos['radius'],previous_pos['theta'])
                 theta += previous_pos['theta']
             radius = previous_pos['radius']
             theta += np.arctan(input_d[ix]['value']) # valueに相当する角度だけ方位角を増減する
