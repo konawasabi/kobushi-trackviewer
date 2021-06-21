@@ -161,10 +161,14 @@ class Station():
         self.environment = parent
 
 class ControlPoints():
+    '''マップ要素が存在する距離程のリストを作る
+    '''
     def __init__(self, parent):
         self.list_cp = []
         self.environment = parent
     def add(self, value):
         self.list_cp.append(value)
     def relocate(self):
+        '''self.list_cpについて、重複する要素を除去して距離順にソートする。
+        '''
         self.list_cp = sorted(list(set(self.list_cp)))
