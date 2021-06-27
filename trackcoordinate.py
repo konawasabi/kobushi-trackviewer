@@ -139,7 +139,7 @@ class curve_intermediate(curve):
         dist = np.array([0,l_intermediate])
         tau = l_intermediate/R
         res = [np.fabs(R)*np.sin(dist/np.fabs(R)),R*(1-np.cos(dist/np.fabs(R)))]
-        return (np.dot(self.rotate(theta), res).T)[1:], tau
+        return (np.dot(self.rotate(theta), res).T)[-1], tau
 
     def transition_curve(self,L, r1, r2, theta, func, l_intermediate):
         '''全長Lの緩和曲線について、l_intermediateでの座標、方位、曲線半径を返す。
@@ -155,7 +155,7 @@ class curve_intermediate(curve):
 
         if True: # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
-            rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate)
+            rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate) if r2 != np.inf else 0
             
             # クロソイドパラメータAの決定
             if(r1 != np.inf):
@@ -173,4 +173,4 @@ class curve_intermediate(curve):
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
                 turn = (-(l_intermediate-L0)**2-L0**2)/(2*A**2)
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
-        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[1:], turn, rl
+        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl

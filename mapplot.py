@@ -1,5 +1,6 @@
 import numpy as np
 import trackcoordinate as tc
+import trackgenerator as tgen
 
 def plot_vetical_profile(environment, ax_g, ax_r):
     '''線路縦断面図を作成する。
@@ -174,6 +175,18 @@ def plot_planer_map(environment, ax):
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
+    #ax.scatter(output[:,0],output[:,1],marker='+')
+    #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
+    #print(track_coarse)
+    ax.set_aspect('equal')
+    ax.invert_yaxis()
+
+
+def plot_planermap_2(environment, ax):
+    trackgenerator = tgen.TrackGenerator(environment)
+    output = trackgenerator.generate_owntrack()
+    
+    ax.plot(output[:,1],output[:,2])
     #ax.scatter(output[:,0],output[:,1],marker='+')
     #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
     #print(track_coarse)

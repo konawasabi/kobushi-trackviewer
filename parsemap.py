@@ -39,6 +39,7 @@ if __name__ == '__main__':
     for i in result.station.position:
         print(i['distance'],result.station.stationkey[i['stationkey']])
     
+    '''
     planer_fig = plt.figure()
     profile_fig = plt.figure()
     ax1 = planer_fig.add_subplot(1,1,1)
@@ -46,4 +47,10 @@ if __name__ == '__main__':
     ax3 = profile_fig.add_subplot(2,1,2)
     mapplot.plot_planer_map(result, ax1)
     mapplot.plot_vetical_profile(result, ax2, ax3)
+    plt.show()
+    '''
+    
+    planer_fig = plt.figure()
+    ax1 = planer_fig.add_subplot(1,1,1)
+    mapplot.plot_planermap_2(result, ax1)
     plt.show()
