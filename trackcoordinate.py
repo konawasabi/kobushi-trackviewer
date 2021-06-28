@@ -166,11 +166,11 @@ class curve_intermediate(curve):
             if (1/r1 < 1/r2): # 右向きに曲率が増加する場合
                 tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
                 dist = np.array([0,l_intermediate])+A**2/r1
-                turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2)
+                turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2) # 緩和曲線通過前後での方位角変化。クロソイド曲線の接線角τは、原点(L0)からの距離lに対してτ=l^2/(2A^2)。
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y'))).T
             else: # 左向きに曲率が増加する場合
                 tau1 = -(A/r1)**2/2
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
-                turn = (-(l_intermediate-L0)**2-L0**2)/(2*A**2)
+                turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2)
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl
