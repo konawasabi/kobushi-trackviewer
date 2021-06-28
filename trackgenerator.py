@@ -35,7 +35,8 @@ class TrackGenerator():
         if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
             # numpy RuntimeWarning発生時に当該点の距離程を印字
             def print_warning_position(err,flag):
-                print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(input_d[ix]['distance']))
+                print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(dist))
+                raise
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
             
