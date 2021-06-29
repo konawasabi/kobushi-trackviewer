@@ -57,10 +57,10 @@ class TrackGenerator():
             sys.excepthook = info
         
         for dist in self.list_cp:
-            
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
-                self.last_pos['radius'] = self.data_ownt[radius_p.pointer['next']]['value'] if self.data_ownt[radius_p.pointer['next']]['value'] != 'c' else self.data_ownt[radius_p.pointer['last']]['value'] if radius_p.pointer['last'] != None else self.last_pos['radius'] #要素区間終端の半径をlast_posに設定。'c'の場合はlast要素の値をセット
+                #self.last_pos['radius'] = self.data_ownt[radius_p.pointer['next']]['value'] if self.data_ownt[radius_p.pointer['next']]['value'] != 'c' else self.data_ownt[radius_p.pointer['last']]['value'] if radius_p.pointer['last'] != None else self.last_pos['radius'] #要素区間終端の半径をlast_posに設定。'c'の場合はlast要素の値をセット
+                self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                 radius_p.seeknext()
             
             if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
@@ -145,8 +145,8 @@ class TrackGenerator():
             self.last_pos['distance'] = dist
             self.result.append([self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z']])
             
-        for i in self.result:
-            print(i)
+        #for i in self.result:
+        #    print(i)
         return np.array(self.result)
     class TrackPointer():
         def __init__(self,environment,target):
@@ -201,3 +201,16 @@ class TrackGenerator():
             pointer['last'] == None (リスト始端の要素地点に到達していない) なら必ずTrue。
             '''
             return (self.data[self.pointer['last']]['distance'] >= distance) if self.pointer['last'] != None else True
+        def seekoriginofcontinuous(self,index):
+            '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す
+            '''
+            if(index < 0 or index == None):
+                return None
+            else:
+                while True:
+                    if(self.data[index]['key'] == self.target and self.data[index]['value'] != 'c'):
+                        break
+                    else:
+                        index -= 1
+                return index
+                

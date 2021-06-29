@@ -158,7 +158,7 @@ class curve_intermediate(curve):
 
         if True: # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
-            rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate) if r2 != np.inf else 0
+            rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate) if (1/r1 + (1/r2 - 1/r1)/L * l_intermediate) != 0 else np.inf
             
             # クロソイドパラメータAの決定
             if(r1 != np.inf):
