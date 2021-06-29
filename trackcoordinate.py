@@ -176,4 +176,4 @@ class curve_intermediate(curve):
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
                 turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2) if A != 0 else 0
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
-        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl
+        return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl if rl == np.inf else 0
