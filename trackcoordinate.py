@@ -152,6 +152,9 @@ class curve_intermediate(curve):
         '''
         r1 = np.inf if r1==0 else r1
         r2 = np.inf if r2==0 else r2
+        
+        r1 = np.inf if np.fabs(r1)>1e6 else r1
+        r2 = np.inf if np.fabs(r2)>1e6  else r2
 
         if True: # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
@@ -166,11 +169,11 @@ class curve_intermediate(curve):
             if (1/r1 < 1/r2): # 右向きに曲率が増加する場合
                 tau1 = (A/r1)**2/2 #緩和曲線始端の方位角
                 dist = np.array([0,l_intermediate])+A**2/r1
-                turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2) # 緩和曲線通過前後での方位角変化。クロソイド曲線の接線角τは、原点(L0)からの距離lに対してτ=l^2/(2A^2)。
+                turn = ((l_intermediate-L0)**2-L0**2)/(2*A**2)  if A != 0 else 0 # 緩和曲線通過前後での方位角変化。クロソイド曲線の接線角τは、原点(L0)からの距離lに対してτ=l^2/(2A^2)。
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y'))).T
             else: # 左向きに曲率が増加する場合
                 tau1 = -(A/r1)**2/2
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
-                turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2)
+                turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2) if A != 0 else 0
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl
