@@ -34,6 +34,7 @@ if __name__ == '__main__':
         print('controlpoints list')
         for i in result.controlpoints.list_cp:
             print(i)
+            
     
     print('station list')
     for i in result.station.position:
@@ -53,4 +54,10 @@ if __name__ == '__main__':
     planer_fig = plt.figure()
     ax1 = planer_fig.add_subplot(1,1,1)
     mapplot.plot_planermap_2(result, ax1)
+    
+    if not __debug__:
+        print('own_track position')
+        for i in result.owntrack_pos:
+            print(i)
+    
     plt.show()

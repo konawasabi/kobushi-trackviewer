@@ -184,9 +184,9 @@ def plot_planer_map(environment, ax):
 
 def plot_planermap_2(environment, ax):
     trackgenerator = tgen.TrackGenerator(environment)
-    output = trackgenerator.generate_owntrack()
+    environment.owntrack_pos = trackgenerator.generate_owntrack()
     
-    ax.plot(output[:,1],output[:,2])
+    ax.plot(environment.owntrack_pos[:,1],environment.owntrack_pos[:,2])
     #ax.scatter(output[:,0],output[:,1],marker='+')
     #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
     #print(track_coarse)
