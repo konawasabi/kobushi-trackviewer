@@ -60,7 +60,8 @@ class TrackGenerator():
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 #self.last_pos['radius'] = self.data_ownt[radius_p.pointer['next']]['value'] if self.data_ownt[radius_p.pointer['next']]['value'] != 'c' else self.data_ownt[radius_p.pointer['last']]['value'] if radius_p.pointer['last'] != None else self.last_pos['radius'] #要素区間終端の半径をlast_posに設定。'c'の場合はlast要素の値をセット
-                self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
+                if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
+                    self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                 radius_p.seeknext()
             
             if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
@@ -204,13 +205,14 @@ class TrackGenerator():
         def seekoriginofcontinuous(self,index):
             '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す
             '''
-            if(index < 0 or index == None):
-                return None
-            else:
+            if(index != None):
                 while True:
                     if(self.data[index]['key'] == self.target and self.data[index]['value'] != 'c'):
                         break
                     else:
                         index -= 1
-                return index
+                        if(index < 0):
+                            index = None
+                            break
+            return index
                 
