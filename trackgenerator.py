@@ -134,8 +134,27 @@ class TrackGenerator():
             # turnに対する処理
             
             # gradientに対する処理
-            gradient = 0
-            z=0
+            while(gradient_p.overNextpoint(dist)):
+                if(gradient_p.seekoriginofcontinuous(gradient_p.pointer['next']) != None):
+                    self.last_pos['gradient'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
+                gradient_p.seeknext()
+            
+            if(gradient_p.pointer['last'] == None):
+                z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
+                gradient = self.last_pos['gradient']
+            elif(gradient_p.pointer['next'] == None):
+                z = grad_gen.straight(self.cp_max - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
+                gradient = self.last_pos['gradient']
+            else:
+                if(self.data_ownt[gradient_p.pointer['next']]['value'] == 'c'):
+                    z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
+                    gradient = self.last_pos['gradient']
+                else:
+                    if(self.data_ownt[gradient_p.pointer['next']]['flag'] == 'i' or self.data_ownt[gradient_p.pointer['last']]['flag'] == 'bt'):
+                        [tmp_d, z], gradient = grad_gen.transition(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'],self.last_pos['gradient'],self.data_ownt[gradient_p.pointer['next']]['value'],dist - self.last_pos['distance'])
+                    else:
+                        z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
+                        gradient = self.last_pos['gradient']
             
             self.last_pos['x']       += x
             self.last_pos['y']       += y
@@ -162,10 +181,20 @@ class TrackGenerator():
             '''ix0以降で注目する要素が現れるインデックスを探索。データ終端まで到達した場合はNoneを返す。
             '''
             ix = ix0
+            '''
             while (self.data[ix]['key'] != self.target):
                 ix+=1
                 if (ix > self.ix_max):
                     ix = None
+                    break
+            '''
+            while True:
+                if (ix > self.ix_max):
+                    ix = None
+                    break
+                if(self.data[ix]['key'] != self.target):
+                    ix+=1
+                else:
                     break
             return ix
         def seekfirst(self):
@@ -203,7 +232,8 @@ class TrackGenerator():
             '''
             return (self.data[self.pointer['last']]['distance'] >= distance) if self.pointer['last'] != None else True
         def seekoriginofcontinuous(self,index):
-            '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す
+            '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す。
+            リストの先頭まで探索しても見つからなかった場合はNoneを返す。
             '''
             if(index != None):
                 while True:

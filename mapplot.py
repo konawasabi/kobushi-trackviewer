@@ -182,13 +182,12 @@ def plot_planer_map(environment, ax):
     ax.invert_yaxis()
 
 
-def plot_planermap_2(environment, ax):
+def plot_planermap_2(environment, ax_pl, ax_h):
     trackgenerator = tgen.TrackGenerator(environment)
     environment.owntrack_pos = trackgenerator.generate_owntrack()
     
-    ax.plot(environment.owntrack_pos[:,1],environment.owntrack_pos[:,2])
-    #ax.scatter(output[:,0],output[:,1],marker='+')
-    #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
-    #print(track_coarse)
-    ax.set_aspect('equal')
-    ax.invert_yaxis()
+    ax_pl.plot(environment.owntrack_pos[:,1],environment.owntrack_pos[:,2])
+    ax_pl.set_aspect('equal')
+    ax_pl.invert_yaxis()
+
+    ax_h.plot(environment.owntrack_pos[:,0],environment.owntrack_pos[:,3])

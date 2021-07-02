@@ -32,7 +32,7 @@ class gradient_intermediate(gradient):
         '''
         dist = l_intermediate
         theta = np.arctan(gr/1000)
-        return np.array([dist,dist*np.sin(theta)]).T
+        return np.array([dist,dist*np.sin(theta)]).T[-1]
     def transition(self, L, gr1, gr2, l_intermediate, y0=0):
         '''全長Lの縦曲線について、l_intermediateでの高度変化、勾配を返す。
         L: 縦曲線長 [m]
@@ -42,7 +42,7 @@ class gradient_intermediate(gradient):
         dist = l_intermediate
         theta1 = np.arctan(gr1/1000)
         theta2 = np.arctan(gr2/1000)
-        return np.vstack((dist,y0+L/(theta2-theta1)*np.cos(theta1)-L/(theta2-theta1)*np.cos((theta2-theta1)/L*dist+theta1))).T, 1000*np.tan((theta2 - theta1)/L*l_intermediate + theta1)
+        return np.vstack((dist,y0+L/(theta2-theta1)*np.cos(theta1)-L/(theta2-theta1)*np.cos((theta2-theta1)/L*dist+theta1))).T[-1], 1000*np.tan((theta2 - theta1)/L*l_intermediate + theta1)
     
 class curve():
     def __init__(self):

@@ -53,7 +53,11 @@ if __name__ == '__main__':
     
     planer_fig = plt.figure()
     ax1 = planer_fig.add_subplot(1,1,1)
-    mapplot.plot_planermap_2(result, ax1)
+    
+    profile_fig = plt.figure()
+    ax2 = profile_fig.add_subplot(1,1,1)
+    
+    mapplot.plot_planermap_2(result, ax1, ax2)
     
     if not __debug__:
         print('own_track position')
