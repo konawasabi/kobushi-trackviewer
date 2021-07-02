@@ -7,9 +7,11 @@ class TrackGenerator():
         self.data_ownt = self.env.own_track.data
         self.list_cp = self.env.controlpoints.list_cp
         
+        # マップ要素が存在する距離程の最小, 最大値
         self.cp_min = min(self.list_cp)
         self.cp_max = max(self.list_cp)
         
+        # 前回処理した地点の情報
         self.last_pos = {}
         self.last_pos['x']        = x0     if x0     != None else 0
         self.last_pos['y']        = y0     if y0     != None else 0
@@ -19,6 +21,7 @@ class TrackGenerator():
         self.last_pos['gradient'] = gr0    if gr0    != None else 0
         self.last_pos['distance'] = dist0  if dist0  != None else self.cp_min
         
+        #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z']]]
     def generate_owntrack(self):
         '''マップ要素が存在する全ての距離程(self.list_cp)に対して自軌道の座標データを生成する。
@@ -62,7 +65,6 @@ class TrackGenerator():
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
                     self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                 radius_p.seeknext()
-            
             if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
                 if(self.last_pos['radius'] == 0):
                     [x, y] =curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['theta'], dist - self.last_pos['distance'])
@@ -83,7 +85,7 @@ class TrackGenerator():
                                                          self.last_pos['theta'],\
                                                          dist - self.last_pos['distance'])
                 radius = self.last_pos['radius']
-            else:
+            else: # 一般の場合の処理
                 if(self.data_ownt[radius_p.pointer['next']]['value'] == 'c'): # 曲線半径が変化しない区間かどうか
                     if(self.last_pos['radius'] == 0): # 曲線半径が0 (直線)の場合
                         [x, y] = curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
@@ -98,20 +100,20 @@ class TrackGenerator():
                     radius = self.last_pos['radius']
                 else: # 曲線半径が変化する場合
                     if(self.data_ownt[radius_p.pointer['next']]['flag'] == 'i' or self.data_ownt[radius_p.pointer['last']]['flag'] == 'bt'): # interpolateフラグがある
-                        if(self.last_pos['radius'] != self.data_ownt[radius_p.pointer['next']]['value']):
+                        if(self.last_pos['radius'] != self.data_ownt[radius_p.pointer['next']]['value']): # 注目区間前後で異なる曲線半径を取るなら緩和曲線を出力
                             [x, y], tau, radius = curve_gen.transition_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
                                                                        self.last_pos['radius'],\
                                                                        self.data_ownt[radius_p.pointer['next']]['value'],\
                                                                        self.last_pos['theta'],\
                                                                        'line',\
                                                                        dist - self.last_pos['distance'])
-                        elif(self.data_ownt[radius_p.pointer['next']]['value'] != 0):
+                        elif(self.data_ownt[radius_p.pointer['next']]['value'] != 0): # 曲線半径が変化せず、!=0の場合は円軌道を出力
                             [x, y], tau = curve_gen.circular_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
                             self.last_pos['radius'],\
                             self.last_pos['theta'],\
                             dist - self.last_pos['distance'])
                             radius = self.last_pos['radius']
-                        else:
+                        else: # 直線軌道を出力
                             [x, y] = curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
                                                       self.last_pos['theta'],\
                                                       dist - self.last_pos['distance'])
@@ -132,11 +134,10 @@ class TrackGenerator():
             # turnに対する処理
             
             # gradientに対する処理
-            while(gradient_p.overNextpoint(dist)):
+            while(gradient_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(gradient_p.seekoriginofcontinuous(gradient_p.pointer['next']) != None):
                     self.last_pos['gradient'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
                 gradient_p.seeknext()
-            
             if(gradient_p.pointer['last'] == None): #最初の勾配要素に到達していない
                 if(gradient_p.pointer['next'] == None): # 勾配が存在しないmapの場合の処理
                     z = grad_gen.straight(self.cp_max - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
@@ -146,21 +147,22 @@ class TrackGenerator():
             elif(gradient_p.pointer['next'] == None): #最後の勾配要素を通過した
                 z = grad_gen.straight(self.cp_max - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                 gradient = self.last_pos['gradient']
-            else:
-                if(self.data_ownt[gradient_p.pointer['next']]['value'] == 'c'):
+            else: # 一般の場合の処理
+                if(self.data_ownt[gradient_p.pointer['next']]['value'] == 'c'): # 注目区間の前後で勾配が変化しない場合
                     z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                     gradient = self.last_pos['gradient']
                 else:
-                    if(self.data_ownt[gradient_p.pointer['next']]['flag'] == 'i' or self.data_ownt[gradient_p.pointer['last']]['flag'] == 'bt'):
-                        if(self.last_pos['gradient'] != self.data_ownt[gradient_p.pointer['next']]['value']):
+                    if(self.data_ownt[gradient_p.pointer['next']]['flag'] == 'i' or self.data_ownt[gradient_p.pointer['last']]['flag'] == 'bt'): # interpolateフラグがある場合
+                        if(self.last_pos['gradient'] != self.data_ownt[gradient_p.pointer['next']]['value']): # 注目区間の前後で勾配が変化するなら縦曲線を出力
                             [tmp_d, z], gradient = grad_gen.transition(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'],self.last_pos['gradient'],self.data_ownt[gradient_p.pointer['next']]['value'],dist - self.last_pos['distance'])
-                        else:
+                        else: # 一定勾配を出力
                             z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                             gradient = self.last_pos['gradient']
-                    else:
+                    else: # interpolate出ない場合、一定勾配を出力
                         z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                         gradient = self.last_pos['gradient']
             
+            # 地点情報を更新
             self.last_pos['x']       += x
             self.last_pos['y']       += y
             self.last_pos['z']       += z
@@ -168,10 +170,9 @@ class TrackGenerator():
             self.last_pos['radius']   = radius
             self.last_pos['gradient'] = gradient
             self.last_pos['distance'] = dist
+            # 座標リストに追加
             self.result.append([self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z']])
             
-        #for i in self.result:
-        #    print(i)
         return np.array(self.result)
     class TrackPointer():
         def __init__(self,environment,target):
