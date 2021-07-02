@@ -139,10 +139,10 @@ class TrackGenerator():
                     self.last_pos['gradient'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
                 gradient_p.seeknext()
             
-            if(gradient_p.pointer['last'] == None):
+            if(gradient_p.pointer['last'] == None): #最初の勾配要素に到達していない
                 z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
                 gradient = self.last_pos['gradient']
-            elif(gradient_p.pointer['next'] == None):
+            elif(gradient_p.pointer['next'] == None): #最後の勾配要素を通過した
                 z = grad_gen.straight(self.cp_max - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                 gradient = self.last_pos['gradient']
             else:
@@ -151,7 +151,11 @@ class TrackGenerator():
                     gradient = self.last_pos['gradient']
                 else:
                     if(self.data_ownt[gradient_p.pointer['next']]['flag'] == 'i' or self.data_ownt[gradient_p.pointer['last']]['flag'] == 'bt'):
-                        [tmp_d, z], gradient = grad_gen.transition(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'],self.last_pos['gradient'],self.data_ownt[gradient_p.pointer['next']]['value'],dist - self.last_pos['distance'])
+                        if(self.last_pos['gradient'] != self.data_ownt[gradient_p.pointer['next']]['value']):
+                            [tmp_d, z], gradient = grad_gen.transition(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'],self.last_pos['gradient'],self.data_ownt[gradient_p.pointer['next']]['value'],dist - self.last_pos['distance'])
+                        else:
+                            z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
+                            gradient = self.last_pos['gradient']
                     else:
                         z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                         gradient = self.last_pos['gradient']
