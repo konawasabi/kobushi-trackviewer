@@ -140,7 +140,10 @@ class TrackGenerator():
                 gradient_p.seeknext()
             
             if(gradient_p.pointer['last'] == None): #最初の勾配要素に到達していない
-                z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
+                if(gradient_p.pointer['next'] == None): # 勾配が存在しないmapの場合の処理
+                    z = grad_gen.straight(self.cp_max - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
+                else:
+                    z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['gradient'], dist - self.last_pos['distance'])
                 gradient = self.last_pos['gradient']
             elif(gradient_p.pointer['next'] == None): #最後の勾配要素を通過した
                 z = grad_gen.straight(self.cp_max - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
