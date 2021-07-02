@@ -59,7 +59,6 @@ class TrackGenerator():
         for dist in self.list_cp:
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
-                #self.last_pos['radius'] = self.data_ownt[radius_p.pointer['next']]['value'] if self.data_ownt[radius_p.pointer['next']]['value'] != 'c' else self.data_ownt[radius_p.pointer['last']]['value'] if radius_p.pointer['last'] != None else self.last_pos['radius'] #要素区間終端の半径をlast_posに設定。'c'の場合はlast要素の値をセット
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
                     self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                 radius_p.seeknext()
@@ -72,8 +71,19 @@ class TrackGenerator():
                 else:
                     [x, y], tau =curve_gen.circular_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.cp_min, self.last_pos['theta'], dist - self.last_pos['distance'])
                     radius = self.last_pos['radius']
-            elif(radius_p.pointer['next'] != None):
-                #if(self.last_pos['radius'] == self.data_ownt[radius_p.pointer['next']]['value'] if self.data_ownt[radius_p.pointer['next']]['value'] != 'c' else self.data_ownt[radius_p.pointer['last']]['value']):#現在地点とpointer['next']の示す要素の曲線半径が等しいかどうか
+            elif(radius_p.pointer['next'] == None): # curve要素リスト終端に到達
+                if(self.last_pos['radius'] == 0): # 曲線半径が0 (直線)の場合
+                    [x, y] = curve_gen.straight(self.cp_max - self.last_pos['distance'],\
+                                              self.last_pos['theta'],\
+                                              dist - self.last_pos['distance'])
+                    tau = 0
+                else: # 一定半径の曲線の場合
+                    [x, y], tau = curve_gen.circular_curve(self.cp_max - self.last_pos['distance'],\
+                                                         self.last_pos['radius'],\
+                                                         self.last_pos['theta'],\
+                                                         dist - self.last_pos['distance'])
+                radius = self.last_pos['radius']
+            else:
                 if(self.data_ownt[radius_p.pointer['next']]['value'] == 'c'): # 曲線半径が変化しない区間かどうか
                     if(self.last_pos['radius'] == 0): # 曲線半径が0 (直線)の場合
                         [x, y] = curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
@@ -119,18 +129,6 @@ class TrackGenerator():
                                                                  self.last_pos['theta'],\
                                                                  dist - self.last_pos['distance'])
                         radius = self.last_pos['radius']
-            else: # 要素リスト終端に到達
-                if(self.last_pos['radius'] == 0): # 曲線半径が0 (直線)の場合
-                    [x, y] = curve_gen.straight(self.cp_max - self.last_pos['distance'],\
-                                              self.last_pos['theta'],\
-                                              dist - self.last_pos['distance'])
-                    tau = 0
-                else: # 一定半径の曲線の場合
-                    [x, y], tau = curve_gen.circular_curve(self.cp_max - self.last_pos['distance'],\
-                                                         self.last_pos['radius'],\
-                                                         self.last_pos['theta'],\
-                                                         dist - self.last_pos['distance'])
-                radius = self.last_pos['radius']
             # turnに対する処理
             
             # gradientに対する処理
