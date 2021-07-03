@@ -200,4 +200,7 @@ def plot_stationpoint(environment, ax_pl, ax_h):
     
     ax_pl.scatter(station_pos[:,1],station_pos[:,2], facecolor='white', edgecolors='black', zorder=10)
     
+    for i in range(0,len(station_pos)):
+        ax_pl.annotate(environment.station.stationkey[environment.station.position[station_pos[i][0]]],xy=(station_pos[i][1],station_pos[i][2]), zorder=11)
+    
     ax_h.scatter(station_pos[:,0],station_pos[:,3], facecolor='white', edgecolors='black', zorder=10)

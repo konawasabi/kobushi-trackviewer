@@ -2,6 +2,11 @@ import lark
 from lark import Lark, Transformer, v_args, exceptions
 import sys
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+# https://qiita.com/yniji/items/3fac25c2ffa316990d0c matplotlibで日本語を使う
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
 import mapinterpleter as interp
 import mapplot

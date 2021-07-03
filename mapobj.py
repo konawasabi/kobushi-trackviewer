@@ -139,7 +139,7 @@ class Station():
                     if(buff=='\n' or buff.count(',')<1):#空白行（コメントのみの行など）、コンマ区切りが存在しない行なら次の行に進む。
                         continue
                     buff = buff.split(',')
-                    result_stations[buff[0].lower()]=buff[1]
+                    result_stations[buff[0].lower()]=buff[1].replace('\"','')
                 f.close()
             except:
                 f.close()
