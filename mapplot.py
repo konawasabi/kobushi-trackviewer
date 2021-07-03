@@ -193,3 +193,9 @@ def plot_planermap_2(environment, ax_pl, ax_h, ax_r):
     ax_h.plot(environment.owntrack_pos[:,0],environment.owntrack_pos[:,3])
     
     ax_r.plot(environment.owntrack_pos[:,0],np.sign(environment.owntrack_pos[:,5]))
+
+def plot_stationpoint(environment, ax):
+    station_dist = np.array(list(environment.station.position.keys()))
+    station_pos = environment.owntrack_pos[np.isin(environment.owntrack_pos[:,0],station_dist)]
+    
+    ax.scatter(station_pos[:,1],station_pos[:,2], facecolor='None', edgecolors='tab:blue')

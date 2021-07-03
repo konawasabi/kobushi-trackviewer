@@ -26,7 +26,7 @@ class TrackGenerator():
     def generate_owntrack(self):
         '''マップ要素が存在する全ての距離程(self.list_cp)に対して自軌道の座標データを生成する。
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
-        結果はself.result に[[distance,xpos,ypos,zpos],[d.,x.,y.],[...],...]として格納する。
+        結果はself.result に[[distance,xpos,ypos,zpos,theta,radius,gradient],[d.,x.,y.,...],[...],...]として格納する。
         '''
         radius_p   = self.TrackPointer(self.env,'radius')
         gradient_p = self.TrackPointer(self.env,'gradient')
@@ -158,7 +158,7 @@ class TrackGenerator():
                         else: # 一定勾配を出力
                             z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                             gradient = self.last_pos['gradient']
-                    else: # interpolate出ない場合、一定勾配を出力
+                    else: # interpolateでない場合、一定勾配を出力
                         z = grad_gen.straight(self.data_ownt[gradient_p.pointer['next']]['distance'] - self.last_pos['distance'], self.last_pos['gradient'], dist - self.last_pos['distance'])
                         gradient = self.last_pos['gradient']
             
@@ -187,13 +187,6 @@ class TrackGenerator():
             '''ix0以降で注目する要素が現れるインデックスを探索。データ終端まで到達した場合はNoneを返す。
             '''
             ix = ix0
-            '''
-            while (self.data[ix]['key'] != self.target):
-                ix+=1
-                if (ix > self.ix_max):
-                    ix = None
-                    break
-            '''
             while True:
                 if (ix > self.ix_max):
                     ix = None

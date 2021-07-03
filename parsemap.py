@@ -38,7 +38,7 @@ if __name__ == '__main__':
     
     print('station list')
     for i in result.station.position:
-        print(i['distance'],result.station.stationkey[i['stationkey']])
+        print(i,result.station.stationkey[result.station.position[i]])
     
     planer_fig = plt.figure()
     ax1 = planer_fig.add_subplot(1,1,1)
@@ -48,6 +48,7 @@ if __name__ == '__main__':
     ax3 = profile_fig.add_subplot(2,1,2)
     
     mapplot.plot_planermap_2(result, ax1, ax2, ax3)
+    mapplot.plot_stationpoint(result, ax1)
     
     if not __debug__:
         print('own_track position')

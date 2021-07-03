@@ -154,9 +154,10 @@ class Station():
                 encode_retry = 'utf-8'
             self.stationkey = read_stationlist(f_path,encode_retry)
     def put(self, *argvs):
-        self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
+        #self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
+        self.position[self.environment.variable['distance']]=argvs[0].lower()
     def __init__(self, parent):
-        self.position = []
+        self.position = {}
         self.stationkey = {}
         self.environment = parent
 
