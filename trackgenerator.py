@@ -22,7 +22,7 @@ class TrackGenerator():
         self.last_pos['distance'] = dist0  if dist0  != None else self.cp_min
         
         #座標情報を格納するリスト
-        self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z']]]
+        self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
     def generate_owntrack(self):
         '''マップ要素が存在する全ての距離程(self.list_cp)に対して自軌道の座標データを生成する。
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
@@ -171,7 +171,7 @@ class TrackGenerator():
             self.last_pos['gradient'] = gradient
             self.last_pos['distance'] = dist
             # 座標リストに追加
-            self.result.append([self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z']])
+            self.result.append([self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']])
             
         return np.array(self.result)
     class TrackPointer():
