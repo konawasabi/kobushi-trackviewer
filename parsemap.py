@@ -48,7 +48,7 @@ if __name__ == '__main__':
     ax3 = profile_fig.add_subplot(2,1,2)
     
     mapplot.plot_planermap_2(result, ax1, ax2, ax3)
-    mapplot.plot_stationpoint(result, ax1)
+    mapplot.plot_stationpoint(result, ax1, ax2)
     
     if not __debug__:
         print('own_track position')
