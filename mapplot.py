@@ -214,7 +214,7 @@ class Mapplot():
             height_max = max(self.station_pos[:,3]) #max(environment.owntrack_pos[:,3])
             height_min = min(self.station_pos[:,3]) #min(environment.owntrack_pos[:,3])
             
-            station_marker_ypos = (height_max-height_min)*1.2+height_min
+            station_marker_ypos = (height_max-height_min)*1.1+height_min
             
             for i in range(0,len(self.station_pos)):
                 ax_h.plot([self.station_pos[i][0],self.station_pos[i][0]],[self.station_pos[i][3],station_marker_ypos],color='tab:blue')
@@ -222,14 +222,22 @@ class Mapplot():
                 if(labelplot):
                     ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8)
     def gradient_value(self, ax_h):
-        gradp = tgen.TrackPointer(self.environment, 'gradient')
+        gradient_p = tgen.TrackPointer(self.environment, 'gradient')
         grad_last = 0
         height_max = max(self.environment.owntrack_pos[:,3])
         height_min = min(self.environment.owntrack_pos[:,3])
-        gradline_min = height_min - (height_max-height_min)*0.05
-        while gradp.pointer['next'] != None:
-            pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradp.data[gradp.pointer['next']]['distance']][0]
-            #if(gradp.data[gradp.pointer['next']]['value'] == 'c'):
-            #    ax_h.plot([pos_temp[0],pos_temp[0]],[height_min,pos_temp[3]],color='tab:blue')
-            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
-            gradp.seeknext()
+        gradline_min = height_min - (height_max-height_min)*0.1
+        gradient_p.seeknext()
+        while gradient_p.pointer['next'] != None:
+            if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
+                pass
+            elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i' and gradient_p.data[gradient_p.pointer['last']]['value'] == 'c'):
+                pass
+            elif((gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i' and gradient_p.data[gradient_p.pointer['last']]['value'] != 'c')\
+             or gradient_p.data[gradient_p.pointer['last']]['flag'] == 'bt'\
+             or gradient_p.data[gradient_p.pointer['next']]['flag'] != 'i'):
+                pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
+                #if(gradp.data[gradient_p.pointer['next']]['value'] == 'c'):
+                #    ax_h.plot([pos_temp[0],pos_temp[0]],[height_min,pos_temp[3]],color='tab:blue')
+                ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
+            gradient_p.seeknext()
