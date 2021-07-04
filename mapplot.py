@@ -182,25 +182,38 @@ def plot_planer_map(environment, ax):
     ax.invert_yaxis()
 
 
-def plot_planermap_2(environment, ax_pl, ax_h, ax_r):
-    trackgenerator = tgen.TrackGenerator(environment)
-    environment.owntrack_pos = trackgenerator.generate_owntrack()
-    
-    ax_pl.plot(environment.owntrack_pos[:,1],environment.owntrack_pos[:,2])
-    ax_pl.set_aspect('equal')
-    ax_pl.invert_yaxis()
+class Mapplot():
+    def __init__(self,env):
+        self.environment = env
+        trackgenerator = tgen.TrackGenerator(self.environment)
+        self.environment.owntrack_pos = trackgenerator.generate_owntrack()
+        self.station_dist = np.array(list(self.environment.station.position.keys()))
+        self.station_pos = self.environment.owntrack_pos[np.isin(self.environment.owntrack_pos[:,0],self.station_dist)]
+    def plot_plane(self, ax_pl):
+        ax_pl.plot(self.environment.owntrack_pos[:,1],self.environment.owntrack_pos[:,2])
+        ax_pl.set_aspect('equal')
+        ax_pl.invert_yaxis()
+    def plot_vertical(self, ax_h, ax_r):
+        ax_h.plot(self.environment.owntrack_pos[:,0],self.environment.owntrack_pos[:,3])
+        ax_r.plot(self.environment.owntrack_pos[:,0],np.sign(self.environment.owntrack_pos[:,5]))
 
-    ax_h.plot(environment.owntrack_pos[:,0],environment.owntrack_pos[:,3])
-    
-    ax_r.plot(environment.owntrack_pos[:,0],np.sign(environment.owntrack_pos[:,5]))
-
-def plot_stationpoint(environment, ax_pl, ax_h):
-    station_dist = np.array(list(environment.station.position.keys()))
-    station_pos = environment.owntrack_pos[np.isin(environment.owntrack_pos[:,0],station_dist)]
-    
-    ax_pl.scatter(station_pos[:,1],station_pos[:,2], facecolor='white', edgecolors='black', zorder=10)
-    
-    for i in range(0,len(station_pos)):
-        ax_pl.annotate(environment.station.stationkey[environment.station.position[station_pos[i][0]]],xy=(station_pos[i][1],station_pos[i][2]), zorder=11)
-    
-    ax_h.scatter(station_pos[:,0],station_pos[:,3], facecolor='white', edgecolors='black', zorder=10)
+    def plot_stationpoint_plane(self, ax_pl, labelplot = True):
+        
+        ax_pl.scatter(self.station_pos[:,1],self.station_pos[:,2], facecolor='white', edgecolors='black', zorder=10)
+        
+        if(labelplot):
+            for i in range(0,len(self.station_pos)):
+                #ax_pl.annotate(environment.station.stationkey[environment.station.position[station_pos[i][0]]],xy=(station_pos[i][1],station_pos[i][2]), zorder=11)
+                ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8)
+    def plot_stationpoint_height(self, ax_h, labelplot = True):
+        height_max = max(self.station_pos[:,3]) #max(environment.owntrack_pos[:,3])
+        height_min = min(self.station_pos[:,3]) #min(environment.owntrack_pos[:,3])
+        
+        station_marker_ypos = (height_max-height_min)*1.2+height_min
+        
+        for i in range(0,len(self.station_pos)):
+            ax_h.plot([self.station_pos[i][0],self.station_pos[i][0]],[self.station_pos[i][3],station_marker_ypos],color='tab:blue')
+            ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
+            if(labelplot):
+                ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8)
+        
