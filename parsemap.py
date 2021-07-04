@@ -45,7 +45,7 @@ if __name__ == '__main__':
     for i in result.station.position:
         print(i,result.station.stationkey[result.station.position[i]])
         
-    mp = mapplot.Mapplot(result)
+    mplot = mapplot.Mapplot(result)
     
     planer_fig = plt.figure()
     ax1 = planer_fig.add_subplot(1,1,1)
@@ -54,10 +54,10 @@ if __name__ == '__main__':
     ax2 = profile_fig.add_subplot(2,1,1)
     ax3 = profile_fig.add_subplot(2,1,2)
     
-    mp.plot_plane(ax1)
-    mp.plot_vertical(ax2, ax3)
-    mp.plot_stationpoint_plane(ax1)
-    mp.plot_stationpoint_height(ax2)
+    mplot.plane(ax1)
+    mplot.vertical(ax2, ax3)
+    mplot.stationpoint_plane(ax1)
+    mplot.stationpoint_height(ax2)
     
     if not __debug__:
         print('own_track position')
