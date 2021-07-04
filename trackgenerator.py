@@ -28,9 +28,9 @@ class TrackGenerator():
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
         結果はself.result に[[distance,xpos,ypos,zpos,theta,radius,gradient],[d.,x.,y.,...],[...],...]として格納する。
         '''
-        radius_p   = self.TrackPointer(self.env,'radius')
-        gradient_p = self.TrackPointer(self.env,'gradient')
-        turn_p     = self.TrackPointer(self.env,'turn')
+        radius_p   = TrackPointer(self.env,'radius')
+        gradient_p = TrackPointer(self.env,'gradient')
+        turn_p     = TrackPointer(self.env,'turn')
         
         grad_gen = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
@@ -174,74 +174,74 @@ class TrackGenerator():
             self.result.append([self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']])
             
         return np.array(self.result)
-    class TrackPointer():
-        def __init__(self,environment,target):
-            self.pointer = {'last':None, 'next':0}
-            self.env = environment
-            self.target = target
-            self.data = self.env.own_track.data
-            self.ix_max = len(self.data) - 1
-            
-            self.seekfirst()
-        def seek(self, ix0):
-            '''ix0以降で注目する要素が現れるインデックスを探索。データ終端まで到達した場合はNoneを返す。
-            '''
-            ix = ix0
+class TrackPointer():
+    def __init__(self,environment,target):
+        self.pointer = {'last':None, 'next':0}
+        self.env = environment
+        self.target = target
+        self.data = self.env.own_track.data
+        self.ix_max = len(self.data) - 1
+        
+        self.seekfirst()
+    def seek(self, ix0):
+        '''ix0以降で注目する要素が現れるインデックスを探索。データ終端まで到達した場合はNoneを返す。
+        '''
+        ix = ix0
+        while True:
+            if (ix > self.ix_max):
+                ix = None
+                break
+            if(self.data[ix]['key'] != self.target):
+                ix+=1
+            else:
+                break
+        return ix
+    def seekfirst(self):
+        '''注目する要素が初めて現れるインデックスを探索して、pointer['next']にセットする。
+        '''
+        self.pointer['next'] = self.seek(0)
+    def seeknext(self):
+        '''次の要素が存在するインデックスを探し、self.pointer['last', 'next']を書き換える。
+        self.pointer['next'] == None の場合は何もしない。
+        '''
+        if(self.pointer['next'] != None):
+            self.pointer['last'] = self.pointer['next']
+            self.pointer['next'] = self.seek(self.pointer['next']+1)
+    def insection(self,distance):
+        '''注目している要素の区間内かどうか調べる。
+        self.pointer['last'] < 与えられたdistance <= self.pointer['next'] ならTrue
+        '''
+        return (self.data[self.pointer['prev']]['distance'] > distance and self.data[self.pointer['next']]['distance'] <= distance)
+    def onNextpoint(self,distance):
+        '''注目している要素区間の終端にいるか調べる。
+        与えられたdistance == 注目しているpointer['next'] ならTrue。
+        pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
+        '''
+        return (self.data[self.pointer['next']]['distance'] == distance) if self.pointer['next'] != None else False
+    def overNextpoint(self,distance):
+        '''注目している要素区間を超えたか調べる。
+        与えられたdistance > 注目しているpointer['next'] ならTrue。
+        pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
+        '''
+        return (self.data[self.pointer['next']]['distance'] < distance) if self.pointer['next'] != None else False
+    def beforeLastpoint(self,distance):
+        '''注目している要素区間にまだ到達していないか調べる。
+        与えられたdistance <= 注目しているpointer['last'] ならTrue。
+        pointer['last'] == None (リスト始端の要素地点に到達していない) なら必ずTrue。
+        '''
+        return (self.data[self.pointer['last']]['distance'] >= distance) if self.pointer['last'] != None else True
+    def seekoriginofcontinuous(self,index):
+        '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す。
+        リストの先頭まで探索しても見つからなかった場合はNoneを返す。
+        '''
+        if(index != None):
             while True:
-                if (ix > self.ix_max):
-                    ix = None
+                if(self.data[index]['key'] == self.target and self.data[index]['value'] != 'c'):
                     break
-                if(self.data[ix]['key'] != self.target):
-                    ix+=1
                 else:
-                    break
-            return ix
-        def seekfirst(self):
-            '''注目する要素が初めて現れるインデックスを探索して、pointer['next']にセットする。
-            '''
-            self.pointer['next'] = self.seek(0)
-        def seeknext(self):
-            '''次の要素が存在するインデックスを探し、self.pointer['last', 'next']を書き換える。
-            self.pointer['next'] == None の場合は何もしない。
-            '''
-            if(self.pointer['next'] != None):
-                self.pointer['last'] = self.pointer['next']
-                self.pointer['next'] = self.seek(self.pointer['next']+1)
-        def insection(self,distance):
-            '''注目している要素の区間内かどうか調べる。
-            self.pointer['last'] < 与えられたdistance <= self.pointer['next'] ならTrue
-            '''
-            return (self.data[self.pointer['prev']]['distance'] > distance and self.data[self.pointer['next']]['distance'] <= distance)
-        def onNextpoint(self,distance):
-            '''注目している要素区間の終端にいるか調べる。
-            与えられたdistance == 注目しているpointer['next'] ならTrue。
-            pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
-            '''
-            return (self.data[self.pointer['next']]['distance'] == distance) if self.pointer['next'] != None else False
-        def overNextpoint(self,distance):
-            '''注目している要素区間を超えたか調べる。
-            与えられたdistance > 注目しているpointer['next'] ならTrue。
-            pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
-            '''
-            return (self.data[self.pointer['next']]['distance'] < distance) if self.pointer['next'] != None else False
-        def beforeLastpoint(self,distance):
-            '''注目している要素区間にまだ到達していないか調べる。
-            与えられたdistance <= 注目しているpointer['last'] ならTrue。
-            pointer['last'] == None (リスト始端の要素地点に到達していない) なら必ずTrue。
-            '''
-            return (self.data[self.pointer['last']]['distance'] >= distance) if self.pointer['last'] != None else True
-        def seekoriginofcontinuous(self,index):
-            '''注目している要素のvalue=c (直前に指定した値と同一)であった場合、その起源となる要素(value != c)を示すインデックスを返す。
-            リストの先頭まで探索しても見つからなかった場合はNoneを返す。
-            '''
-            if(index != None):
-                while True:
-                    if(self.data[index]['key'] == self.target and self.data[index]['value'] != 'c'):
+                    index -= 1
+                    if(index < 0):
+                        index = None
                         break
-                    else:
-                        index -= 1
-                        if(index < 0):
-                            index = None
-                            break
-            return index
-                
+        return index
+            
