@@ -222,22 +222,44 @@ class Mapplot():
                 if(labelplot):
                     ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8)
     def gradient_value(self, ax_h):
+        def vertline():
+            pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
+            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
+        def gradval(pos_start=None, value=None):
+            pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
+            if(pos_start == None):
+                pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0]
+            if(value == None):
+                value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
+            value = str(value) if value != 0 else 'Lv.'
+            ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8)
+            
         gradient_p = tgen.TrackPointer(self.environment, 'gradient')
         grad_last = 0
         height_max = max(self.environment.owntrack_pos[:,3])
         height_min = min(self.environment.owntrack_pos[:,3])
         gradline_min = height_min - (height_max-height_min)*0.1
-        gradient_p.seeknext()
+        #gradient_p.seeknext()
         while gradient_p.pointer['next'] != None:
-            if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
-                pass
-            elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i' and gradient_p.data[gradient_p.pointer['last']]['value'] == 'c'):
-                pass
-            elif((gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i' and gradient_p.data[gradient_p.pointer['last']]['value'] != 'c')\
-             or gradient_p.data[gradient_p.pointer['last']]['flag'] == 'bt'\
-             or gradient_p.data[gradient_p.pointer['next']]['flag'] != 'i'):
-                pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
-                #if(gradp.data[gradient_p.pointer['next']]['value'] == 'c'):
-                #    ax_h.plot([pos_temp[0],pos_temp[0]],[height_min,pos_temp[3]],color='tab:blue')
-                ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
+            # 勾配区切り線の描画処理。変化開始点に描く。
+            if(gradient_p.pointer['last'] == None):
+                vertline()
+            else:
+                if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
+                    vertline()
+                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i'):
+                    if(gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value'] == gradient_p.data[gradient_p.pointer['last']]['value']):
+                        vertline()
+                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == ''):
+                    if(gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
+                        vertline()
+            # 勾配値のプロット
+            if(gradient_p.pointer['last'] == None):
+                gradval(pos_start = min(self.environment.owntrack_pos[:,0]), value=0)
+            else:
+                if(gradient_p.data[gradient_p.pointer['next']]['value'] == 'c'):
+                    gradval()
+                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == '' and gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
+                    gradval()
             gradient_p.seeknext()
+            
