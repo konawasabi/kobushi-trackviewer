@@ -208,7 +208,7 @@ class Mapplot():
             if(labelplot):
                 for i in range(0,len(self.station_pos)):
                     #ax_pl.annotate(environment.station.stationkey[environment.station.position[station_pos[i][0]]],xy=(station_pos[i][1],station_pos[i][2]), zorder=11)
-                    ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8)
+                    ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',))
     def stationpoint_height(self, ax_h, labelplot = True):
         if(not self.nostation):
             height_max = max(self.station_pos[:,3]) #max(environment.owntrack_pos[:,3])
@@ -220,7 +220,7 @@ class Mapplot():
                 ax_h.plot([self.station_pos[i][0],self.station_pos[i][0]],[self.station_pos[i][3],station_marker_ypos],color='tab:blue')
                 ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
                 if(labelplot):
-                    ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8)
+                    ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',))
     def gradient_value(self, ax_h):
         def vertline():
             pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
