@@ -1,6 +1,7 @@
 import numpy as np
 import trackcoordinate as tc
 import trackgenerator as tgen
+import matplotlib.transforms
 
 def plot_vetical_profile(environment, ax_g, ax_r):
     '''線路縦断面図を作成する。
@@ -193,23 +194,24 @@ class Mapplot():
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
             ax_pl.scatter(self.station_pos[:,1],self.station_pos[:,2], facecolor='white', edgecolors='black', zorder=10)
+            trans_offs = matplotlib.transforms.offset_copy(ax_pl.transData, x=0,y=4, units='dots')
             
             if(labelplot):
                 for i in range(0,len(self.station_pos)):
                     #ax_pl.annotate(environment.station.stationkey[environment.station.position[station_pos[i][0]]],xy=(station_pos[i][1],station_pos[i][2]), zorder=11)
-                    ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',))
+                    ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
     def stationpoint_height(self, ax_h, labelplot = True):
         if(not self.nostation):
             height_max = max(self.station_pos[:,3])
             height_min = min(self.station_pos[:,3])
             
             station_marker_ypos = (height_max-height_min)*1.1+height_min
-            
+            trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=0,y=4, units='dots')
             for i in range(0,len(self.station_pos)):
                 ax_h.plot([self.station_pos[i][0],self.station_pos[i][0]],[self.station_pos[i][3],station_marker_ypos],color='tab:blue')
                 ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
                 if(labelplot):
-                    ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',))
+                    ax_h.text(self.station_pos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=45, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
     def gradient_value(self, ax_h):
         def vertline():
             pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
@@ -223,13 +225,14 @@ class Mapplot():
                 if(value == None):
                     value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
                 value = str(value) if value != 0 else 'Lv.'
-                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8)
+                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8, transform=trans_offs)
             
         gradient_p = tgen.TrackPointer(self.environment, 'gradient')
         grad_last = 0
         height_max = max(self.environment.owntrack_pos[:,3])
         height_min = min(self.environment.owntrack_pos[:,3])
         gradline_min = height_min - (height_max-height_min)*0.1
+        trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=-8/2, units='dots')
         while(gradient_p.pointer['next'] != None):
             # 勾配区切り線の描画処理。変化開始点に描く。
             if(gradient_p.pointer['last'] == None):
@@ -248,4 +251,8 @@ class Mapplot():
                         vertline()
                         gradval()
             gradient_p.seeknext()
-        gradval(pos_end = max(self.environment.owntrack_pos[:,0]))
+        # 最終勾配制御点以降の勾配値をプロットする
+        if(gradient_p.pointer['last'] == None):
+            gradval(pos_end = max(self.environment.owntrack_pos[:,0]),pos_start = min(self.environment.owntrack_pos[:,0]),value=0)
+        else:
+            gradval(pos_end = max(self.environment.owntrack_pos[:,0]))
