@@ -19,7 +19,6 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     output_gradient = np.array([0,0])
     output_radius = np.array([0,0])
     while (ix < len(input_d)):
-        #from IPython.core.debugger import Pdb; Pdb().set_trace()
         if(input_d[ix]['key'] == 'gradient'):
             if(input_d[ix]['distance'] != previous_pos_gradient['distance']):
                 if (input_d[ix]['value']=='c'): # 現在点の勾配 = 直前点の勾配なら、直線スロープを出力
@@ -67,10 +66,6 @@ def plot_vetical_profile(environment, ax_g, ax_r):
     
     ax_g.plot(output_gradient[:,0],output_gradient[:,1]) #勾配が存在しないmapだとoutput_gradientが空->エラーになる
     ax_r.plot(output_radius[:,0],output_radius[:,1])
-    
-    #ax_r.set_xlim([0,5000])
-    #ax_g.set_xlim([0,5000])
-    #ax.scatter(output[:,0],output[:,1],marker='+')
 
 
 def plot_planer_map(environment, ax):
@@ -86,8 +81,6 @@ def plot_planer_map(environment, ax):
     curve_gen = tc.curve()
     
     output = np.array([[0,0]])
-    #track_coarse = np.array([[0,0,0]])
-    
     if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
         # numpy RuntimeWarning発生時に当該点の距離程を印字
         def print_warning_position(err,flag):
@@ -170,14 +163,9 @@ def plot_planer_map(environment, ax):
             previous_pos['y'] = output[-1][1]
             previous_pos['theta'] = theta
             previous_pos['radius'] = radius
-        #if(track_coarse[-1][2] != input_d[ix]['distance']):
-        #    track_coarse = np.vstack((track_coarse,np.array([output[-1][0],output[-1][1],input_d[ix]['distance']])))
         ix+=1
         
     ax.plot(output[:,0],output[:,1])
-    #ax.scatter(output[:,0],output[:,1],marker='+')
-    #ax.scatter(track_coarse[:,0],track_coarse[:,1],marker='+')
-    #print(track_coarse)
     ax.set_aspect('equal')
     ax.invert_yaxis()
 
@@ -212,8 +200,8 @@ class Mapplot():
                     ax_pl.text(self.station_pos[i][1],self.station_pos[i][2], self.environment.station.stationkey[self.environment.station.position[self.station_pos[i][0]]], rotation=30, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',))
     def stationpoint_height(self, ax_h, labelplot = True):
         if(not self.nostation):
-            height_max = max(self.station_pos[:,3]) #max(environment.owntrack_pos[:,3])
-            height_min = min(self.station_pos[:,3]) #min(environment.owntrack_pos[:,3])
+            height_max = max(self.station_pos[:,3])
+            height_min = min(self.station_pos[:,3])
             
             station_marker_ypos = (height_max-height_min)*1.1+height_min
             
@@ -226,11 +214,12 @@ class Mapplot():
         def vertline():
             pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
             ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
-        def gradval(pos_start=None, value=None, doplot=True):
+        def gradval(pos_start=None, pos_end=None, value=None, doplot=True):
             if(doplot):
-                pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
+                if(pos_end == None):
+                    pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
                 if(pos_start == None):
-                    pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0] #要検討
+                    pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0]
                 if(value == None):
                     value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
                 value = str(value) if value != 0 else 'Lv.'
@@ -241,8 +230,7 @@ class Mapplot():
         height_max = max(self.environment.owntrack_pos[:,3])
         height_min = min(self.environment.owntrack_pos[:,3])
         gradline_min = height_min - (height_max-height_min)*0.1
-        #gradient_p.seeknext()
-        while gradient_p.pointer['next'] != None:
+        while(gradient_p.pointer['next'] != None):
             # 勾配区切り線の描画処理。変化開始点に描く。
             if(gradient_p.pointer['last'] == None):
                 vertline()
@@ -259,6 +247,5 @@ class Mapplot():
                     if(gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
                         vertline()
                         gradval()
-            # 最終制御点の先に勾配値をプロットしたい
             gradient_p.seeknext()
-            
+        gradval(pos_end = max(self.environment.owntrack_pos[:,0]))
