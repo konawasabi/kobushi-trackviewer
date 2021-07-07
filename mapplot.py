@@ -200,6 +200,7 @@ class Mapplot():
     def vertical(self, ax_h, ax_r):
         ax_h.plot(self.environment.owntrack_pos[:,0],self.environment.owntrack_pos[:,3])
         ax_r.plot(self.environment.owntrack_pos[:,0],np.sign(self.environment.owntrack_pos[:,5]))
+        ax_r.set_ylim(-3,3)
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
@@ -225,14 +226,15 @@ class Mapplot():
         def vertline():
             pos_temp = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
             ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
-        def gradval(pos_start=None, value=None):
-            pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
-            if(pos_start == None):
-                pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0]
-            if(value == None):
-                value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
-            value = str(value) if value != 0 else 'Lv.'
-            ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8)
+        def gradval(pos_start=None, value=None, doplot=True):
+            if(doplot):
+                pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
+                if(pos_start == None):
+                    pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0] #要検討
+                if(value == None):
+                    value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
+                value = str(value) if value != 0 else 'Lv.'
+                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8)
             
         gradient_p = tgen.TrackPointer(self.environment, 'gradient')
         grad_last = 0
@@ -244,22 +246,19 @@ class Mapplot():
             # 勾配区切り線の描画処理。変化開始点に描く。
             if(gradient_p.pointer['last'] == None):
                 vertline()
+                gradval(pos_start = min(self.environment.owntrack_pos[:,0]),value=0)
             else:
                 if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
                     vertline()
+                    gradval()
                 elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i'):
                     if(gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value'] == gradient_p.data[gradient_p.pointer['last']]['value']):
                         vertline()
+                        gradval()
                 elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == ''):
                     if(gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
                         vertline()
-            # 勾配値のプロット
-            if(gradient_p.pointer['last'] == None):
-                gradval(pos_start = min(self.environment.owntrack_pos[:,0]), value=0)
-            else:
-                if(gradient_p.data[gradient_p.pointer['next']]['value'] == 'c'):
-                    gradval()
-                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == '' and gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
-                    gradval()
+                        gradval()
+            # 最終制御点の先に勾配値をプロットしたい
             gradient_p.seeknext()
             
