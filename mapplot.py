@@ -256,3 +256,29 @@ class Mapplot():
             gradval(pos_end = max(self.environment.owntrack_pos[:,0]),pos_start = min(self.environment.owntrack_pos[:,0]),value=0)
         else:
             gradval(pos_end = max(self.environment.owntrack_pos[:,0]))
+    def radius_value(self, ax_r):
+        def pltval(pos_start=None, pos_end=None, value=None, doplot=True):
+            if(doplot):
+                if(pos_end == None):
+                    pos_end = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == rad_p.data[rad_p.pointer['next']]['distance']][0][0]
+                if(pos_start == None):
+                    pos_start = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == rad_p.data[rad_p.pointer['last']]['distance']][0][0]
+                if(value == None):
+                    value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
+                if(value != 0):
+                    ax_r.text((pos_start+pos_end)/2,1.1*np.sign(value), value, rotation=90, size=8, transform=trans_offs)
+        rad_p = tgen.TrackPointer(self.environment, 'radius')
+        trans_offs = matplotlib.transforms.offset_copy(ax_r.transData, x=-8/2, units='dots')
+        while(rad_p.pointer['next'] != None):
+            if(rad_p.pointer['last'] == None):
+                pass
+            else:
+                if(rad_p.data[rad_p.pointer['next']]['flag'] == 'bt'):
+                    pltval()
+                elif(rad_p.data[rad_p.pointer['next']]['flag'] == 'i'):
+                    if(rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['next'])]['value'] == rad_p.data[rad_p.pointer['last']]['value']):
+                        pltval()
+                elif(rad_p.data[rad_p.pointer['next']]['flag'] == ''):
+                    if(rad_p.data[rad_p.pointer['last']]['flag'] != 'bt'):
+                        pltval()
+            rad_p.seeknext()

@@ -59,6 +59,7 @@ if __name__ == '__main__':
     mplot.stationpoint_plane(ax1)
     mplot.stationpoint_height(ax2)
     mplot.gradient_value(ax2)
+    mplot.radius_value(ax3)
     
     if not __debug__:
         print('own_track position')
