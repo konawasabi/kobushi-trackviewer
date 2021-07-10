@@ -45,8 +45,12 @@ if __name__ == '__main__':
     for i in result.station.position:
         print(i,result.station.stationkey[result.station.position[i]])
         
-    dmin = min(result.station.position.keys()) - 500
-    dmax = max(result.station.position.keys()) + 500
+    if(len(result.station.position) > 0):
+        dmin = min(result.station.position.keys()) - 500
+        dmax = max(result.station.position.keys()) + 500
+    else:
+        dmin = None
+        dmax = None
         
     mplot = mapplot.Mapplot(result)
     

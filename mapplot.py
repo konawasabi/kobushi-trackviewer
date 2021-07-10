@@ -177,8 +177,8 @@ class Mapplot():
         trackgenerator = tgen.TrackGenerator(self.environment)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()
         self.distrange = {}
-        self.distrange['plane'] = [None,None]
-        self.distrange['vertical'] = [None,None]
+        self.distrange['plane'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
+        self.distrange['vertical'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
         if (len(self.environment.station.position)>0):
             self.station_dist = np.array(list(self.environment.station.position.keys()))
             self.station_pos = self.environment.owntrack_pos[np.isin(self.environment.owntrack_pos[:,0],self.station_dist)]
@@ -187,21 +187,23 @@ class Mapplot():
             self.nostation = True
     def plane(self, ax_pl, distmin = None, distmax = None):
         owntrack = self.environment.owntrack_pos
-        self.distrange['plane'] = [distmin,distmax]
-        if (self.distrange['plane'][0] != None):
-            owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
-        if (self.distrange['plane'][1] != None):
-            owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
+        if (distmin != None):
+            self.distrange['plane'][0] = distmin
+        if (distmax != None):
+            self.distrange['plane'][1] = distmax
+        owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
+        owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
         ax_pl.plot(owntrack[:,1],owntrack[:,2])
         ax_pl.set_aspect('equal')
         ax_pl.invert_yaxis()
     def vertical(self, ax_h, ax_r, distmin = None, distmax = None):
         owntrack = self.environment.owntrack_pos
-        self.distrange['vertical'] = [distmin,distmax]
-        if (self.distrange['vertical'][0] != None):
-            owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
-        if (self.distrange['vertical'][1] != None):
-            owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
+        if (distmin != None):
+            self.distrange['vertical'][0] = distmin
+        if (distmax != None):
+            self.distrange['vertical'][1] = distmax
+        owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
+        owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
         ax_h.plot(owntrack[:,0],owntrack[:,3])
         ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]))
         ax_r.set_ylim(-3,3)
@@ -209,10 +211,8 @@ class Mapplot():
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
             stationpos = self.station_pos
-            if (self.distrange['plane'][0] != None):
-                stationpos = stationpos[stationpos[:,0] >= self.distrange['plane'][0]]
-            if (self.distrange['plane'][1] != None):
-                stationpos = stationpos[stationpos[:,0] <= self.distrange['plane'][1]]
+            stationpos = stationpos[stationpos[:,0] >= self.distrange['plane'][0]]
+            stationpos = stationpos[stationpos[:,0] <= self.distrange['plane'][1]]
             ax_pl.scatter(stationpos[:,1],stationpos[:,2], facecolor='white', edgecolors='black', zorder=10)
             trans_offs = matplotlib.transforms.offset_copy(ax_pl.transData, x=8*1.2 ,y=8*1, units='dots')
             
@@ -223,10 +223,8 @@ class Mapplot():
     def stationpoint_height(self, ax_h, labelplot = True):
         if(not self.nostation):
             stationpos = self.station_pos
-            if (self.distrange['vertical'][0] != None):
-                stationpos = stationpos[stationpos[:,0] >= self.distrange['vertical'][0]]
-            if (self.distrange['vertical'][1] != None):
-                stationpos = stationpos[stationpos[:,0] <= self.distrange['vertical'][1]]
+            stationpos = stationpos[stationpos[:,0] >= self.distrange['vertical'][0]]
+            stationpos = stationpos[stationpos[:,0] <= self.distrange['vertical'][1]]
                 
             height_max = max(stationpos[:,3])
             height_min = min(stationpos[:,3])
@@ -254,10 +252,8 @@ class Mapplot():
                 ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8, transform=trans_offs)
             
         owntrack = self.environment.owntrack_pos
-        if (self.distrange['vertical'][0] != None):
-            owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
-        if (self.distrange['vertical'][1] != None):
-            owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
+        owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
+        owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
         
         gradient_p = tgen.TrackPointer(self.environment, 'gradient')
         grad_last = 0
@@ -305,10 +301,8 @@ class Mapplot():
                     ax_r.text((pos_start+pos_end)/2,1.1*np.sign(value), value, rotation=90, size=8, transform=trans_offs)
         
         owntrack = self.environment.owntrack_pos
-        if (self.distrange['vertical'][0] != None):
-            owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
-        if (self.distrange['vertical'][1] != None):
-            owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
+        owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
+        owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
         
         rad_p = tgen.TrackPointer(self.environment, 'radius')
         trans_offs = matplotlib.transforms.offset_copy(ax_r.transData, x=-8/2, units='dots')
