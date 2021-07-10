@@ -243,9 +243,9 @@ class Mapplot():
         def gradval(pos_start=None, pos_end=None, value=None, doplot=True):
             if(doplot):
                 if(pos_end == None):
-                    pos_end = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0][0]
+                    pos_end = gradient_p.data[gradient_p.pointer['next']]['distance']
                 if(pos_start == None):
-                    pos_start = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['last']]['distance']][0][0]
+                    pos_start = gradient_p.data[gradient_p.pointer['last']]['distance']
                 if(value == None):
                     value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
                 value = str(value) if value != 0 else 'Lv.'
@@ -292,9 +292,9 @@ class Mapplot():
         def pltval(pos_start=None, pos_end=None, value=None, doplot=True):
             if(doplot):
                 if(pos_end == None):
-                    pos_end = owntrack[owntrack[:,0] == rad_p.data[rad_p.pointer['next']]['distance']][0][0]
+                    pos_end = rad_p.data[rad_p.pointer['next']]['distance']
                 if(pos_start == None):
-                    pos_start = owntrack[owntrack[:,0] == rad_p.data[rad_p.pointer['last']]['distance']][0][0]
+                    pos_start = rad_p.data[rad_p.pointer['last']]['distance']
                 if(value == None):
                     value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
                 if(value != 0):
@@ -308,7 +308,7 @@ class Mapplot():
         trans_offs = matplotlib.transforms.offset_copy(ax_r.transData, x=-8/2, units='dots')
         
         while(rad_p.data[rad_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
-            gradient_p.seeknext()
+            rad_p.seeknext()
         while(rad_p.pointer['next'] != None and rad_p.data[rad_p.pointer['next']]['distance'] <= self.distrange['vertical'][1]):
             if(rad_p.pointer['last'] == None):
                 pass
