@@ -45,6 +45,9 @@ if __name__ == '__main__':
     for i in result.station.position:
         print(i,result.station.stationkey[result.station.position[i]])
         
+    dmin = min(result.station.position.keys()) - 500
+    dmax = max(result.station.position.keys()) + 500
+        
     mplot = mapplot.Mapplot(result)
     
     planer_fig = plt.figure()
@@ -54,8 +57,8 @@ if __name__ == '__main__':
     ax2 = profile_fig.add_subplot(2,1,1)
     ax3 = profile_fig.add_subplot(2,1,2)
     
-    mplot.plane(ax1)
-    mplot.vertical(ax2, ax3)
+    mplot.plane(ax1,distmin=dmin,distmax=dmax)
+    mplot.vertical(ax2, ax3,distmin=dmin,distmax=dmax)
     mplot.stationpoint_plane(ax1)
     mplot.stationpoint_height(ax2)
     mplot.gradient_value(ax2)
