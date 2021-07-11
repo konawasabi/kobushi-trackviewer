@@ -298,7 +298,7 @@ class Mapplot():
                 if(value == None):
                     value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
                 if(value != 0):
-                    ax_r.text((pos_start+pos_end)/2,1.1*np.sign(value), value, rotation=90, size=8, transform=trans_offs)
+                    ax_r.text((pos_start+pos_end)/2,1.1*np.sign(value), value, rotation=90, size=8, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
         
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
