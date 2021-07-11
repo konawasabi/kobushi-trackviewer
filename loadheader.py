@@ -12,16 +12,15 @@ def loadheader(path,HEAD_STR,HEAD_VER):
     rootpath = input.resolve().parent
     try:
         f = open(input,'rb') #文字コードが不明なのでバイナリで読み込む
-        top2 = f.read(2)
+        top2 = f.read(2) #ファイル先頭の2byteを読み取り、utf-16かどうか判断。
         if top2 == b'\xff\xfe':
             header_encoding = 'utf-16le'
         elif top2 == b'\xfe\xff':
             header_encoding = 'utf-16be'
-        else:
+        else: # utf-16でなければとりあえずutf-8と仮定する
             header_encoding = 'utf-8'
         f.seek(0)
-        header = f.readline().decode(header_encoding,'ignore') #一行目をutf-8でデコード。
-        #print(header)
+        header = f.readline().decode(header_encoding,'ignore') #一行目をheader_encodingでデコード
         f.close()
     except Exception as e:
         raise OSError()
