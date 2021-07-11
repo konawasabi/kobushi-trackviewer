@@ -18,18 +18,41 @@ if __name__ == '__main__':
     
     argvs = sys.argv
     
+    if not __debug__:
+        # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
+        def info(type, value, tb):
+            if hasattr(sys, "ps1") or not sys.stderr.isatty():
+                # You are in interactive mode or don't have a tty-like
+                # device, so call the default hook
+                sys.__excepthook__(type, value, tb)
+            else:
+                import traceback, pdb
+
+                # You are NOT in interactive mode; print the exception...
+                traceback.print_exception(type, value, tb)
+                # ...then start the debugger in post-mortem mode
+                pdb.pm()
+        import sys
+        sys.excepthook = info
+    
     try:
         result = interpreter.load_files(argvs[1])
     except exceptions.VisitError as e:
         print(e.orig_exc)
         #print(vars(e))
         #print(e)
-        sys.exit()
+        if not __debug__:
+            raise
+        else:
+            sys.exit()
     except Exception as e:
         print('Unexpected error.')
         #print(type(e))
         print(e)
-        sys.exit()
+        if not __debug__:
+            raise
+        else:
+            sys.exit()
     
     if not __debug__:
         print('own_track data')

@@ -42,7 +42,7 @@ class TrackGenerator():
                 raise
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
-            
+            '''
             # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
             def info(type, value, tb):
                 if hasattr(sys, "ps1") or not sys.stderr.isatty():
@@ -58,7 +58,7 @@ class TrackGenerator():
                     pdb.pm()
             import sys
             sys.excepthook = info
-        
+            '''
         for dist in self.list_cp:
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
