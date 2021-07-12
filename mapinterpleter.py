@@ -7,7 +7,7 @@ import mapobj
 
 @v_args(inline=True)
 class ParseMap(Transformer):
-    from operator import sub, mul, mod, neg
+    from operator import sub, mul, mod, neg, pos
     
     number = float
     null_value = type(None)

@@ -19,6 +19,7 @@
 
 ?factor: SIGNED_NUMBER          -> number
        | "-" factor             -> neg
+       | "+" factor             -> pos
        | string
        | "(" expression ")"
        | "$" VALNAME            -> call_variable
