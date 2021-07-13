@@ -262,27 +262,28 @@ class Mapplot():
         gradline_min = height_min - (height_max-height_min)*0.1
         trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=-8/2, units='dots')
         
-        while(gradient_p.data[gradient_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
-            gradient_p.seeknext()
-        
-        while(gradient_p.pointer['next'] != None and gradient_p.data[gradient_p.pointer['next']]['distance'] <= self.distrange['vertical'][1]):
-            # 勾配区切り線の描画処理。変化開始点に描く。
-            if(gradient_p.pointer['last'] == None):
-                vertline()
-                gradval(pos_start = min(owntrack[:,0]),value=0)
-            else:
-                if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
+        if(gradient_p.pointer['last'] == None and gradient_p.pointer['next'] != None):
+            while(gradient_p.data[gradient_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
+                gradient_p.seeknext()
+            
+            while(gradient_p.pointer['next'] != None and gradient_p.data[gradient_p.pointer['next']]['distance'] <= self.distrange['vertical'][1]):
+                # 勾配区切り線の描画処理。変化開始点に描く。
+                if(gradient_p.pointer['last'] == None):
                     vertline()
-                    gradval()
-                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i'):
-                    if(gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value'] == gradient_p.data[gradient_p.pointer['last']]['value']):
+                    gradval(pos_start = min(owntrack[:,0]),value=0)
+                else:
+                    if(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'bt'):
                         vertline()
                         gradval()
-                elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == ''):
-                    if(gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
-                        vertline()
-                        gradval()
-            gradient_p.seeknext()
+                    elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == 'i'):
+                        if(gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value'] == gradient_p.data[gradient_p.pointer['last']]['value']):
+                            vertline()
+                            gradval()
+                    elif(gradient_p.data[gradient_p.pointer['next']]['flag'] == ''):
+                        if(gradient_p.data[gradient_p.pointer['last']]['flag'] != 'bt'):
+                            vertline()
+                            gradval()
+                gradient_p.seeknext()
         # 最終勾配制御点以降の勾配値をプロットする
         if(gradient_p.pointer['last'] == None):
             gradval(pos_end = max(owntrack[:,0]),pos_start = min(owntrack[:,0]),value=0)
