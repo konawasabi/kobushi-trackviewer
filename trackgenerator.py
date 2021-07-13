@@ -11,6 +11,18 @@ class TrackGenerator():
         self.cp_min = min(self.list_cp)
         self.cp_max = max(self.list_cp)
         
+        # 等間隔で距離程を追加する
+        if(len(self.env.station.position) > 0):
+            self.stationdist_min = round(min(self.env.station.position.keys()),-1) - 500
+            self.stationdist_max = round(max(self.env.station.position.keys()),-1) + 500
+            cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,25)
+            self.list_cp.extend(cp_equaldist)
+            self.list_cp = sorted(list(set(self.list_cp)))
+        else:
+            cp_equaldist = np.arange(round(self.cp_min,-1) - 500,round(self.cp_max,-1) + 500,25)
+            self.list_cp.extend(cp_equaldist)
+            self.list_cp = sorted(list(set(self.list_cp)))
+        
         # 前回処理した地点の情報
         self.last_pos = {}
         self.last_pos['x']        = x0     if x0     != None else 0
