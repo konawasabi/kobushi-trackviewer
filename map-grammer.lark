@@ -50,3 +50,5 @@ string: /'[^']*'/ -> remquote
 %ignore CPP_COMMENT
 %ignore NEWLINE
 %ignore "\""
+%ignore "\xa0" // 半角カナのスペース
+
