@@ -12,7 +12,7 @@ class TrackGenerator():
         self.cp_max = max(self.list_cp)
         
         # 等間隔で距離程を追加する
-        if(len(self.env.station.position) > 0):
+        if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後500mに追加
             self.stationdist_min = round(min(self.env.station.position.keys()),-1) - 500
             self.stationdist_max = round(max(self.env.station.position.keys()),-1) + 500
             cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,25)
@@ -54,7 +54,7 @@ class TrackGenerator():
                 raise
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
-            '''
+            ''' デバッガ関係は__main__部で取り扱う
             # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
             def info(type, value, tb):
                 if hasattr(sys, "ps1") or not sys.stderr.isatty():
