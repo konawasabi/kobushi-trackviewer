@@ -11,8 +11,6 @@ from matplotlib import rcParams
 import lark
 from lark import Lark, Transformer, v_args, exceptions
 
-import numpy as np
-
 # https://qiita.com/yniji/items/3fac25c2ffa316990d0c matplotlibで日本語を使う
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
@@ -30,16 +28,12 @@ class mainwindow(ttk.Frame):
         self.create_widgets()
         self.interpreter = interpreter
         
-        self.X = np.linspace(-np.pi,np.pi,100)
-        
     def create_widgets(self):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        self.sin_btn = ttk.Button(self.control_frame, text="Sin", command=self.plotsin)
-        self.sin_btn.grid(column=0, row=1, sticky=(tk.N, tk.S))
-        self.cos_btn = ttk.Button(self.control_frame, text="Cos", command=self.plotcos)
-        self.cos_btn.grid(column=0, row=2, sticky=(tk.N, tk.S))
+        #self.sin_btn = ttk.Button(self.control_frame, text="Sin", command=self.plotsin)
+        #self.sin_btn.grid(column=0, row=1, sticky=(tk.N, tk.S))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -71,40 +65,53 @@ class mainwindow(ttk.Frame):
     
     def open_mapfile(self):
         inputdir = filedialog.askopenfilename()
-        self.filedir_entry_val.set(inputdir)
-        
-        self.result = self.interpreter.load_files(inputdir)
-        
-        if(len(self.result.station.position) > 0):
-            dmin = min(self.result.station.position.keys()) - 500
-            dmax = max(self.result.station.position.keys()) + 500
-        else:
-            dmin = None
-            dmax = None
+        if inputdir != '':
+            self.filedir_entry_val.set(inputdir)
             
-        mplot = mapplot.Mapplot(self.result)
+            self.result = self.interpreter.load_files(inputdir)
+            
+            if(len(self.result.station.position) > 0):
+                self.dmin = min(self.result.station.position.keys()) - 500
+                self.dmax = max(self.result.station.position.keys()) + 500
+            else:
+                self.dmin = None
+                self.dmax = None
+                
+            self.mplot = mapplot.Mapplot(self.result)
+            self.draw_planerplot()
+            self.draw_profileplot()
+            if not __debug__:
+                self.print_debugdata()
+    def draw_planerplot(self):
         self.ax_plane.cla()
+        
+        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax)
+        self.mplot.stationpoint_plane(self.ax_plane)
+        
+        self.plane_canvas.draw()
+    def draw_profileplot(self):
         self.ax_profile_g.cla()
         self.ax_profile_r.cla()
         
-        mplot.plane(self.ax_plane,distmin=dmin,distmax=dmax)
-        mplot.vertical(self.ax_profile_g, self.ax_profile_r,distmin=dmin,distmax=dmax)
-        mplot.stationpoint_plane(self.ax_plane)
-        mplot.stationpoint_height(self.ax_profile_g)
-        mplot.gradient_value(self.ax_profile_g)
-        mplot.radius_value(self.ax_profile_r)
+        self.mplot.vertical(self.ax_profile_g, self.ax_profile_r,distmin=self.dmin,distmax=self.dmax)
+        self.mplot.stationpoint_height(self.ax_profile_g)
+        self.mplot.gradient_value(self.ax_profile_g)
+        self.mplot.radius_value(self.ax_profile_r)
         
-        self.plane_canvas.draw()
         self.profile_canvas.draw()
-    
-    def plotsin(self):
-        self.ax_plane.cla()
-        self.ax_plane.plot(self.X,np.sin(self.X))
-        self.plane_canvas.draw()
-    def plotcos(self):
-        self.ax_plane.cla()
-        self.ax_plane.plot(self.X,np.cos(self.X))
-        self.plane_canvas.draw()
+    def print_debugdata(self):
+        print('own_track data')
+        for i in self.result.own_track.data:
+            print(i)
+        print('controlpoints list')
+        for i in self.result.controlpoints.list_cp:
+            print(i)
+        print('own_track position')
+        for i in self.result.owntrack_pos:
+            print(i)
+        print('station list')
+        for i in self.result.station.position:
+            print(i,self.result.station.stationkey[self.result.station.position[i]])
 
 if __name__ == '__main__':
     if not __debug__:
