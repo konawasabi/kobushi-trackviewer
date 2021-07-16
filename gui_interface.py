@@ -1,3 +1,5 @@
+import sys
+
 import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as filedialog
@@ -105,6 +107,23 @@ class mainwindow(ttk.Frame):
         self.plane_canvas.draw()
 
 if __name__ == '__main__':
+    if not __debug__:
+        # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
+        def info(type, value, tb):
+            if hasattr(sys, "ps1") or not sys.stderr.isatty():
+                # You are in interactive mode or don't have a tty-like
+                # device, so call the default hook
+                sys.__excepthook__(type, value, tb)
+            else:
+                import traceback, pdb
+
+                # You are NOT in interactive mode; print the exception...
+                traceback.print_exception(type, value, tb)
+                # ...then start the debugger in post-mortem mode
+                pdb.pm()
+        import sys
+        sys.excepthook = info
+    
     rule = open('map-grammer.lark', encoding='utf-8').read()
     parser = Lark(rule, parser='lalr', maybe_placeholders=True)
     
