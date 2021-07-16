@@ -31,7 +31,7 @@ class TrackGenerator():
         self.last_pos['theta']    = theta0 if theta0 != None else 0
         self.last_pos['radius']   = r0     if r0     != None else 0
         self.last_pos['gradient'] = gr0    if gr0    != None else 0
-        self.last_pos['distance'] = dist0  if dist0  != None else self.cp_min
+        self.last_pos['distance'] = dist0  if dist0  != None else min(self.list_cp)
         
         #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
