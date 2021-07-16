@@ -32,16 +32,18 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        self.save_btn = ttk.Button(self.control_frame, text="Save", command=None)
-        self.save_btn.grid(column=0, row=0, sticky=(tk.N, tk.S))
-        self.save_btn = ttk.Button(self.control_frame, text="Quit", command=self.quit)
-        self.save_btn.grid(column=0, row=10, sticky=(tk.N, tk.S))
+        self.saveplots_btn = ttk.Button(self.control_frame, text="Save plots", command=None)
+        self.saveplots_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        self.savetrack_btn = ttk.Button(self.control_frame, text="Save track", command=None)
+        self.savetrack_btn.grid(column=0, row=1, sticky=(tk.W, tk.E))
+        self.quit_btn = ttk.Button(self.control_frame, text="Quit", command=self.quit)
+        self.quit_btn.grid(column=0, row=10, sticky=(tk.W, tk.E))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         
         self.open_btn = ttk.Button(self.file_frame, text="Open", command=self.open_mapfile)
-        self.open_btn.grid(column=0, row=0, sticky=(tk.N, tk.S))
+        self.open_btn.grid(column=0, row=0, sticky=(tk.W))
         
         self.filedir_entry_val = tk.StringVar()
         self.filedir_entry = ttk.Entry(self.file_frame, width=75, textvariable=self.filedir_entry_val)
