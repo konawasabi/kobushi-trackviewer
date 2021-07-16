@@ -19,14 +19,14 @@ import mapinterpleter as interp
 import mapplot
 
 class mainwindow(ttk.Frame):
-    def __init__(self, master, interpreter):
+    def __init__(self, master, parser):
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi Track Viewer')
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.create_widgets()
-        self.interpreter = interpreter
+        self.parser = parser
         
     def create_widgets(self):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
@@ -68,7 +68,8 @@ class mainwindow(ttk.Frame):
         if inputdir != '':
             self.filedir_entry_val.set(inputdir)
             
-            self.result = self.interpreter.load_files(inputdir)
+            interpreter = interp.ParseMap(None,self.parser)
+            self.result = interpreter.load_files(inputdir)
             
             if(len(self.result.station.position) > 0):
                 self.dmin = min(self.result.station.position.keys()) - 500
@@ -132,8 +133,7 @@ if __name__ == '__main__':
         sys.excepthook = info
     
     rule = open('map-grammer.lark', encoding='utf-8').read()
-    parser = Lark(rule, parser='lalr', maybe_placeholders=True)
     
     root = tk.Tk()
-    app = mainwindow(master=root,interpreter = interp.ParseMap(None,parser))
+    app = mainwindow(master=root, parser = Lark(rule, parser='lalr', maybe_placeholders=True))
     app.mainloop()
