@@ -32,8 +32,10 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        #self.sin_btn = ttk.Button(self.control_frame, text="Sin", command=self.plotsin)
-        #self.sin_btn.grid(column=0, row=1, sticky=(tk.N, tk.S))
+        self.save_btn = ttk.Button(self.control_frame, text="Save", command=None)
+        self.save_btn.grid(column=0, row=0, sticky=(tk.N, tk.S))
+        self.save_btn = ttk.Button(self.control_frame, text="Quit", command=self.quit)
+        self.save_btn.grid(column=0, row=10, sticky=(tk.N, tk.S))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -81,8 +83,8 @@ class mainwindow(ttk.Frame):
             self.mplot = mapplot.Mapplot(self.result)
             self.draw_planerplot()
             self.draw_profileplot()
-            if not __debug__:
-                self.print_debugdata()
+            
+            self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
         
@@ -101,18 +103,19 @@ class mainwindow(ttk.Frame):
         
         self.profile_canvas.draw()
     def print_debugdata(self):
-        print('own_track data')
-        for i in self.result.own_track.data:
-            print(i)
-        print('controlpoints list')
-        for i in self.result.controlpoints.list_cp:
-            print(i)
-        print('own_track position')
-        for i in self.result.owntrack_pos:
-            print(i)
-        print('station list')
-        for i in self.result.station.position:
-            print(i,self.result.station.stationkey[self.result.station.position[i]])
+        if not __debug__:
+            print('own_track data')
+            for i in self.result.own_track.data:
+                print(i)
+            print('controlpoints list')
+            for i in self.result.controlpoints.list_cp:
+                print(i)
+            print('own_track position')
+            for i in self.result.owntrack_pos:
+                print(i)
+            print('station list')
+            for i in self.result.station.position:
+                print(i,self.result.station.stationkey[self.result.station.position[i]])
 
 if __name__ == '__main__':
     if not __debug__:
