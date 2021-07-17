@@ -22,6 +22,7 @@ class mainwindow(ttk.Frame):
     def __init__(self, master, parser):
         self.dmin = None
         self.dmax = None
+        self.result = None
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi Track Viewer')
@@ -36,12 +37,28 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
+        self.stationpos_val = tk.BooleanVar(value=True)
+        self.stationpos_chk = ttk.Checkbutton(self.control_frame, text='駅座標',onvalue=True, offvalue=False, variable=self.stationpos_val, command=self.plot_all)
+        self.stationpos_chk.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+        self.stationlabel_val = tk.BooleanVar(value=True)
+        self.stationlabel_chk = ttk.Checkbutton(self.control_frame, text='駅名',onvalue=True, offvalue=False, variable=self.stationlabel_val, command=self.plot_all)
+        self.stationlabel_chk.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E))
+        self.gradientpos_val = tk.BooleanVar(value=True)
+        self.gradientpos_chk = ttk.Checkbutton(self.control_frame, text='勾配変化点',onvalue=True, offvalue=False, variable=self.gradientpos_val, command=self.plot_all)
+        self.gradientpos_chk.grid(column=0, row=2, sticky=(tk.N, tk.W, tk.E))
+        self.gradientval_val = tk.BooleanVar(value=True)
+        self.gradientval_chk = ttk.Checkbutton(self.control_frame, text='勾配値',onvalue=True, offvalue=False, variable=self.gradientval_val, command=self.plot_all)
+        self.gradientval_chk.grid(column=0, row=3, sticky=(tk.N, tk.W, tk.E))
+        self.curveval_val = tk.BooleanVar(value=True)
+        self.curveval_chk = ttk.Checkbutton(self.control_frame, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
+        self.curveval_chk.grid(column=0, row=4, sticky=(tk.N, tk.W, tk.E))
+        
         self.saveplots_btn = ttk.Button(self.control_frame, text="Save plots", command=None)
-        self.saveplots_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        self.saveplots_btn.grid(column=0, row=10, sticky=(tk.W, tk.E))
         self.savetrack_btn = ttk.Button(self.control_frame, text="Save track", command=None)
-        self.savetrack_btn.grid(column=0, row=1, sticky=(tk.W, tk.E))
+        self.savetrack_btn.grid(column=0, row=11, sticky=(tk.W, tk.E))
         self.quit_btn = ttk.Button(self.control_frame, text="Quit", command=self.quit)
-        self.quit_btn.grid(column=0, row=10, sticky=(tk.W, tk.E))
+        self.quit_btn.grid(column=0, row=12, sticky=(tk.W, tk.E))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -114,15 +131,15 @@ class mainwindow(ttk.Frame):
                 self.distance_scale.set(0)
                 
             self.mplot = mapplot.Mapplot(self.result)
-            self.draw_planerplot()
-            self.draw_profileplot()
+            self.plot_all()
             
             self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
         
         self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax)
-        self.mplot.stationpoint_plane(self.ax_plane)
+        if self.stationpos_val.get():
+            self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         
         self.plane_canvas.draw()
     def draw_profileplot(self):
@@ -130,9 +147,11 @@ class mainwindow(ttk.Frame):
         self.ax_profile_r.cla()
         
         self.mplot.vertical(self.ax_profile_g, self.ax_profile_r,distmin=self.dmin,distmax=self.dmax)
-        self.mplot.stationpoint_height(self.ax_profile_g)
-        self.mplot.gradient_value(self.ax_profile_g)
-        self.mplot.radius_value(self.ax_profile_r)
+        if self.stationpos_val.get():
+            self.mplot.stationpoint_height(self.ax_profile_g,labelplot=self.stationlabel_val.get())
+        if self.gradientpos_val.get():
+            self.mplot.gradient_value(self.ax_profile_g,labelplot=self.gradientval_val.get())
+        self.mplot.radius_value(self.ax_profile_r,labelplot=self.curveval_val.get())
         
         self.profile_canvas.draw()
     def print_debugdata(self):
@@ -157,18 +176,20 @@ class mainwindow(ttk.Frame):
             self.dmin = distmin
             self.dmax = distmin + self.dist_range_arb_val.get()
             
-            self.draw_planerplot()
-            self.draw_profileplot()
+            self.plot_all()
     def setdist_all(self):
         self.dmin = self.distrange_min
         self.dmax = self.distrange_max
         
-        self.draw_planerplot()
-        self.draw_profileplot()
+        self.plot_all()
     def setdist_arbitrary(self):
         self.setdist_scale(0)
     def distset_entry(self):
         self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
+    def plot_all(self):
+        if(self.result != None):
+            self.draw_planerplot()
+            self.draw_profileplot()
 
 if __name__ == '__main__':
     if not __debug__:

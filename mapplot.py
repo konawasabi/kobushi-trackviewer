@@ -239,11 +239,11 @@ class Mapplot():
                     #ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
                     if(labelplot):
                         ax_h.text(stationpos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
-    def gradient_value(self, ax_h):
+    def gradient_value(self, ax_h, labelplot = True):
         def vertline():
             pos_temp = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
             ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
-        def gradval(pos_start=None, pos_end=None, value=None, doplot=True):
+        def gradval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
             if(doplot):
                 if(pos_end == None):
                     pos_end = gradient_p.data[gradient_p.pointer['next']]['distance']
@@ -292,8 +292,8 @@ class Mapplot():
             gradval(pos_end = max(owntrack[:,0]),pos_start = min(owntrack[:,0]),value=0)
         else:
             gradval(pos_end = max(owntrack[:,0]))
-    def radius_value(self, ax_r):
-        def pltval(pos_start=None, pos_end=None, value=None, doplot=True):
+    def radius_value(self, ax_r, labelplot = True):
+        def pltval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
             if(doplot):
                 if(pos_end == None):
                     pos_end = rad_p.data[rad_p.pointer['next']]['distance']
