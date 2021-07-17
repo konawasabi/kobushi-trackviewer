@@ -56,23 +56,27 @@ class mainwindow(ttk.Frame):
         self.setdist_frame = ttk.Frame(self, padding='3 3 3 3')
         self.setdist_frame.grid(column=0, row=2, sticky=(tk.W, tk.E))
         
+        self.distset_btn = ttk.Button(self.setdist_frame, text="Set", command=self.distset_entry, width=3)
+        self.distset_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        
         self.setdist_entry_val = tk.DoubleVar()
         self.setdist_entry = ttk.Entry(self.setdist_frame, width=7, textvariable=self.setdist_entry_val)
-        self.setdist_entry.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        self.setdist_entry.grid(column=1, row=0, sticky=(tk.W, tk.E))
         
         self.distance_scale = ttk.Scale(self.setdist_frame, orient=tk.HORIZONTAL, length=500, from_=0, to=100, command=self.setdist_scale)
-        self.distance_scale.grid(column=1, row=0, sticky=(tk.W, tk.E))
+        self.distance_scale.grid(column=2, row=0, sticky=(tk.W, tk.E))
         
         self.dist_range_sel = tk.StringVar(value='all')
         #self.dist_range = ttk.Combobox(self.setdist_frame, textvariable=self.dist_range_val, width = 6, state='readonly')
         #self.dist_range['values'] = ('all', '10 km', '5 km', '2 km', '1 km', '500 m', '200 m', '100 m')
         self.dist_range_all = ttk.Radiobutton(self.setdist_frame, text='all',variable=self.dist_range_sel, value='all', command=self.setdist_all)
-        self.dist_range_all.grid(column=2, row=0, sticky=(tk.W, tk.E))
+        self.dist_range_all.grid(column=3, row=0, sticky=(tk.W, tk.E))
         self.dist_range_arb = ttk.Radiobutton(self.setdist_frame, text='',variable=self.dist_range_sel, value='arb', command=self.setdist_arbitrary)
-        self.dist_range_arb.grid(column=3, row=0, sticky=(tk.W, tk.E))
+        self.dist_range_arb.grid(column=4, row=0, sticky=(tk.W, tk.E))
         self.dist_range_arb_val = tk.DoubleVar(value=5000)
         self.dist_range_arb_entry = ttk.Entry(self.setdist_frame, width=5, textvariable=self.dist_range_arb_val)
-        self.dist_range_arb_entry.grid(column=4, row=0, sticky=(tk.W, tk.E))
+        self.dist_range_arb_entry.grid(column=5, row=0, sticky=(tk.W, tk.E))
+        
         
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -146,11 +150,10 @@ class mainwindow(ttk.Frame):
             for i in self.result.station.position:
                 print(i,self.result.station.stationkey[self.result.station.position[i]])
     def setdist_scale(self, val):
+        pos = float(self.distance_scale.get())
+        distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
+        self.setdist_entry_val.set(distmin)
         if(self.dist_range_sel.get() == 'arb'):
-            pos = float(self.distance_scale.get())
-            distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
-            self.setdist_entry_val.set(distmin)
-            
             self.dmin = distmin
             self.dmax = distmin + self.dist_range_arb_val.get()
             
@@ -164,6 +167,8 @@ class mainwindow(ttk.Frame):
         self.draw_profileplot()
     def setdist_arbitrary(self):
         self.setdist_scale(0)
+    def distset_entry(self):
+        self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
 
 if __name__ == '__main__':
     if not __debug__:
