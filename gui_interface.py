@@ -105,7 +105,7 @@ class mainwindow(ttk.Frame):
         self.plane_canvas.draw()
         self.plane_canvas.get_tk_widget().grid(row = 0, column = 0)
         
-        self.fig_profile, ((self.ax_profile_g, self.ax_profile_r)) = plt.subplots(2,1,figsize=(8,3),sharex='col')
+        self.fig_profile, ((self.ax_profile_g, self.ax_profile_r)) = plt.subplots(2,1, figsize=(8,3), sharex='col', gridspec_kw={'height_ratios': [2, 1]})
         self.fig_profile.subplots_adjust(hspace=0)
         
         self.profile_canvas = FigureCanvasTkAgg(self.fig_profile, master=self.canvas_frame)
