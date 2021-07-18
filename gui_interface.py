@@ -105,8 +105,10 @@ class mainwindow(ttk.Frame):
         self.plane_canvas.draw()
         self.plane_canvas.get_tk_widget().grid(row = 0, column = 0)
         
-        self.fig_profile, ((self.ax_profile_g, self.ax_profile_r)) = plt.subplots(2,1, figsize=(8,3), sharex='col', gridspec_kw={'height_ratios': [2, 1]})
+        self.fig_profile, ((self.ax_profile_s, self.ax_profile_g, self.ax_profile_r)) = plt.subplots(3,1, figsize=(8,3), sharex='col', gridspec_kw={'height_ratios': [1, 3, 2]})
         self.fig_profile.subplots_adjust(hspace=0)
+        self.ax_profile_s.tick_params(labelleft=False, left=False)
+        self.ax_profile_r.tick_params(labelleft=False, left=False)
         
         self.profile_canvas = FigureCanvasTkAgg(self.fig_profile, master=self.canvas_frame)
         self.profile_canvas.draw()
@@ -144,10 +146,10 @@ class mainwindow(ttk.Frame):
     def draw_profileplot(self):
         self.ax_profile_g.cla()
         self.ax_profile_r.cla()
+        self.ax_profile_s.cla()
         
         self.mplot.vertical(self.ax_profile_g, self.ax_profile_r,distmin=self.dmin,distmax=self.dmax)
-        if self.stationpos_val.get():
-            self.mplot.stationpoint_height(self.ax_profile_g,labelplot=self.stationlabel_val.get())
+        self.mplot.stationpoint_height(self.ax_profile_g,self.ax_profile_s,labelplot=self.stationlabel_val.get())
         if self.gradientpos_val.get():
             self.mplot.gradient_value(self.ax_profile_g,labelplot=self.gradientval_val.get())
         self.mplot.radius_value(self.ax_profile_r,labelplot=self.curveval_val.get())
