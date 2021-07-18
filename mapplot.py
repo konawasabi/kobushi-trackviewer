@@ -206,7 +206,8 @@ class Mapplot():
         owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
         ax_h.plot(owntrack[:,0],owntrack[:,3])
         ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]))
-        ax_r.set_ylim(-3,3)
+        ax_r.set_ylim(-5,5)
+        ax_r.tick_params(labelleft=False, left=False)
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
@@ -302,7 +303,7 @@ class Mapplot():
                 if(value == None):
                     value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
                 if(value != 0):
-                    ax_r.text((pos_start+pos_end)/2,1.1*np.sign(value), value, rotation=90, size=8, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
+                    ax_r.text((pos_start+pos_end)/2,1.2*np.sign(value), '{:.0f}'.format(value), rotation=90, size=8, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
         
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
