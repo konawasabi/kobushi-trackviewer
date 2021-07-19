@@ -207,8 +207,8 @@ class Mapplot():
         self.heightmax = max(owntrack[:,3])
         self.heightmin = min(owntrack[:,3])
         ax_h.plot(owntrack[:,0],owntrack[:,3])
-        ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]))
-        ax_r.set_ylim(-5,5)
+        ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1)
+        ax_r.set_ylim(-6,6)
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
@@ -238,7 +238,7 @@ class Mapplot():
                 station_marker_ypos = self.heightmax
                 trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=-8/2,y=8*1, units='dots')
                 for i in range(0,len(stationpos)):
-                    ax_h.plot([stationpos[i][0],stationpos[i][0]],[stationpos[i][3],station_marker_ypos],color='tab:blue')
+                    ax_h.plot([stationpos[i][0],stationpos[i][0]],[stationpos[i][3],station_marker_ypos],color='tab:blue',lw=1)
                     #ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
                     if(labelplot):
                         #ax_h.text(stationpos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
@@ -246,7 +246,7 @@ class Mapplot():
     def gradient_value(self, ax_h, labelplot = True):
         def vertline():
             pos_temp = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
-            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue')
+            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue',lw=1)
         def gradval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
             if(doplot):
                 if(pos_end == None):
@@ -256,7 +256,7 @@ class Mapplot():
                 if(value == None):
                     value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
                 value = str(value) if value != 0 else 'Lv.'
-                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=8, transform=trans_offs)
+                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=7, transform=trans_offs)
             
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
@@ -306,7 +306,7 @@ class Mapplot():
                 if(value == None):
                     value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
                 if(value != 0):
-                    ax_r.text((pos_start+pos_end)/2,1.2*np.sign(value), '{:.0f}'.format(value), rotation=90, size=8, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
+                    ax_r.text((pos_start+pos_end)/2,1.2*np.sign(value), '{:.0f}'.format(value), rotation=90, size=7, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
         
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]

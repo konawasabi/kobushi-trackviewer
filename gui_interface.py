@@ -98,14 +98,14 @@ class mainwindow(ttk.Frame):
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        self.fig_plane = plt.figure(figsize=(8,5))
+        self.fig_plane = plt.figure(figsize=(10,5))
         self.ax_plane = self.fig_plane.add_subplot()
         
         self.plane_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.canvas_frame)
         self.plane_canvas.draw()
         self.plane_canvas.get_tk_widget().grid(row = 0, column = 0)
         
-        self.fig_profile, ((self.ax_profile_s, self.ax_profile_g, self.ax_profile_r)) = plt.subplots(3,1, figsize=(8,3), sharex='col', gridspec_kw={'height_ratios': [1, 3, 2]})
+        self.fig_profile, ((self.ax_profile_s, self.ax_profile_g, self.ax_profile_r)) = plt.subplots(3,1, figsize=(10,3), sharex='col', gridspec_kw={'height_ratios': [3, 6, 4]})
         self.fig_profile.subplots_adjust(hspace=0)
         self.ax_profile_s.tick_params(labelleft=False, left=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
