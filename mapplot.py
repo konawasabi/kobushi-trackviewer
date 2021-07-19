@@ -185,7 +185,7 @@ class Mapplot():
             self.nostation = False
         else:
             self.nostation = True
-    def plane(self, ax_pl, distmin = None, distmax = None):
+    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['plane'][0] = distmin
@@ -194,7 +194,26 @@ class Mapplot():
         owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
         ax_pl.plot(owntrack[:,1],owntrack[:,2])
-        ax_pl.set_aspect('equal')
+        #if iswholemap:
+        if True:
+            ax_pl.set_aspect('equal')
+        else:
+            windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth())
+            '''
+            distr = distmax - distmin
+            pos0 = owntrack[0]
+            ax_pl.set_xlim(pos0[1],pos0[1] + distr)
+            ax_pl.set_ylim(pos0[2],pos0[2] + distr*windowratio)
+            '''
+            plotrange = [max(owntrack[:,1]) - min(owntrack[:,1]),max(owntrack[:,2]) - min(owntrack[:,2])]
+            
+            if(plotrange[0] > plotrange[1]):
+                yminval = min(owntrack[:,2])
+                ax_pl.set_ylim(yminval,yminval + plotrange[0]*windowratio)
+            else:
+                xminval = min(owntrack[:,1])
+                ax_pl.set_xlim(xminval,xminval + plotrange[1]/windowratio)
+            
         ax_pl.invert_yaxis()
     def vertical(self, ax_h, ax_r, distmin = None, distmax = None):
         owntrack = self.environment.owntrack_pos
@@ -244,10 +263,13 @@ class Mapplot():
                         #ax_h.text(stationpos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
                         ax_s.text(stationpos[i][0],1, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
     def gradient_value(self, ax_h, labelplot = True):
+        # 勾配数値をプロットする
         def vertline():
+            # 勾配変化点へ垂直線を描画
             pos_temp = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
             ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue',lw=1)
         def gradval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
+            # 勾配数値をプロット
             if(doplot):
                 if(pos_end == None):
                     pos_end = gradient_p.data[gradient_p.pointer['next']]['distance']
