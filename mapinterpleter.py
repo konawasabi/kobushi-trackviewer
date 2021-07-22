@@ -93,6 +93,17 @@ class ParseMap(Transformer):
                     temp_argv = [key] # stationKeyがある場合、マップファイル指定の引数の先頭にkeyを追加する
                     temp_argv.extend(argument[-1].children[1:])
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
+            elif(first_obj in ['track']):
+                if(argument[1].children[0].lower() != 'cant'):
+                    key = argument[0].children[1] # trackKeyを取得
+                    temp = getattr(self.environment, 'othertrack') # 対応するオブジェクトを取得する
+                    for elem in argument[1:]: # 2番目以降もマップ要素かどうか(例: Track.X.Interpolate(...) or Track.Position(...) )
+                        if(elem.data == 'mapfunc'): # 関数なら探索中止
+                            break
+                        temp = getattr(temp, elem.children[0].lower()) # 対応するオブジェクトを取得
+                    temp_argv = [key] # stationKeyがある場合、マップファイル指定の引数の先頭にkeyを追加する
+                    temp_argv.extend(argument[-1].children[1:])
+                    getattr(temp, argument[-1].children[0].lower())(*temp_argv)
     def include_file(self, path): #外部ファイルインクルード
         input = loadheader.joinpath(self.environment.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)

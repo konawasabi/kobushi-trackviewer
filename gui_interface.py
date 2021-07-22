@@ -169,6 +169,13 @@ class mainwindow(ttk.Frame):
             print('station list')
             for i in self.result.station.position:
                 print(i,self.result.station.stationkey[self.result.station.position[i]])
+            print('othertrack data')
+            for i in self.result.othertrack.data.keys():
+                print(i)
+                for j in self.result.othertrack.data[i]:
+                    print(j)
+            print('Track keys:')
+            print(self.result.othertrack.data.keys())
     def setdist_scale(self, val):
         pos = float(self.distance_scale.get())
         distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min

@@ -15,7 +15,7 @@ class Environment():
         self.own_track = Owntrack(self)
         self.station = Station(self)
         self.controlpoints = ControlPoints(self)
-
+        self.othertrack = Othertrack(self)
 class Owntrack():
     '''自軌道データクラス
     (1)パーサが読み取った自軌道マップ要素を変換するサブクラス
@@ -174,3 +174,57 @@ class ControlPoints():
         '''self.list_cpについて、重複する要素を除去して距離順にソートする。
         '''
         self.list_cp = sorted(list(set(self.list_cp)))
+
+class Othertrack():
+    class setposition():
+        def __init__(self, parent, dimension):
+            self.parent = parent
+            self.dimension = dimension
+        def interpolate(self, *a):
+            if(len(a)==1):
+                self.parent.putdata(a[0],self.dimension+'.position',None)
+                self.parent.putdata(a[0],self.dimension+'.radius',None)
+            elif(len(a)==2):
+                self.parent.putdata(a[0],self.dimension+'.position',a[1])
+                self.parent.putdata(a[0],self.dimension+'.radius',None)
+            elif(len(a)>=3):
+                self.parent.putdata(a[0],self.dimension+'.position',a[1])
+                self.parent.putdata(a[0],self.dimension+'.radius',a[2])
+    def __init__(self,p):
+        self.data = {}
+        self.environment = p
+        self.x = self.setposition(self, 'x')
+        self.y = self.setposition(self, 'y')
+    
+    def position(self, *a):
+        if(len(a)==3):
+            self.x.interpolate(a[0],a[1],0)
+            self.y.interpolate(a[0],a[2],0)
+        elif(len(a)==4):
+            self.x.interpolate(a[0],a[1],a[3])
+            self.y.interpolate(a[0],a[2],0)
+        elif(len(a)>=5):
+            self.x.interpolate(a[0],a[1],a[3])
+            self.y.interpolate(a[0],a[2],a[4])
+    def putdata(self,trackkey,elementkey,value,flag=''):
+        '''dataリストへ要素をdictとして追加する。
+        distance
+            呼び出された時点でのdistance変数の値
+        key
+            マップ要素の種別
+                'x.position' : x方向座標
+                'x.radius'   : x方向相対半径
+                'y.position' : y方向座標
+                'y.radius'   : y方向相対半径
+        value
+            Noneの場合、'c':直前のコマンドで指定された値と同一を代入
+        flag
+            '':change, 'i':interpolate, 'bt':begintransition
+        '''
+        trackkey_lc = trackkey.lower()
+        if trackkey_lc not in self.data.keys():
+            self.data[trackkey_lc] = []
+        self.data[trackkey_lc].append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':elementkey, 'flag':flag})
+    def relocate(self):
+        for trackkey in self.data.keys():
+            self.data[trackkey] = sorted(self.data[trackkey], key=lambda x: x['distance'])
