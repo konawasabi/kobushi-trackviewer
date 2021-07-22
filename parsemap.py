@@ -81,13 +81,14 @@ if __name__ == '__main__':
     ax1 = planer_fig.add_subplot(1,1,1)
     
     profile_fig = plt.figure()
-    ax2 = profile_fig.add_subplot(2,1,1)
-    ax3 = profile_fig.add_subplot(2,1,2)
+    ax2 = profile_fig.add_subplot(3,1,1)
+    ax3 = profile_fig.add_subplot(3,1,2)
+    ax4 = profile_fig.add_subplot(3,1,3)
     
-    mplot.plane(ax1,distmin=dmin,distmax=dmax)
+    mplot.plane(ax1,distmin=dmin,distmax=dmax,iswholemap = True)
     mplot.vertical(ax2, ax3,distmin=dmin,distmax=dmax)
     mplot.stationpoint_plane(ax1)
-    mplot.stationpoint_height(ax2)
+    mplot.stationpoint_height(ax2,ax4)
     mplot.gradient_value(ax2)
     mplot.radius_value(ax3)
     
