@@ -206,6 +206,8 @@ class Othertrack():
         elif(len(a)>=5):
             self.x.interpolate(a[0],a[1],a[3])
             self.y.interpolate(a[0],a[2],a[4])
+    def gauge(self, *a):
+        pass
     def putdata(self,trackkey,elementkey,value,flag=''):
         '''dataリストへ要素をdictとして追加する。
         distance
