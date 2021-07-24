@@ -31,10 +31,12 @@ class mainwindow(ttk.Frame):
             self.create_widgets()
             #self.insert_test()
         def create_widgets(self):
-            self.othertrack_tree = CheckboxTreeview(self, show='headings', columns=['mindist', 'maxdist'])
+            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'])
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
-            #self.othertrack_tree.column('#0', width=20)
-            self.othertrack_tree.heading("#0", text='track key')
+            self.othertrack_tree.column('#0', width=200)
+            self.othertrack_tree.column('mindist', width=100)
+            self.othertrack_tree.column('maxdist', width=100)
+            self.othertrack_tree.heading('#0', text='track key')
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
 
@@ -161,8 +163,12 @@ class mainwindow(ttk.Frame):
             self.mplot = mapplot.Mapplot(self.result)
             self.plot_all()
             
+            if self.subwindow.othertrack_tree.exists('root'):
+                self.subwindow.othertrack_tree.delete('root')
+            self.subwindow.othertrack_tree.insert("", "end", 'root', text='root', open=True)
             for i in self.result.othertrack.data.keys():
-                self.subwindow.othertrack_tree.insert("", "end", i, text=i, values=(0,1000))
+                self.subwindow.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance']))
+            #self.subwindow.othertrack_tree.see('root')
             
             self.print_debugdata()
     def draw_planerplot(self):
