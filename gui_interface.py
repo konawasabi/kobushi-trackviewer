@@ -29,7 +29,7 @@ class mainwindow(ttk.Frame):
             self.master.rowconfigure(0, weight=1)
             self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
             self.create_widgets()
-            #self.insert_test()
+            self.master.geometry('+1100+0')
         def create_widgets(self):
             self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'])
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
@@ -39,13 +39,6 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('#0', text='track key')
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
-
-        def insert_test(self):
-            self.othertrack_tree.insert("", "end", "1", text="1")
-            self.othertrack_tree.insert("1", "end", "11", text="11")
-            self.othertrack_tree.insert("1", "end", "12",  text="12")
-            self.othertrack_tree.insert("11", "end", "111", text="111")
-            self.othertrack_tree.insert("", "end", "2", text="2")
     def __init__(self, master, parser):
         self.dmin = None
         self.dmax = None
