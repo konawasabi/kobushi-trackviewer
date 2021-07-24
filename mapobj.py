@@ -223,7 +223,7 @@ class Othertrack():
         flag
             '':change, 'i':interpolate, 'bt':begintransition
         '''
-        trackkey_lc = trackkey.lower()
+        trackkey_lc = str(trackkey).lower()
         if trackkey_lc not in self.data.keys():
             self.data[trackkey_lc] = []
         self.data[trackkey_lc].append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':elementkey, 'flag':flag})
