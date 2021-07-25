@@ -177,3 +177,36 @@ class curve_intermediate(curve):
                 turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2)
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl if np.fabs(rl) < 1e6 else 0
+
+class OtherTrack():
+    def __init__(self):
+        pass
+    def relative_position(self, L, radius, ya, yb, l_intermediate):
+        if radius != 0:
+            tau = np.arctan((yb-ya)/L)
+            theta = 2*np.arcsin(np.sqrt(L**2+(yb-ya)**2)/(2*radius))
+
+            phiA = theta/2-tau
+
+            x0 = 0 + radius*np.sin(phiA)
+            y0 = ya + radius*np.cos(phiA)
+
+            Y = y0 - radius*np.cos(np.arcsin((l_intermediate-x0)/radius))
+        else:
+            Y = (yb - ya)/L * l_intermediate + ya
+        
+        return Y
+    def rotate(self, tau1):
+        '''２次元回転行列を返す。
+        tau1: 回転角度 [rad]
+        '''
+        return np.array([[np.cos(tau1), -np.sin(tau1)], [np.sin(tau1),  np.cos(tau1)]])
+    def absolute_position_X(self, L, radius, xa, xb, l_intermediate, pos_ownt):
+        '''
+        pos_ownt:
+        '''
+        posrel = np.array([0,self.relative_position(L, radius, xa, xb, l_intermediate)])
+        return np.dot(self.rotate(theta),pos_ownt[4]) + np.array([pos_ownt[1],pos_ownt[2]])
+    def absolute_position_Y(self, L, radius, ya, yb, l_intermediate, pos_ownt):
+        posrel = np.array([0,self.relative_position(L, radius, ya, yb, l_intermediate)])
+        return posrel + np.array([pos_ownt[1],pos_ownt[3]])

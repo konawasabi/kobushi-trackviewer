@@ -257,3 +257,29 @@ class TrackPointer():
                         break
         return index
             
+class OtherTrackGenerator():
+    class TrackPointer(TrackPointer):
+        def __init__(self,environment,target,trackkey):
+            super().__init__(environment,target)
+            self.data = environment.othertrack.data[trackkey]
+        
+    def __init__(self,environment,trackkey):
+        self.env = environment
+        self.trackkey = trackkey
+        self.data = environment.othertrack.data[trackkey]
+        self.owntrack_position = environment.owntrack_pos
+        self.result = []
+        # 前回処理した地点の情報
+        self.last_pos = {}
+        self.last_pos['x.position'] = 0
+        self.last_pos['y.position'] = 0
+        self.last_pos['x.radius'] = 0
+        self.last_pos['y.radius'] = 0
+        
+    def generate(self)
+        tp_xpos = self.TrackPointer(self.env,'x.position',self.trackkey)
+        tp_xrad = self.TrackPointer(self.env,'x.radius',self.trackkey)
+        tp_ypos = self.TrackPointer(self.env,'y.position',self.trackkey)
+        tp_yrad = self.TrackPointer(self.env,'y.radius',self.trackkey)
+        for element in self.owntrack_position:
+            pass
