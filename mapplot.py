@@ -174,8 +174,16 @@ def plot_planer_map(environment, ax):
 class Mapplot():
     def __init__(self,env):
         self.environment = env
+        
         trackgenerator = tgen.TrackGenerator(self.environment)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()
+        
+        otgenerator = {}
+        self.environment.othertrack_pos = {}
+        for key in self.environment.othertrack.data.keys():
+            otgenerator[key] = tgen.OtherTrackGenerator(self.environment,key)
+            self.environment.othertrack_pos[key] = otgenerator[key].generate()
+            
         self.distrange = {}
         self.distrange['plane'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
         self.distrange['vertical'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
@@ -185,7 +193,7 @@ class Mapplot():
             self.nostation = False
         else:
             self.nostation = True
-    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True):
+    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True, othertrack_list = None):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['plane'][0] = distmin
@@ -194,6 +202,12 @@ class Mapplot():
         owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
         ax_pl.plot(owntrack[:,1],owntrack[:,2])
+        if othertrack_list != None:
+            for key in othertrack_list:
+                othertrack = self.environment.othertrack_pos[key]
+                othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
+                othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
+                ax_pl.plot(othertrack[:,1],othertrack[:,2])
         #if iswholemap:
         if True:
             ax_pl.set_aspect('equal')
