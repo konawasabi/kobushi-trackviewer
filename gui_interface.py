@@ -220,6 +220,11 @@ class mainwindow(ttk.Frame):
                     print(j)
             print('Track keys:')
             print(self.result.othertrack.data.keys())
+            print('othertrack position')
+            for i in self.result.othertrack.data.keys():
+                print(i)
+                for j in self.result.othertrack_pos[i]:
+                    print(j)
     def setdist_scale(self, val):
         pos = float(self.distance_scale.get())
         distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
