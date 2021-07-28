@@ -19,6 +19,21 @@ rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 
 import mapinterpleter as interp
 import mapplot
 
+# http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
+class Catcher:
+    def __init__(self, func, subst, widget):
+        self.func = func
+        self.subst = subst
+        self.widget = widget
+    
+    def __call__(self, *args):
+        try:
+            if self.subst:
+               args = self.subst(*args)
+            return self.func(*args)
+        except Exception as e:
+            raise e
+
 class mainwindow(ttk.Frame):
     class SubWindow(ttk.Frame):
         def __init__(self, master):
@@ -248,6 +263,7 @@ if __name__ == '__main__':
     
     rule = open('map-grammer.lark', encoding='utf-8').read()
     
+    tk.CallWrapper = Catcher
     root = tk.Tk()
     app = mainwindow(master=root, parser = Lark(rule, parser='lalr', maybe_placeholders=True))
     app.mainloop()
