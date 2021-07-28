@@ -206,7 +206,7 @@ class OtherTrack():
         pos_ownt:
         '''
         posrel = np.array([0,self.relative_position(L, radius, xa, xb, l_intermediate)])
-        return np.dot(self.rotate(theta),pos_ownt[4]) + np.array([pos_ownt[1],pos_ownt[2]])
+        return np.dot(self.rotate(pos_ownt[4]),posrel) + np.array([pos_ownt[1],pos_ownt[2]])
     def absolute_position_Y(self, L, radius, ya, yb, l_intermediate, pos_ownt):
         posrel = np.array([0,self.relative_position(L, radius, ya, yb, l_intermediate)])
         return posrel + np.array([pos_ownt[1],pos_ownt[3]])

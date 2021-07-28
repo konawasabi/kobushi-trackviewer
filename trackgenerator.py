@@ -269,17 +269,54 @@ class OtherTrackGenerator():
         self.data = environment.othertrack.data[trackkey]
         self.owntrack_position = environment.owntrack_pos
         self.result = []
+        self.distrange={'min':min(self.data, key=lambda x: x['distance'])['distance'], 'max':max(self.data, key=lambda x: x['distance'])['distance']}
         # 前回処理した地点の情報
-        self.last_pos = {}
-        self.last_pos['x.position'] = 0
-        self.last_pos['y.position'] = 0
-        self.last_pos['x.radius'] = 0
-        self.last_pos['y.radius'] = 0
-        
-    def generate(self)
-        tp_xpos = self.TrackPointer(self.env,'x.position',self.trackkey)
-        tp_xrad = self.TrackPointer(self.env,'x.radius',self.trackkey)
-        tp_ypos = self.TrackPointer(self.env,'y.position',self.trackkey)
-        tp_yrad = self.TrackPointer(self.env,'y.radius',self.trackkey)
+        self.pos = {'last':{}, 'next':{}}
+        for key in ['x.position','x.radius','y.position','y.radius','distance']:
+            self.pos['last'][key] = 0
+            self.pos['next'][key] = 0
+    
+    def generate(self):
+        track_gen = tc.OtherTrack()
+        trackptr = {}
+        trackptr['x.position'] = self.TrackPointer(self.env,'x.position',self.trackkey)
+        trackptr['x.radius']   = self.TrackPointer(self.env,'x.radius',self.trackkey)
+        trackptr['y.position'] = self.TrackPointer(self.env,'y.position',self.trackkey)
+        trackptr['y.radius']   = self.TrackPointer(self.env,'y.radius',self.trackkey)
+        #tp_keys = ['x.position','x.radius','y.position','y.radius']
         for element in self.owntrack_position:
-            pass
+            if self.distrange['min'] > element[0]:
+                continue
+            elif pointer['last'] == None:
+                for tpkey in trackptr.keys():
+                    trackptr[tpkey].seeknext()
+                    newval = {'last':{}, 'next':{}}
+                    k = 'last'
+                    newval[k] = self.data[self.trackptr[tpkey].pointer[k]]['value']
+                    self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos[k][tpkey]
+                    k = 'next'
+                    newval[k] = self.data[self.trackptr[tpkey].pointer[k]]['value']
+                    self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos['last'][tpkey]
+                for k in ['last','next']:
+                    self.pos[k]['distance'] = self.data[self.trackptr[tpkey].pointer[k]]['distance']
+            for tpkey in trackptr.keys():
+                if trackptr[tpkey].overNextpoint(element[0]):
+                    trackptr[tpkey].seeknext()
+                    if self.trackptr[tpkey].pointer['next'] != None:
+                        self.pos['last'][tpkey] = self.pos['next'][tpkey]
+                        k = 'next'
+                        newval = self.data[self.trackptr[tpkey].pointer[k]]['value']
+                        self.pos[k][tpkey] = newval[k] if newval != 'c' else self.pos['last'][tpkey]
+            if self.trackptr[tpkey].pointer['next'] != None:
+                for k in ['last','next']:
+                    self.pos[k]['distance'] = self.data[self.trackptr[tpkey].pointer[k]]['distance']
+                
+                L = self.pos['next']['distance'] - self.pos['last']['distance']
+                l_intermediate =element[0] - self.pos['last']['distance']
+                temp_result_X = track_gen.absolute_position_X(L, self.pos['last']['x.radius'], self.pos['last']['x.position'], self.pos['next']['x.position'],l_intermediate,element)
+                temp_result_Y = track_gen.absolute_position_Y(L, self.pos['last']['y.radius'], self.pos['last']['y.position'], self.pos['next']['y.position'],l_intermediate,element)
+            else:
+                temp_result_X = np.dot(track_gen.rotate(element[4]), np.array([0,self.pos['last']['x.position']]))
+                temp_result_Y = [0,self.pos['last']['y.position']]
+            self.result.append([element[0],temp_result_X[0],temp_result_X[1],temp_result_Y[1]])
+        return np.array(self.result)
