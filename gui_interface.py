@@ -182,7 +182,7 @@ class mainwindow(ttk.Frame):
     def draw_planerplot(self):
         self.ax_plane.cla()
         
-        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax,iswholemap = True if self.dist_range_sel.get()=='all' else False)
+        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax,iswholemap = True if self.dist_range_sel.get()=='all' else False, othertrack_list = self.result.othertrack.data.keys())
         if self.stationpos_val.get():
             self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         

@@ -258,63 +258,66 @@ class TrackPointer():
         return index
             
 class OtherTrackGenerator():
-    class TrackPointer(TrackPointer):
+    class OtherTrackPointer(TrackPointer):
         def __init__(self,environment,target,trackkey):
             super().__init__(environment,target)
             self.data = environment.othertrack.data[trackkey]
+            self.ix_max = len(self.data) - 1
+            self.seekfirst()
         
     def __init__(self,environment,trackkey):
         self.env = environment
         self.trackkey = trackkey
-        self.data = environment.othertrack.data[trackkey]
-        self.owntrack_position = environment.owntrack_pos
+        self.data = self.env.othertrack.data[trackkey]
+        self.owntrack_position = self.env.owntrack_pos
         self.result = []
         self.distrange={'min':min(self.data, key=lambda x: x['distance'])['distance'], 'max':max(self.data, key=lambda x: x['distance'])['distance']}
         # 前回処理した地点の情報
         self.pos = {'last':{}, 'next':{}}
-        for key in ['x.position','x.radius','y.position','y.radius','distance']:
+        for key in ['x.position','x.radius','x.distance','y.position','y.radius','y.distance']:
             self.pos['last'][key] = 0
             self.pos['next'][key] = 0
     
     def generate(self):
         track_gen = tc.OtherTrack()
         trackptr = {}
-        trackptr['x.position'] = self.TrackPointer(self.env,'x.position',self.trackkey)
-        trackptr['x.radius']   = self.TrackPointer(self.env,'x.radius',self.trackkey)
-        trackptr['y.position'] = self.TrackPointer(self.env,'y.position',self.trackkey)
-        trackptr['y.radius']   = self.TrackPointer(self.env,'y.radius',self.trackkey)
+        trackptr['x.position'] = self.OtherTrackPointer(self.env,'x.position',self.trackkey)
+        trackptr['x.radius']   = self.OtherTrackPointer(self.env,'x.radius',self.trackkey)
+        trackptr['y.position'] = self.OtherTrackPointer(self.env,'y.position',self.trackkey)
+        trackptr['y.radius']   = self.OtherTrackPointer(self.env,'y.radius',self.trackkey)
         #tp_keys = ['x.position','x.radius','y.position','y.radius']
         for element in self.owntrack_position:
             if self.distrange['min'] > element[0]:
                 continue
-            elif pointer['last'] == None:
+            else:
                 for tpkey in trackptr.keys():
-                    trackptr[tpkey].seeknext()
-                    newval = {'last':{}, 'next':{}}
-                    k = 'last'
-                    newval[k] = self.data[self.trackptr[tpkey].pointer[k]]['value']
-                    self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos[k][tpkey]
-                    k = 'next'
-                    newval[k] = self.data[self.trackptr[tpkey].pointer[k]]['value']
-                    self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos['last'][tpkey]
-                for k in ['last','next']:
-                    self.pos[k]['distance'] = self.data[self.trackptr[tpkey].pointer[k]]['distance']
+                    if trackptr[tpkey].pointer['last'] == None:
+                        trackptr[tpkey].seeknext()
+                        newval = {'last':None, 'next':None}
+                        k = 'last'
+                        newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
+                        self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos[k][tpkey]
+                        k = 'next'
+                        newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
+                        self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos['last'][tpkey]
+                for tpkey in ['x.', 'y.']:
+                    if trackptr[tpkey+'position'].pointer['last'] == None:
+                        for k in ['last','next']:
+                            self.pos[k][tpkey+'distance'] = self.data[trackptr[tpkey+'position'].pointer[k]]['distance']
             for tpkey in trackptr.keys():
                 if trackptr[tpkey].overNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
-                    if self.trackptr[tpkey].pointer['next'] != None:
+                    if trackptr[tpkey].pointer['next'] != None:
                         self.pos['last'][tpkey] = self.pos['next'][tpkey]
                         k = 'next'
-                        newval = self.data[self.trackptr[tpkey].pointer[k]]['value']
-                        self.pos[k][tpkey] = newval[k] if newval != 'c' else self.pos['last'][tpkey]
-            if self.trackptr[tpkey].pointer['next'] != None:
+                        newval = self.data[trackptr[tpkey].pointer[k]]['value']
+                        self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
+            if trackptr[tpkey].pointer['next'] != None:
                 for k in ['last','next']:
-                    self.pos[k]['distance'] = self.data[self.trackptr[tpkey].pointer[k]]['distance']
+                    self.pos[k]['distance'] = self.data[trackptr[tpkey].pointer[k]]['distance']
                 
-                L = self.pos['next']['distance'] - self.pos['last']['distance']
-                l_intermediate =element[0] - self.pos['last']['distance']
-                temp_result_X = track_gen.absolute_position_X(L, self.pos['last']['x.radius'], self.pos['last']['x.position'], self.pos['next']['x.position'],l_intermediate,element)
-                temp_result_Y = track_gen.absolute_position_Y(L, self.pos['last']['y.radius'], self.pos['last']['y.position'], self.pos['next']['y.position'],l_intermediate,element)
+                temp_result_X = track_gen.absolute_position_X(self.pos['next']['x.distance'] - self.pos['last']['x.distance'], self.pos['last']['x.radius'], self.pos['last']['x.position'], self.pos['next']['x.position'],element[0] - self.pos['last']['x.distance'],element)
+                temp_result_Y = track_gen.absolute_position_Y(self.pos['next']['y.distance'] - self.pos['last']['y.distance'], self.pos['last']['y.radius'], self.pos['last']['y.position'], self.pos['next']['y.position'],element[0] - self.pos['last']['y.distance'],element)
             else:
                 temp_result_X = np.dot(track_gen.rotate(element[4]), np.array([0,self.pos['last']['x.position']]))
                 temp_result_Y = [0,self.pos['last']['y.position']]

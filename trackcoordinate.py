@@ -193,7 +193,7 @@ class OtherTrack():
 
             Y = y0 - radius*np.cos(np.arcsin((l_intermediate-x0)/radius))
         else:
-            Y = (yb - ya)/L * l_intermediate + ya
+            Y = (yb - ya)/L * l_intermediate + ya if L != 0 else 0
         
         return Y
     def rotate(self, tau1):
