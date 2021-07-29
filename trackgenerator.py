@@ -12,14 +12,15 @@ class TrackGenerator():
         self.cp_max = max(self.list_cp)
         
         # 等間隔で距離程を追加する
+        equaldist_unit = 5
         if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後500mに追加
             self.stationdist_min = round(min(self.env.station.position.keys()),-1) - 500
             self.stationdist_max = round(max(self.env.station.position.keys()),-1) + 500
-            cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,25)
+            cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
         else:
-            cp_equaldist = np.arange(round(self.cp_min,-1) - 500,round(self.cp_max,-1) + 500,25)
+            cp_equaldist = np.arange(round(self.cp_min,-1) - 500,round(self.cp_max,-1) + 500,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
         
@@ -286,6 +287,7 @@ class OtherTrackGenerator():
         trackptr['y.position'] = self.OtherTrackPointer(self.env,'y.position',self.trackkey)
         trackptr['y.radius']   = self.OtherTrackPointer(self.env,'y.radius',self.trackkey)
         #tp_keys = ['x.position','x.radius','y.position','y.radius']
+        skip_dimension = {'x.position':False, 'x.radius':False, 'y.position':False, 'y.radius':False}
         for element in self.owntrack_position:
             if self.distrange['min'] > element[0]:
                 continue
@@ -293,6 +295,9 @@ class OtherTrackGenerator():
                 for tpkey in trackptr.keys():
                     if trackptr[tpkey].pointer['last'] == None:
                         trackptr[tpkey].seeknext()
+                        if trackptr[tpkey].pointer['next'] == None:
+                            skip_dimension[tpkey] = True
+                            continue
                         newval = {'last':None, 'next':None}
                         k = 'last'
                         newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
@@ -301,25 +306,39 @@ class OtherTrackGenerator():
                         newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos['last'][tpkey]
                 for tpkey in ['x.', 'y.']:
-                    if trackptr[tpkey+'position'].pointer['last'] == None:
+                    if trackptr[tpkey+'position'].pointer['last'] == None and skip_dimension[tpkey+'position'] == False:
                         for k in ['last','next']:
                             self.pos[k][tpkey+'distance'] = self.data[trackptr[tpkey+'position'].pointer[k]]['distance']
             for tpkey in trackptr.keys():
-                if trackptr[tpkey].overNextpoint(element[0]):
+                while trackptr[tpkey].overNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
                     if trackptr[tpkey].pointer['next'] != None:
                         self.pos['last'][tpkey] = self.pos['next'][tpkey]
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
-            if trackptr[tpkey].pointer['next'] != None:
+            if trackptr['x.position'].pointer['next'] != None: # skip_dimension に従って計算するかどうか判断する
                 for k in ['last','next']:
-                    self.pos[k]['distance'] = self.data[trackptr[tpkey].pointer[k]]['distance']
+                    self.pos[k]['x.distance'] = self.data[trackptr['x.position'].pointer[k]]['distance']
                 
-                temp_result_X = track_gen.absolute_position_X(self.pos['next']['x.distance'] - self.pos['last']['x.distance'], self.pos['last']['x.radius'], self.pos['last']['x.position'], self.pos['next']['x.position'],element[0] - self.pos['last']['x.distance'],element)
-                temp_result_Y = track_gen.absolute_position_Y(self.pos['next']['y.distance'] - self.pos['last']['y.distance'], self.pos['last']['y.radius'], self.pos['last']['y.position'], self.pos['next']['y.position'],element[0] - self.pos['last']['y.distance'],element)
+                temp_result_X = track_gen.absolute_position_X(self.pos['next']['x.distance'] - self.pos['last']['x.distance'],\
+                 self.pos['next']['x.radius'],\
+                 self.pos['last']['x.position'],\
+                 self.pos['next']['x.position'],\
+                 element[0] - self.pos['last']['x.distance'],\
+                 element)
             else:
-                temp_result_X = np.dot(track_gen.rotate(element[4]), np.array([0,self.pos['last']['x.position']]))
-                temp_result_Y = [0,self.pos['last']['y.position']]
+                temp_result_X = np.dot(track_gen.rotate(element[4]), np.array([0,self.pos['last']['x.position']])) + np.array([element[1],element[2]])
+            if trackptr['y.position'].pointer['next'] != None:
+                for k in ['last','next']:
+                    self.pos[k]['y.distance'] = self.data[trackptr['y.position'].pointer[k]]['distance']
+                temp_result_Y = track_gen.absolute_position_Y(self.pos['next']['y.distance'] - self.pos['last']['y.distance'],\
+                 self.pos['next']['y.radius'],\
+                 self.pos['last']['y.position'],\
+                 self.pos['next']['y.position'],\
+                 element[0] - self.pos['last']['y.distance'],\
+                 element)
+            else:
+                temp_result_Y = [0,self.pos['last']['y.position']]+ np.array([element[1],element[3]])
             self.result.append([element[0],temp_result_X[0],temp_result_X[1],temp_result_Y[1]])
         return np.array(self.result)
