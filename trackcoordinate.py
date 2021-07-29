@@ -183,15 +183,20 @@ class OtherTrack():
         pass
     def relative_position(self, L, radius, ya, yb, l_intermediate):
         if radius != 0:
-            tau = np.arctan((yb-ya)/L)
-            theta = 2*np.arcsin(np.sqrt(L**2+(yb-ya)**2)/(2*radius))
+            sintheta = np.sqrt(L**2+(yb-ya)**2)/(2*radius)
+            
+            if np.fabs(sintheta) <= 1:
+                tau = np.arctan((yb-ya)/L) # tau: 注目する区間の始終点を結ぶ直線が自軌道となす角
+                theta = 2*np.arcsin(sintheta) # theta: 注目する区間での旋回角
 
-            phiA = theta/2-tau
+                phiA = theta/2-tau
 
-            x0 = 0 + radius*np.sin(phiA)
-            y0 = ya + radius*np.cos(phiA)
+                x0 = 0 + radius*np.sin(phiA)
+                y0 = ya + radius*np.cos(phiA)
 
-            Y = y0 - radius*np.cos(np.arcsin((l_intermediate-x0)/radius))
+                Y = y0 - radius*np.cos(np.arcsin((l_intermediate-x0)/radius))
+            else:
+                Y = (yb - ya)/L * l_intermediate + ya if L != 0 else 0
         else:
             Y = (yb - ya)/L * l_intermediate + ya if L != 0 else 0
         
