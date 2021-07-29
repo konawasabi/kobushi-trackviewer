@@ -36,7 +36,8 @@ class Catcher:
 
 class mainwindow(ttk.Frame):
     class SubWindow(ttk.Frame):
-        def __init__(self, master):
+        def __init__(self, master, mainwindow):
+            self.mainwindow = mainwindow
             self.parent = master
             super().__init__(master, padding='3 3 3 3')
             self.master.title('Plot control')
@@ -47,6 +48,7 @@ class mainwindow(ttk.Frame):
             self.master.geometry('+1100+0')
         def create_widgets(self):
             self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'])
+            self.othertrack_tree.bind("<<TreeviewSelect>>", self.print_checkedtrack)
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
@@ -54,6 +56,20 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('#0', text='track key')
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
+            
+            self.otselect_btn = ttk.Button(self, text="Checked track", command=lambda: self.print_checkedtrack(None))
+            self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
+        def print_checkedtrack(self, event):
+            print('event: ',event)
+            print('<--checked tracks-->')
+            if len(self.othertrack_tree.get_checked())>0:
+                print(self.othertrack_tree.get_checked())
+            else:
+                print(None)
+            self.mainwindow.plot_all()
+            #for i in self.othertrack_tree.get_checked():
+                #print(i)
+            
     def __init__(self, master, parser):
         self.dmin = None
         self.dmax = None
@@ -65,7 +81,7 @@ class mainwindow(ttk.Frame):
         self.master.rowconfigure(0, weight=1)
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.create_widgets()
-        self.subwindow = self.SubWindow(tk.Toplevel(master))
+        self.subwindow = self.SubWindow(tk.Toplevel(master), self)
         
         self.parser = parser
         
@@ -168,9 +184,6 @@ class mainwindow(ttk.Frame):
                 self.setdist_entry_val.set(self.dmin)
                 self.distance_scale.set(0)
                 
-            self.mplot = mapplot.Mapplot(self.result)
-            self.plot_all()
-            
             if self.subwindow.othertrack_tree.exists('root'):
                 self.subwindow.othertrack_tree.delete('root')
             self.subwindow.othertrack_tree.insert("", "end", 'root', text='root', open=True)
@@ -178,11 +191,14 @@ class mainwindow(ttk.Frame):
                 self.subwindow.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance']))
             #self.subwindow.othertrack_tree.see('root')
             
+            self.mplot = mapplot.Mapplot(self.result)
+            self.plot_all()
+            
             self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
         
-        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax,iswholemap = True if self.dist_range_sel.get()=='all' else False, othertrack_list = self.result.othertrack.data.keys())
+        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax,iswholemap = True if self.dist_range_sel.get()=='all' else False, othertrack_list = self.subwindow.othertrack_tree.get_checked())
         if self.stationpos_val.get():
             self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         
