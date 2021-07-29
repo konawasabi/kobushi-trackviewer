@@ -206,11 +206,22 @@ class OtherTrack():
         '''
         return np.array([[np.cos(tau1), -np.sin(tau1)], [np.sin(tau1),  np.cos(tau1)]])
     def absolute_position_X(self, L, radius, xa, xb, l_intermediate, pos_ownt):
-        '''
-        pos_ownt:
+        '''他軌道x方向の絶対座標を返す
+        L:              区間長
+        radius:         相対半径
+        xa, xb:         区間始終点でのx方向位置
+        l_intermediate: 座標を求める位置
+        pos_ownt:       座標を求める位置での自軌道の座標情報
         '''
         posrel = np.array([0,self.relative_position(L, radius, xa, xb, l_intermediate)])
-        return np.dot(self.rotate(pos_ownt[4]),posrel) + np.array([pos_ownt[1],pos_ownt[2]])
+        return np.dot(self.rotate(pos_ownt[4]),posrel) + np.array([pos_ownt[1],pos_ownt[2]]) # 自軌道の方位角に応じて計算結果を回転させ、自軌道座標に加算する
     def absolute_position_Y(self, L, radius, ya, yb, l_intermediate, pos_ownt):
+        '''他軌道y方向の絶対座標を返す
+        L:              区間長
+        radius:         相対半径
+        ya, yb:         区間始終点でのy方向位置
+        l_intermediate: 座標を求める位置
+        pos_ownt:       座標を求める位置での自軌道の座標情報
+        '''
         posrel = np.array([0,self.relative_position(L, radius, ya, yb, l_intermediate)])
-        return posrel + np.array([pos_ownt[1],pos_ownt[3]])
+        return posrel + np.array([pos_ownt[1],pos_ownt[3]]) # 計算結果を自軌道座標に加算する
