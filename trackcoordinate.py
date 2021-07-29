@@ -184,20 +184,19 @@ class OtherTrack():
     def relative_position(self, L, radius, ya, yb, l_intermediate):
         if radius != 0:
             sintheta = np.sqrt(L**2+(yb-ya)**2)/(2*radius)
-            
-            if np.fabs(sintheta) <= 1:
-                tau = np.arctan((yb-ya)/L) # tau: 注目する区間の始終点を結ぶ直線が自軌道となす角
-                theta = 2*np.arcsin(sintheta) # theta: 注目する区間での旋回角
+            if np.fabs(sintheta) <= 1: # 与えられた相対半径radiusと区間長Lで座標計算できるか判断する
+                tau = np.arctan((yb-ya)/L) # 注目する区間の始終点を結ぶ直線が自軌道となす角
+                theta = 2*np.arcsin(sintheta) # 注目する区間での方位角の変化
 
-                phiA = theta/2-tau
-
+                phiA = theta/2-tau # 区間始点での自軌道に対する方位角
+                # 円軌道の中心座標
                 x0 = 0 + radius*np.sin(phiA)
                 y0 = ya + radius*np.cos(phiA)
-
+                # 注目点の座標
                 Y = y0 - radius*np.cos(np.arcsin((l_intermediate-x0)/radius))
-            else:
+            else: # 計算できないradius, Lの場合、直線として計算
                 Y = (yb - ya)/L * l_intermediate + ya if L != 0 else 0
-        else:
+        else: # radius==0 なら直線として計算
             Y = (yb - ya)/L * l_intermediate + ya if L != 0 else 0
         
         return Y
