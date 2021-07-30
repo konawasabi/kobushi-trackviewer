@@ -182,7 +182,15 @@ class OtherTrack():
     def __init__(self):
         pass
     def relative_position(self, L, radius, ya, yb, l_intermediate):
-        if radius != 0:
+        '''注目点での相対座標を返す。
+        L:              区間長
+        radius:         相対半径
+        ya, yb:         区間始終点での相対位置
+        l_intermediate: 座標を求める位置
+        '''
+        if L == 0:
+            Y = yb
+        elif radius != 0:
             sintheta = np.sqrt(L**2+(yb-ya)**2)/(2*radius)
             if np.fabs(sintheta) <= 1: # 与えられた相対半径radiusと区間長Lで座標計算できるか判断する
                 tau = np.arctan((yb-ya)/L) # 注目する区間の始終点を結ぶ直線が自軌道となす角
@@ -206,7 +214,7 @@ class OtherTrack():
         '''
         return np.array([[np.cos(tau1), -np.sin(tau1)], [np.sin(tau1),  np.cos(tau1)]])
     def absolute_position_X(self, L, radius, xa, xb, l_intermediate, pos_ownt):
-        '''他軌道x方向の絶対座標を返す
+        '''他軌道x方向(水平方向)の絶対座標を返す
         L:              区間長
         radius:         相対半径
         xa, xb:         区間始終点でのx方向位置
@@ -216,7 +224,7 @@ class OtherTrack():
         posrel = np.array([0,self.relative_position(L, radius, xa, xb, l_intermediate)])
         return np.dot(self.rotate(pos_ownt[4]),posrel) + np.array([pos_ownt[1],pos_ownt[2]]) # 自軌道の方位角に応じて計算結果を回転させ、自軌道座標に加算する
     def absolute_position_Y(self, L, radius, ya, yb, l_intermediate, pos_ownt):
-        '''他軌道y方向の絶対座標を返す
+        '''他軌道y方向(鉛直方向)の絶対座標を返す
         L:              区間長
         radius:         相対半径
         ya, yb:         区間始終点でのy方向位置

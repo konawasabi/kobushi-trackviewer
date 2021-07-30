@@ -12,7 +12,7 @@ class TrackGenerator():
         self.cp_max = max(self.list_cp)
         
         # 等間隔で距離程を追加する
-        equaldist_unit = 5
+        equaldist_unit = 25
         if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後500mに追加
             self.stationdist_min = round(min(self.env.station.position.keys()),-1) - 500
             self.stationdist_max = round(max(self.env.station.position.keys()),-1) + 500
