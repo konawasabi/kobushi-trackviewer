@@ -187,6 +187,7 @@ class Mapplot():
         self.distrange = {}
         self.distrange['plane'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
         self.distrange['vertical'] = [min(self.environment.owntrack_pos[:,0]),max(self.environment.owntrack_pos[:,0])]
+        self.origin_angle = self.environment.owntrack_pos[self.environment.owntrack_pos[:,0] == min(self.environment.owntrack_pos[:,0])][0][4]
         if (len(self.environment.station.position)>0):
             self.station_dist = np.array(list(self.environment.station.position.keys()))
             self.station_pos = self.environment.owntrack_pos[np.isin(self.environment.owntrack_pos[:,0],self.station_dist)]
@@ -201,12 +202,18 @@ class Mapplot():
             self.distrange['plane'][1] = distmax
         owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
+        
+        self.origin_angle = owntrack[owntrack[:,0] == min(owntrack[:,0])][0][4]
+        
+        owntrack = self.rotate_track(owntrack,-self.origin_angle)
+        
         ax_pl.plot(owntrack[:,1],owntrack[:,2])
         if othertrack_list != None:
             for key in othertrack_list:
                 othertrack = self.environment.othertrack_pos[key]
                 othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
+                othertrack = self.rotate_track(othertrack,-self.origin_angle)
                 ax_pl.plot(othertrack[:,1],othertrack[:,2])
         #if iswholemap:
         if True:
@@ -248,6 +255,8 @@ class Mapplot():
             stationpos = self.station_pos
             stationpos = stationpos[stationpos[:,0] >= self.distrange['plane'][0]]
             stationpos = stationpos[stationpos[:,0] <= self.distrange['plane'][1]]
+            
+            stationpos = self.rotate_track(stationpos,-self.origin_angle)
             
             if(len(stationpos)>0):
                 ax_pl.scatter(stationpos[:,1],stationpos[:,2], facecolor='white', edgecolors='black', zorder=10)
@@ -379,3 +388,12 @@ class Mapplot():
                     if(rad_p.data[rad_p.pointer['last']]['flag'] != 'bt'):
                         pltval()
             rad_p.seeknext()
+    def rotate_track(self, input, angle):
+        def rotate(tau1):
+            '''２次元回転行列を返す。
+            tau1: 回転角度 [rad]
+            '''
+            return np.array([[np.cos(tau1), -np.sin(tau1)], [np.sin(tau1),  np.cos(tau1)]])
+        temp_i = input.T
+        temp_rot = np.dot(rotate(angle),np.vstack((temp_i[1],temp_i[2])))
+        return np.vstack((np.vstack((temp_i[0],temp_rot)),temp_i[3:])).T
