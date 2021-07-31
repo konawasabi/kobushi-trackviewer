@@ -200,14 +200,16 @@ class Mapplot():
             self.distrange['plane'][0] = distmin
         if (distmax != None):
             self.distrange['plane'][1] = distmax
+        # 描画区間の自軌道データを取り出す
         owntrack = owntrack[owntrack[:,0] >= self.distrange['plane'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['plane'][1]]
-        
+        # 始点での方位角に合わせて回転
         self.origin_angle = owntrack[owntrack[:,0] == min(owntrack[:,0])][0][4]
-        
         owntrack = self.rotate_track(owntrack,-self.origin_angle)
         
-        ax_pl.plot(owntrack[:,1],owntrack[:,2])
+        ax_pl.plot(owntrack[:,1],owntrack[:,2]) # 自軌道描画
+        
+        # 他軌道描画
         if othertrack_list != None:
             for key in othertrack_list:
                 othertrack = self.environment.othertrack_pos[key]
@@ -215,14 +217,16 @@ class Mapplot():
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)
                 ax_pl.plot(othertrack[:,1],othertrack[:,2])
+                
         if iswholemap:
             ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定
         else:
             windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth()) # ax_plのアスペクト比を取得
             plotdistance = max(owntrack[:,0]) - min(owntrack[:,0]) # 描画距離を算出
-            
+            # 描画範囲始点の座標を求める
             yminval = owntrack[0][2]
             xminval = owntrack[0][1]
+            # 描画範囲設定
             ax_pl.set_ylim(yminval-plotdistance*windowratio/2,yminval + plotdistance*windowratio/2)
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             

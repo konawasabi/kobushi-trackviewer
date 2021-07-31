@@ -40,7 +40,7 @@ class mainwindow(ttk.Frame):
             self.mainwindow = mainwindow
             self.parent = master
             super().__init__(master, padding='3 3 3 3')
-            self.master.title('Plot control')
+            self.master.title('Other tracks')
             self.master.columnconfigure(0, weight=1)
             self.master.rowconfigure(0, weight=1)
             self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -60,12 +60,14 @@ class mainwindow(ttk.Frame):
             self.otselect_btn = ttk.Button(self, text="Checked track", command=lambda: self.print_checkedtrack(None))
             self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
         def print_checkedtrack(self, event):
+            '''
             print('event: ',event)
             print('<--checked tracks-->')
             if len(self.othertrack_tree.get_checked())>0:
                 print(self.othertrack_tree.get_checked())
             else:
                 print(None)
+            '''
             self.mainwindow.plot_all()
             #for i in self.othertrack_tree.get_checked():
                 #print(i)
@@ -179,6 +181,13 @@ class mainwindow(ttk.Frame):
             if(len(self.result.station.position) > 0):
                 self.dmin = min(self.result.station.position.keys()) - 500
                 self.dmax = max(self.result.station.position.keys()) + 500
+                self.distrange_min = self.dmin
+                self.distrange_max = self.dmax
+                self.setdist_entry_val.set(self.dmin)
+                self.distance_scale.set(0)
+            else:
+                self.dmin = min(self.result.controlpoints.list_cp)
+                self.dmax = max(self.result.controlpoints.list_cp)
                 self.distrange_min = self.dmin
                 self.distrange_max = self.dmax
                 self.setdist_entry_val.set(self.dmin)
