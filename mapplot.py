@@ -221,8 +221,8 @@ class Mapplot():
             windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth()) # ax_plのアスペクト比を取得
             plotdistance = max(owntrack[:,0]) - min(owntrack[:,0]) # 描画距離を算出
             
-            yminval = min(owntrack[:,2])
-            xminval = min(owntrack[:,1])
+            yminval = owntrack[0][2]
+            xminval = owntrack[0][1]
             ax_pl.set_ylim(yminval-plotdistance*windowratio/2,yminval + plotdistance*windowratio/2)
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             
