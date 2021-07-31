@@ -157,5 +157,7 @@ class ParseMap(Transformer):
         if(self.isroot): # 最上層のマップファイルのロードが完了したら、データを距離でソート
             self.environment.controlpoints.relocate()
             self.environment.own_track.relocate()
+            self.environment.othertrack.relocate()
+        
         print(str(f_path.name)+' loaded.')
         return self.environment
