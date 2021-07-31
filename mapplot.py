@@ -216,24 +216,15 @@ class Mapplot():
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)
                 ax_pl.plot(othertrack[:,1],othertrack[:,2])
         if iswholemap:
-        #if True:
-            ax_pl.set_aspect('equal')
+            ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定
         else:
-            windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth())
-            '''
-            distr = distmax - distmin
-            pos0 = owntrack[0]
-            ax_pl.set_xlim(pos0[1],pos0[1] + distr)
-            ax_pl.set_ylim(pos0[2],pos0[2] + distr*windowratio)
-            '''
-            plotrange = [max(owntrack[:,1]) - min(owntrack[:,1]),max(owntrack[:,2]) - min(owntrack[:,2])]
+            windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth()) # ax_plのアスペクト比を取得
+            plotdistance = max(owntrack[:,0]) - min(owntrack[:,0]) # 描画距離を算出
             
-            if(plotrange[0] > plotrange[1]):
-                yminval = min(owntrack[:,2])
-                ax_pl.set_ylim(yminval-plotrange[0]*windowratio/2,yminval + plotrange[0]*windowratio/2)
-            else:
-                xminval = min(owntrack[:,1])
-                ax_pl.set_xlim(xminval,xminval + plotrange[1]/windowratio)
+            yminval = min(owntrack[:,2])
+            xminval = min(owntrack[:,1])
+            ax_pl.set_ylim(yminval-plotdistance*windowratio/2,yminval + plotdistance*windowratio/2)
+            ax_pl.set_xlim(xminval,xminval + plotdistance)
             
         ax_pl.invert_yaxis()
     def vertical(self, ax_h, ax_r, distmin = None, distmax = None):
