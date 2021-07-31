@@ -292,6 +292,10 @@ class OtherTrackGenerator():
         trackptr['y.radius']   = self.OtherTrackPointer(self.env,'y.radius',self.trackkey)
         #tp_keys = ['x.position','x.radius','y.position','y.radius']
         #skip_dimension = {'x.position':False, 'x.radius':False, 'y.position':False, 'y.radius':False}
+        for tpkey in trackptr.keys():
+            if trackptr[tpkey].pointer['next'] != None:
+                for k in ['last','next']:
+                    self.pos[k][tpkey] = self.data[trackptr[tpkey].pointer['next']]['value']
         for element in self.owntrack_position: # 自軌道が指定されている全ての距離程について計算する
             if self.distrange['min'] > element[0]: # 対象となる軌道が最初に現れる距離程にまだ達していないか？
                 continue
