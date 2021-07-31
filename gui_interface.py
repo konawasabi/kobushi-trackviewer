@@ -47,8 +47,8 @@ class mainwindow(ttk.Frame):
             self.create_widgets()
             self.master.geometry('+1100+0')
         def create_widgets(self):
-            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'])
-            self.othertrack_tree.bind("<<TreeviewSelect>>", self.print_checkedtrack)
+            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'],selectmode='browse')
+            #self.othertrack_tree.bind("<<TreeviewSelect>>", self.print_checkedtrack)
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
