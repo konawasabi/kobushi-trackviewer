@@ -361,8 +361,11 @@ class Mapplot():
         rad_p = tgen.TrackPointer(self.environment, 'radius')
         trans_offs = matplotlib.transforms.offset_copy(ax_r.transData, x=-8/2, units='dots')
         
-        while(rad_p.data[rad_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
-            rad_p.seeknext()
+        while rad_p.pointer['next'] != None:
+            if(rad_p.data[rad_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
+                rad_p.seeknext()
+            else:
+                break
         while(rad_p.pointer['next'] != None and rad_p.data[rad_p.pointer['next']]['distance'] <= self.distrange['vertical'][1]):
             if(rad_p.pointer['last'] == None):
                 pass
