@@ -215,8 +215,8 @@ class Mapplot():
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)
                 ax_pl.plot(othertrack[:,1],othertrack[:,2])
-        #if iswholemap:
-        if True:
+        if iswholemap:
+        #if True:
             ax_pl.set_aspect('equal')
         else:
             windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth())
@@ -230,7 +230,7 @@ class Mapplot():
             
             if(plotrange[0] > plotrange[1]):
                 yminval = min(owntrack[:,2])
-                ax_pl.set_ylim(yminval,yminval + plotrange[0]*windowratio)
+                ax_pl.set_ylim(yminval-plotrange[0]*windowratio/2,yminval + plotrange[0]*windowratio/2)
             else:
                 xminval = min(owntrack[:,1])
                 ax_pl.set_xlim(xminval,xminval + plotrange[1]/windowratio)
