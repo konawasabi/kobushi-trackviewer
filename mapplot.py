@@ -277,7 +277,8 @@ class Mapplot():
                         #ax_h.text(stationpos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
                         ax_s.text(stationpos[i][0],1, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
     def gradient_value(self, ax_h, labelplot = True):
-        # 勾配数値をプロットする
+        '''縦断面図へ勾配数値をプロットする
+        '''
         def vertline():
             # 勾配変化点へ垂直線を描画
             pos_temp = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
@@ -290,7 +291,11 @@ class Mapplot():
                 if(pos_start == None):
                     pos_start = gradient_p.data[gradient_p.pointer['last']]['distance']
                 if(value == None):
-                    value = gradient_p.data[gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])]['value']
+                    valuecontain = gradient_p.seekoriginofcontinuous(gradient_p.pointer['last'])
+                    if valuecontain != None:
+                        value = gradient_p.data[valuecontain]['value']
+                    else:
+                        value = 0
                 value = str(np.fabs(value)) if value != 0 else 'Lv.'
                 ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=6.5, transform=trans_offs)
             
@@ -305,9 +310,12 @@ class Mapplot():
         gradline_min = height_min - (height_max-height_min)*0.1
         trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=-8/2, units='dots')
         
-        if(gradient_p.pointer['last'] == None and gradient_p.pointer['next'] != None):
-            while(gradient_p.data[gradient_p.pointer['next']]['distance'] < self.distrange['vertical'][0]):
-                gradient_p.seeknext()
+        if(gradient_p.pointer['last'] == None and gradient_p.pointer['next'] != None): # 勾配要素が存在するかどうか判断
+            while gradient_p.pointer['next'] != None:
+                if (gradient_p.data[gradient_p.pointer['next']]['distance'] < self.distrange['vertical'][0]): # プロットする距離程範囲の下限までポインタを進める
+                    gradient_p.seeknext()
+                else:
+                    break
             
             while(gradient_p.pointer['next'] != None and gradient_p.data[gradient_p.pointer['next']]['distance'] <= self.distrange['vertical'][1]):
                 # 勾配区切り線の描画処理。変化開始点に描く。
@@ -333,6 +341,8 @@ class Mapplot():
         else:
             gradval(pos_end = max(owntrack[:,0]))
     def radius_value(self, ax_r, labelplot = True):
+        '''縦断面図へ曲線半径をプロットする
+        '''
         def pltval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
             if(doplot):
                 if(pos_end == None):
