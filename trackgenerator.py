@@ -280,36 +280,22 @@ class OtherTrackGenerator():
             self.pos['next'][key] = 0
     
     def generate(self):
-        track_gen = tc.OtherTrack()
+        '''他軌道座標を計算する。
+        対象はインスタンス作成時に指定したkeyの軌道。
+        '''
+        track_gen = tc.OtherTrack() # 座標計算オブジェクト
+        # 軌道要素ポインタの作成
         trackptr = {}
         trackptr['x.position'] = self.OtherTrackPointer(self.env,'x.position',self.trackkey)
         trackptr['x.radius']   = self.OtherTrackPointer(self.env,'x.radius',self.trackkey)
         trackptr['y.position'] = self.OtherTrackPointer(self.env,'y.position',self.trackkey)
         trackptr['y.radius']   = self.OtherTrackPointer(self.env,'y.radius',self.trackkey)
         #tp_keys = ['x.position','x.radius','y.position','y.radius']
-        skip_dimension = {'x.position':False, 'x.radius':False, 'y.position':False, 'y.radius':False}
-        for element in self.owntrack_position:
-            if self.distrange['min'] > element[0]:
+        #skip_dimension = {'x.position':False, 'x.radius':False, 'y.position':False, 'y.radius':False}
+        for element in self.owntrack_position: # 自軌道が指定されている全ての距離程について計算する
+            if self.distrange['min'] > element[0]: # 対象となる軌道が最初に現れる距離程にまだ達していないか？
                 continue
-            else:
-                for tpkey in trackptr.keys():
-                    if trackptr[tpkey].pointer['last'] == None:
-                        trackptr[tpkey].seeknext()
-                        if trackptr[tpkey].pointer['next'] == None:
-                            skip_dimension[tpkey] = True
-                            continue
-                        newval = {'last':None, 'next':None}
-                        k = 'last'
-                        newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
-                        self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos[k][tpkey]
-                        k = 'next'
-                        newval[k] = self.data[trackptr[tpkey].pointer[k]]['value']
-                        self.pos[k][tpkey] = newval[k] if newval[k] != 'c' else self.pos['last'][tpkey]
-                for tpkey in ['x.', 'y.']:
-                    if trackptr[tpkey+'position'].pointer['last'] == None and skip_dimension[tpkey+'position'] == False:
-                        for k in ['last','next']:
-                            self.pos[k][tpkey+'distance'] = self.data[trackptr[tpkey+'position'].pointer[k]]['distance']
-            for tpkey in trackptr.keys():
+            for tpkey in trackptr.keys(): # ポインタを進める
                 while trackptr[tpkey].overNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
                     if trackptr[tpkey].pointer['next'] != None:
@@ -317,7 +303,7 @@ class OtherTrackGenerator():
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
-            if trackptr['x.position'].pointer['next'] != None: # skip_dimension に従って計算するかどうか判断する
+            if trackptr['x.position'].pointer['last'] != None and trackptr['x.position'].pointer['next'] != None: # skip_dimension に従って計算するかどうか判断する
                 for k in ['last','next']:
                     self.pos[k]['x.distance'] = self.data[trackptr['x.position'].pointer[k]]['distance']
                 
@@ -329,7 +315,7 @@ class OtherTrackGenerator():
                  element)
             else:
                 temp_result_X = np.dot(track_gen.rotate(element[4]), np.array([0,self.pos['last']['x.position']])) + np.array([element[1],element[2]])
-            if trackptr['y.position'].pointer['next'] != None:
+            if trackptr['y.position'].pointer['last'] != None and trackptr['y.position'].pointer['next'] != None:
                 for k in ['last','next']:
                     self.pos[k]['y.distance'] = self.data[trackptr['y.position'].pointer[k]]['distance']
                 temp_result_Y = track_gen.absolute_position_Y(self.pos['next']['y.distance'] - self.pos['last']['y.distance'],\
