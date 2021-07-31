@@ -313,7 +313,7 @@ class OtherTrackGenerator():
                     self.pos[k]['x.distance'] = self.data[trackptr['x.position'].pointer[k]]['distance']
                 
                 temp_result_X = track_gen.absolute_position_X(self.pos['next']['x.distance'] - self.pos['last']['x.distance'],\
-                 self.pos['next']['x.radius'],\
+                 self.pos['last']['x.radius'],\
                  self.pos['last']['x.position'],\
                  self.pos['next']['x.position'],\
                  element[0] - self.pos['last']['x.distance'],\
@@ -324,7 +324,7 @@ class OtherTrackGenerator():
                 for k in ['last','next']:
                     self.pos[k]['y.distance'] = self.data[trackptr['y.position'].pointer[k]]['distance']
                 temp_result_Y = track_gen.absolute_position_Y(self.pos['next']['y.distance'] - self.pos['last']['y.distance'],\
-                 self.pos['next']['y.radius'],\
+                 self.pos['last']['y.radius'],\
                  self.pos['last']['y.position'],\
                  self.pos['next']['y.position'],\
                  element[0] - self.pos['last']['y.distance'],\
