@@ -87,6 +87,7 @@ class mainwindow(ttk.Frame):
         
         self.parser = parser
         
+        master.protocol('WM_DELETE_WINDOW', self.ask_quit)
         
     def create_widgets(self):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
@@ -112,7 +113,7 @@ class mainwindow(ttk.Frame):
         self.saveplots_btn.grid(column=0, row=10, sticky=(tk.W, tk.E))
         self.savetrack_btn = ttk.Button(self.control_frame, text="Save track", command=None)
         self.savetrack_btn.grid(column=0, row=11, sticky=(tk.W, tk.E))
-        self.quit_btn = ttk.Button(self.control_frame, text="Quit", command=self.quit)
+        self.quit_btn = ttk.Button(self.control_frame, text="Quit", command=self.ask_quit)
         self.quit_btn.grid(column=0, row=12, sticky=(tk.W, tk.E))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
@@ -272,6 +273,10 @@ class mainwindow(ttk.Frame):
         if(self.result != None):
             self.draw_planerplot()
             self.draw_profileplot()
+    def ask_quit(self):
+        doquit = tk.messagebox.askyesno(message='終了してよいですか？')
+        if doquit:
+            self.quit()
 
 if __name__ == '__main__':
     if not __debug__:

@@ -130,7 +130,7 @@ class TrackGenerator():
                                                                     self.last_pos['radius'],\
                                                                     self.last_pos['theta'],\
                                                                     dist - self.last_pos['distance'])
-                                                                    radius = self.last_pos['radius']
+                            radius = self.last_pos['radius']
                         else: # 直線軌道を出力
                             [x, y] = curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
                                                       self.last_pos['theta'],\
