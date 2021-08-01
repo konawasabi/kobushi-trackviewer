@@ -49,6 +49,7 @@ class mainwindow(ttk.Frame):
         def create_widgets(self):
             self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'],selectmode='browse')
             #self.othertrack_tree.bind("<<TreeviewSelect>>", self.print_checkedtrack)
+            self.othertrack_tree.bind("<ButtonRelease>", self.print_checkedtrack)
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
@@ -57,17 +58,16 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
             
-            self.otselect_btn = ttk.Button(self, text="Checked track", command=lambda: self.print_checkedtrack(None))
-            self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
-        def print_checkedtrack(self, event):
-            '''
-            print('event: ',event)
-            print('<--checked tracks-->')
-            if len(self.othertrack_tree.get_checked())>0:
-                print(self.othertrack_tree.get_checked())
-            else:
-                print(None)
-            '''
+            #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
+            #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
+        def print_checkedtrack(self, event=None):
+            print()
+            if event != None:
+                for i in vars(event):
+                    print(i, getattr(event, i))
+                    if i == 'widget':
+                        print('\t',getattr(event, i).identify("element", event.x, event.y))
+                        print('\t',self.othertrack_tree.identify_column(event.x),self.othertrack_tree.identify_row(event.y))
             self.mainwindow.plot_all()
             #for i in self.othertrack_tree.get_checked():
                 #print(i)
