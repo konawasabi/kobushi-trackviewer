@@ -87,6 +87,7 @@ class mainwindow(ttk.Frame):
         
         self.create_widgets()
         self.create_menubar()
+        self.bind_keyevent()
         self.subwindow = self.SubWindow(tk.Toplevel(master), self)
         
         self.parser = parser
@@ -110,13 +111,6 @@ class mainwindow(ttk.Frame):
         self.curveval_val = tk.BooleanVar(value=True)
         self.curveval_chk = ttk.Checkbutton(self.control_frame, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
         self.curveval_chk.grid(column=0, row=4, sticky=(tk.N, tk.W, tk.E))
-        
-        self.saveplots_btn = ttk.Button(self.control_frame, text="Save plots", command=None)
-        self.saveplots_btn.grid(column=0, row=10, sticky=(tk.W, tk.E))
-        self.savetrack_btn = ttk.Button(self.control_frame, text="Save track", command=None)
-        self.savetrack_btn.grid(column=0, row=11, sticky=(tk.W, tk.E))
-        self.quit_btn = ttk.Button(self.control_frame, text="Quit", command=self.ask_quit)
-        self.quit_btn.grid(column=0, row=12, sticky=(tk.W, tk.E))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -182,16 +176,18 @@ class mainwindow(ttk.Frame):
         menubar.add_cascade(menu=menu_file, label='File')
         #menubar.add_cascade(menu=menu_edit, label='Edit')
         
-        menu_file.add_command(label='Open...', command=self.open_mapfile)
+        menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         menu_file.add_separator()
         menu_file.add_command(label='Save plots...', command=None)
         menu_file.add_command(label='Save track data...', command=None)
         menu_file.add_separator()
-        menu_file.add_command(label='Quit', command=self.ask_quit)
+        menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Control+Q')
         
         self.master['menu'] = menubar
-        
-    def open_mapfile(self):
+    def bind_keyevent(self):
+        self.bind_all("<Control-o>", self.open_mapfile)
+        self.bind_all("<Control-q>", self.ask_quit)
+    def open_mapfile(self, event=None):
         inputdir = filedialog.askopenfilename()
         if inputdir != '':
             self.filedir_entry_val.set(inputdir)
@@ -294,7 +290,7 @@ class mainwindow(ttk.Frame):
         if(self.result != None):
             self.draw_planerplot()
             self.draw_profileplot()
-    def ask_quit(self):
+    def ask_quit(self, event=None):
         if tk.messagebox.askyesno(message='Kobushi Track Viewerを終了しますか？'):
             self.quit()
 
