@@ -58,6 +58,10 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
             
+            self.ottree_scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.othertrack_tree.yview)
+            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
+            self.othertrack_tree['yscrollcommand'] = self.ottree_scrollbar.set
+            
             #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
             #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
         def print_checkedtrack(self, event=None):
