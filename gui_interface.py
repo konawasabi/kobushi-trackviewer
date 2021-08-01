@@ -82,13 +82,15 @@ class mainwindow(ttk.Frame):
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-        self.create_widgets()
-        self.subwindow = self.SubWindow(tk.Toplevel(master), self)
-        
-        self.parser = parser
         
         master.protocol('WM_DELETE_WINDOW', self.ask_quit)
         
+        self.create_widgets()
+        self.create_menubar()
+        self.subwindow = self.SubWindow(tk.Toplevel(master), self)
+        
+        self.parser = parser
+
     def create_widgets(self):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
@@ -169,7 +171,26 @@ class mainwindow(ttk.Frame):
         self.profile_canvas = FigureCanvasTkAgg(self.fig_profile, master=self.canvas_frame)
         self.profile_canvas.draw()
         self.profile_canvas.get_tk_widget().grid(row = 1, column = 0)
-    
+    def create_menubar(self):
+        self.master.option_add('*tearOff', False)
+        
+        menubar = tk.Menu(self.master)
+        
+        menu_file = tk.Menu(menubar)
+        #menu_edit = tk.Menu(menubar)
+        
+        menubar.add_cascade(menu=menu_file, label='File')
+        #menubar.add_cascade(menu=menu_edit, label='Edit')
+        
+        menu_file.add_command(label='Open...', command=self.open_mapfile)
+        menu_file.add_separator()
+        menu_file.add_command(label='Save plots...', command=None)
+        menu_file.add_command(label='Save track data...', command=None)
+        menu_file.add_separator()
+        menu_file.add_command(label='Quit', command=self.ask_quit)
+        
+        self.master['menu'] = menubar
+        
     def open_mapfile(self):
         inputdir = filedialog.askopenfilename()
         if inputdir != '':
@@ -274,8 +295,7 @@ class mainwindow(ttk.Frame):
             self.draw_planerplot()
             self.draw_profileplot()
     def ask_quit(self):
-        doquit = tk.messagebox.askyesno(message='終了してよいですか？')
-        if doquit:
+        if tk.messagebox.askyesno(message='Kobushi Track Viewerを終了しますか？'):
             self.quit()
 
 if __name__ == '__main__':
