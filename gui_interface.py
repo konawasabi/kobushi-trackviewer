@@ -171,22 +171,25 @@ class mainwindow(ttk.Frame):
         menubar = tk.Menu(self.master)
         
         menu_file = tk.Menu(menubar)
-        #menu_edit = tk.Menu(menubar)
+        menu_option = tk.Menu(menubar)
         
         menubar.add_cascade(menu=menu_file, label='File')
-        #menubar.add_cascade(menu=menu_edit, label='Edit')
+        menubar.add_cascade(menu=menu_option, label='Option')
         
         menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         menu_file.add_separator()
-        menu_file.add_command(label='Save plots...', command=None)
+        menu_file.add_command(label='Save plots...', command=None, accelerator='Control+S')
         menu_file.add_command(label='Save track data...', command=None)
         menu_file.add_separator()
-        menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Control+Q')
+        menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
         
         self.master['menu'] = menubar
     def bind_keyevent(self):
         self.bind_all("<Control-o>", self.open_mapfile)
-        self.bind_all("<Control-q>", self.ask_quit)
+        self.bind_all("<Alt-F4>", self.ask_quit)
+        self.bind_all("<KP_Enter>", self.distset_entry)
+        self.bind_all("<Shift-Left>", self.press_arrowkey)
+        self.bind_all("<Shift-Right>", self.press_arrowkey)
     def open_mapfile(self, event=None):
         inputdir = filedialog.askopenfilename()
         if inputdir != '':
@@ -269,6 +272,8 @@ class mainwindow(ttk.Frame):
                 for j in self.result.othertrack_pos[i]:
                     print(j)
     def setdist_scale(self, val):
+        '''距離程スライドバーの処理
+        '''
         pos = float(self.distance_scale.get())
         distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
         self.setdist_entry_val.set(distmin)
@@ -284,7 +289,7 @@ class mainwindow(ttk.Frame):
         self.plot_all()
     def setdist_arbitrary(self):
         self.setdist_scale(0)
-    def distset_entry(self):
+    def distset_entry(self, event=None):
         self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
     def plot_all(self):
         if(self.result != None):
@@ -293,6 +298,16 @@ class mainwindow(ttk.Frame):
     def ask_quit(self, event=None):
         if tk.messagebox.askyesno(message='Kobushi Track Viewerを終了しますか？'):
             self.quit()
+    def press_arrowkey(self, event=None):
+        #print(event.keysym)
+        if(event.keysym == 'Left'):
+            value = (self.setdist_entry_val.get() -self.dist_range_arb_val.get()/5 -self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100
+            value = 0 if value < 0 else value
+            self.distance_scale.set(value)
+        elif(event.keysym == 'Right'):
+            value = (self.setdist_entry_val.get() + self.dist_range_arb_val.get()/5 - self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100
+            value = 100 if value > 100 else value
+            self.distance_scale.set(value)
 
 if __name__ == '__main__':
     if not __debug__:
