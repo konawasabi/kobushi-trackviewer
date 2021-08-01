@@ -13,14 +13,15 @@ class TrackGenerator():
         
         # 等間隔で距離程を追加する
         equaldist_unit = 25
-        if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後500mに追加
-            self.stationdist_min = round(min(self.env.station.position.keys()),-1) - 500
-            self.stationdist_max = round(max(self.env.station.position.keys()),-1) + 500
+        boundary_margin = 500
+        if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後boundary_margin mに追加
+            self.stationdist_min = round(min(self.env.station.position.keys()),-2) - boundary_margin
+            self.stationdist_max = round(max(self.env.station.position.keys()),-2) + boundary_margin
             cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
         else:
-            cp_equaldist = np.arange(round(self.cp_min,-1) - 500,round(self.cp_max,-1) + 500,equaldist_unit)
+            cp_equaldist = np.arange(round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
         
@@ -145,6 +146,10 @@ class TrackGenerator():
                                                                  dist - self.last_pos['distance'])
                         radius = self.last_pos['radius']
             # turnに対する処理
+            if(turn_p.pointer['next'] != None):
+                if(turn_p.onNextpoint(dist)):
+                    tau += np.arctan(self.data_ownt[turn_p.pointer['next']]['value'])
+                    turn_p.seeknext()
             
             # gradientに対する処理
             while(gradient_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
