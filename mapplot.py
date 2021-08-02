@@ -213,6 +213,8 @@ class Mapplot():
         if othertrack_list != None:
             for key in othertrack_list:
                 othertrack = self.environment.othertrack_pos[key]
+                othertrack = othertrack[othertrack[:,0] >= self.environment.othertrack.cp_range[key]['min']]
+                othertrack = othertrack[othertrack[:,0] <= self.environment.othertrack.cp_range[key]['max']]
                 othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)

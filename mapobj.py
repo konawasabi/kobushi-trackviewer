@@ -231,5 +231,7 @@ class Othertrack():
             self.data[trackkey_lc] = []
         self.data[trackkey_lc].append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':elementkey, 'flag':flag})
     def relocate(self):
+        self.cp_range = {}
         for trackkey in self.data.keys():
-            self.data[trackkey] = sorted(self.data[trackkey], key=lambda x: x['distance'])
+            self.data[trackkey]     = sorted(self.data[trackkey], key=lambda x: x['distance'])
+            self.cp_range[trackkey] = {'min':min(self.data[trackkey], key=lambda x: x['distance'])['distance'],'max':max(self.data[trackkey], key=lambda x: x['distance'])['distance']}
