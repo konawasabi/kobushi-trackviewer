@@ -58,20 +58,25 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
             
-            self.ottree_scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.othertrack_tree.yview)
-            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
-            self.othertrack_tree['yscrollcommand'] = self.ottree_scrollbar.set
+            self.ottree_scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
+            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S))
+            self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
             
             #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
             #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
         def print_checkedtrack(self, event=None):
-            print()
+            columnlabel = {'#0':'Check','#1':'From', '#2':'To'}
             if event != None:
+                '''
                 for i in vars(event):
                     print(i, getattr(event, i))
                     if i == 'widget':
                         print('\t',getattr(event, i).identify("element", event.x, event.y))
                         print('\t',self.othertrack_tree.identify_column(event.x),self.othertrack_tree.identify_row(event.y))
+                '''
+                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text':
+                    print(self.othertrack_tree.identify_row(event.y),columnlabel[self.othertrack_tree.identify_column(event.x)])
+                    
             self.mainwindow.plot_all()
             #for i in self.othertrack_tree.get_checked():
                 #print(i)
@@ -191,7 +196,7 @@ class mainwindow(ttk.Frame):
     def bind_keyevent(self):
         self.bind_all("<Control-o>", self.open_mapfile)
         self.bind_all("<Alt-F4>", self.ask_quit)
-        self.bind_all("<KP_Enter>", self.distset_entry)
+        self.bind_all("<Return>", self.distset_entry)
         self.bind_all("<Shift-Left>", self.press_arrowkey)
         self.bind_all("<Shift-Right>", self.press_arrowkey)
     def open_mapfile(self, event=None):
@@ -224,6 +229,7 @@ class mainwindow(ttk.Frame):
             for i in self.result.othertrack.data.keys():
                 self.subwindow.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance']))
             #self.subwindow.othertrack_tree.see('root')
+            self.subwindow.othertrack_tree.configure(yscrollcommand=self.subwindow.ottree_scrollbar.set)
             
             self.mplot = mapplot.Mapplot(self.result)
             self.plot_all()
