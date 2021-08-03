@@ -3,6 +3,7 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as filedialog
+import tkinter.simpledialog as simpledialog
 from ttkwidgets import CheckboxTreeview
 
 import matplotlib.pyplot as plt
@@ -75,7 +76,22 @@ class mainwindow(ttk.Frame):
                         print('\t',self.othertrack_tree.identify_column(event.x),self.othertrack_tree.identify_row(event.y))
                 '''
                 if getattr(event, 'widget').identify("element", event.x, event.y) == 'text':
-                    print(self.othertrack_tree.identify_row(event.y),columnlabel[self.othertrack_tree.identify_column(event.x)])
+                    cliked_column = self.othertrack_tree.identify_column(event.x)
+                    cliked_track = self.othertrack_tree.identify_row(event.y)
+                    print(cliked_track,columnlabel[cliked_column])
+                    if cliked_column != '#0' and cliked_track != 'root':
+                        if cliked_column == '#1':
+                            defaultval = min(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
+                        else:
+                            defaultval = max(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
+                        inputdata = simpledialog.askfloat(cliked_track+': Distance', columnlabel[cliked_column]+' (default: '+str(defaultval)+' m)')
+                        print(inputdata)
+                        if inputdata != None:
+                            if cliked_column == '#1':
+                                self.mainwindow.result.othertrack.cp_range[cliked_track]['min'] = inputdata
+                            else:
+                                self.mainwindow.result.othertrack.cp_range[cliked_track]['max'] = inputdata
+                            self.othertrack_tree.set(cliked_track,cliked_column,inputdata)
                     
             self.mainwindow.plot_all()
             #for i in self.othertrack_tree.get_checked():
