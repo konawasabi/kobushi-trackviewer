@@ -49,8 +49,7 @@ class mainwindow(ttk.Frame):
             self.master.geometry('+1100+0')
         def create_widgets(self):
             self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'],selectmode='browse')
-            #self.othertrack_tree.bind("<<TreeviewSelect>>", self.print_checkedtrack)
-            self.othertrack_tree.bind("<ButtonRelease>", self.print_checkedtrack)
+            self.othertrack_tree.bind("<ButtonRelease>", self.click_tracklist)
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
@@ -65,27 +64,22 @@ class mainwindow(ttk.Frame):
             
             #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
             #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
-        def print_checkedtrack(self, event=None):
+        def click_tracklist(self, event=None):
+            '''他軌道リストをクリックしたときのイベント処理
+            '''
             columnlabel = {'#0':'Check','#1':'From', '#2':'To'}
             if event != None:
-                '''
-                for i in vars(event):
-                    print(i, getattr(event, i))
-                    if i == 'widget':
-                        print('\t',getattr(event, i).identify("element", event.x, event.y))
-                        print('\t',self.othertrack_tree.identify_column(event.x),self.othertrack_tree.identify_row(event.y))
-                '''
-                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text':
+                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #数値部分クリックかどうか。チェックボックスだとimage
                     cliked_column = self.othertrack_tree.identify_column(event.x)
                     cliked_track = self.othertrack_tree.identify_row(event.y)
-                    print(cliked_track,columnlabel[cliked_column])
+                    #print(cliked_track,columnlabel[cliked_column])
                     if cliked_column != '#0' and cliked_track != 'root':
                         if cliked_column == '#1':
                             defaultval = min(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
                         else:
                             defaultval = max(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
                         inputdata = simpledialog.askfloat(cliked_track+': Distance', columnlabel[cliked_column]+' (default: '+str(defaultval)+' m)')
-                        print(inputdata)
+                        #print(inputdata)
                         if inputdata != None:
                             if cliked_column == '#1':
                                 self.mainwindow.result.othertrack.cp_range[cliked_track]['min'] = inputdata
@@ -94,8 +88,6 @@ class mainwindow(ttk.Frame):
                             self.othertrack_tree.set(cliked_track,cliked_column,inputdata)
                     
             self.mainwindow.plot_all()
-            #for i in self.othertrack_tree.get_checked():
-                #print(i)
             
     def __init__(self, master, parser):
         self.dmin = None
