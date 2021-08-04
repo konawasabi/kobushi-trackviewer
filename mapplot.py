@@ -277,7 +277,7 @@ class Mapplot():
                 station_marker_ypos = self.heightmax
                 trans_offs = matplotlib.transforms.offset_copy(ax_h.transData, x=-8/2,y=8*1, units='dots')
                 for i in range(0,len(stationpos)):
-                    ax_h.plot([stationpos[i][0],stationpos[i][0]],[stationpos[i][3],station_marker_ypos],color='tab:blue',lw=1)
+                    ax_h.plot([stationpos[i][0],stationpos[i][0]],[stationpos[i][3],station_marker_ypos],color='black',lw=1)
                     #ax_h.scatter(self.station_pos[i][0],station_marker_ypos, facecolor='white', edgecolors='black', zorder=10)
                     if(labelplot):
                         #ax_h.text(stationpos[i][0],station_marker_ypos, self.environment.station.stationkey[self.environment.station.position[stationpos[i][0]]], rotation=90, size=8,bbox=dict(boxstyle="square",ec='black',fc='white',), transform=trans_offs)
@@ -288,7 +288,7 @@ class Mapplot():
         def vertline():
             # 勾配変化点へ垂直線を描画
             pos_temp = owntrack[owntrack[:,0] == gradient_p.data[gradient_p.pointer['next']]['distance']][0]
-            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='tab:blue',lw=1)
+            ax_h.plot([pos_temp[0],pos_temp[0]],[gradline_min,pos_temp[3]],color='black',lw=1)
         def gradval(pos_start=None, pos_end=None, value=None, doplot=labelplot):
             # 勾配数値をプロット
             if(doplot):

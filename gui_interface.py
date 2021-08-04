@@ -330,23 +330,27 @@ class mainwindow(ttk.Frame):
     def setdist_scale(self, val):
         '''距離程スライドバーの処理
         '''
-        pos = float(self.distance_scale.get())
-        distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
-        self.setdist_entry_val.set(distmin)
-        if(self.dist_range_sel.get() == 'arb'):
-            self.dmin = distmin
-            self.dmax = distmin + self.dist_range_arb_val.get()
+        if self.result != None:
+            pos = float(self.distance_scale.get())
+            distmin = ((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*pos/100 + self.distrange_min
+            self.setdist_entry_val.set(distmin)
+            if(self.dist_range_sel.get() == 'arb'):
+                self.dmin = distmin
+                self.dmax = distmin + self.dist_range_arb_val.get()
+                
+                self.plot_all()
+    def setdist_all(self):
+        if self.result != None:
+            self.dmin = self.distrange_min
+            self.dmax = self.distrange_max
             
             self.plot_all()
-    def setdist_all(self):
-        self.dmin = self.distrange_min
-        self.dmax = self.distrange_max
-        
-        self.plot_all()
     def setdist_arbitrary(self):
-        self.setdist_scale(0)
+        if self.result != None:
+            self.setdist_scale(0)
     def distset_entry(self, event=None):
-        self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
+        if self.result != None:
+            self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
     def plot_all(self):
         if(self.result != None):
             self.draw_planerplot()
