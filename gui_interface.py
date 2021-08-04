@@ -34,7 +34,11 @@ class Catcher:
                args = self.subst(*args)
             return self.func(*args)
         except Exception as e:
-            raise e
+            if not __debug__:
+                raise e
+            else:
+                print(e)
+                tk.messagebox.showinfo(message=e)
 
 class mainwindow(ttk.Frame):
     class SubWindow(ttk.Frame):
@@ -241,6 +245,9 @@ class mainwindow(ttk.Frame):
         self.menu_file.add_command(label='Save track data...', command=None)
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
+        
+        self.menu_option.add_command(label='座標制御点...', command=None)
+        self.menu_option.add_command(label='描画範囲...', command=None)
         
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
