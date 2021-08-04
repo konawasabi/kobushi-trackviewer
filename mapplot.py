@@ -207,7 +207,7 @@ class Mapplot():
         self.origin_angle = owntrack[owntrack[:,0] == min(owntrack[:,0])][0][4]
         owntrack = self.rotate_track(owntrack,-self.origin_angle)
         
-        ax_pl.plot(owntrack[:,1],owntrack[:,2]) # 自軌道描画
+        ax_pl.plot(owntrack[:,1],owntrack[:,2],color='black') # 自軌道描画
         
         # 他軌道描画
         if othertrack_list != None:
@@ -218,7 +218,7 @@ class Mapplot():
                 othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)
-                ax_pl.plot(othertrack[:,1],othertrack[:,2])
+                ax_pl.plot(othertrack[:,1],othertrack[:,2],color=self.environment.othertrack_linecolor[key])
                 
         if iswholemap:
             ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定
@@ -243,8 +243,8 @@ class Mapplot():
         owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
         self.heightmax = max(owntrack[:,3])
         self.heightmin = min(owntrack[:,3])
-        ax_h.plot(owntrack[:,0],owntrack[:,3])
-        ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1)
+        ax_h.plot(owntrack[:,0],owntrack[:,3],color='black')
+        ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1,color='black')
         ax_r.set_ylim(-6.5,6.5)
 
     def stationpoint_plane(self, ax_pl, labelplot = True):

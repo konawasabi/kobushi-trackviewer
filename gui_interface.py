@@ -41,6 +41,15 @@ class mainwindow(ttk.Frame):
             self.mainwindow = mainwindow
             self.parent = master
             super().__init__(master, padding='3 3 3 3')
+            
+            self.mainwindow.tk.eval("""
+                ttk::style map Treeview \
+                -foreground {disabled SystemGrayText \
+                             selected SystemHighlightText} \
+                -background {disabled SystemButtonFace \
+                             selected SystemHighlight}
+            """)
+            
             self.master.title('Other tracks')
             self.master.columnconfigure(0, weight=1)
             self.master.rowconfigure(0, weight=1)
@@ -48,46 +57,66 @@ class mainwindow(ttk.Frame):
             self.create_widgets()
             self.master.geometry('+1100+0')
         def create_widgets(self):
-            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist'],selectmode='browse')
+            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist', 'linecolor'],selectmode='browse')
             self.othertrack_tree.bind("<ButtonRelease>", self.click_tracklist)
             self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
             self.othertrack_tree.column('maxdist', width=100)
+            self.othertrack_tree.column('linecolor', width=50)
             self.othertrack_tree.heading('#0', text='track key')
             self.othertrack_tree.heading('mindist', text='From')
             self.othertrack_tree.heading('maxdist', text='To')
+            self.othertrack_tree.heading('linecolor', text='Color')
             
             self.ottree_scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
             self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S))
             self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
+            
+            '''
+            def fixed_map(option):
+                return [elm for elm in style.map('Treeview', query_opt=option) if elm[:2] != ('!disabled', '!selected')]
+            style = ttk.Style()
+            style.configure("Treeview.Heading", font=("YU Mincho", 12, "bold", "italic", "underline" ), rowheight=100, foreground="black")
+            style.configure("Treeview", font=("Arial", 10, "overstrike"), rowheight=50)
+            style.map('Treeview', foreground=fixed_map('foreground'), background=fixed_map('background'))
+            '''
             
             #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
             #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
         def click_tracklist(self, event=None):
             '''他軌道リストをクリックしたときのイベント処理
             '''
-            columnlabel = {'#0':'Check','#1':'From', '#2':'To'}
+            columnlabel = {'#0':'Check','#1':'From', '#2':'To', '#3':'Color'}
             if event != None:
                 if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #数値部分クリックかどうか。チェックボックスだとimage
                     cliked_column = self.othertrack_tree.identify_column(event.x)
                     cliked_track = self.othertrack_tree.identify_row(event.y)
                     #print(cliked_track,columnlabel[cliked_column])
-                    if cliked_column != '#0' and cliked_track != 'root':
+                    if cliked_column in ['#1','#2'] and cliked_track != 'root':
                         if cliked_column == '#1':
                             defaultval = min(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
-                        else:
+                        elif cliked_column == '#2':
                             defaultval = max(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
                         inputdata = simpledialog.askfloat(cliked_track+': Distance', columnlabel[cliked_column]+' (default: '+str(defaultval)+' m)')
                         #print(inputdata)
-                        if inputdata != None:
+                        if inputdata != None: # 入力値に問題なければ、描画範囲を変更する
                             if cliked_column == '#1':
                                 self.mainwindow.result.othertrack.cp_range[cliked_track]['min'] = inputdata
-                            else:
+                            elif cliked_column == '#2':
                                 self.mainwindow.result.othertrack.cp_range[cliked_track]['max'] = inputdata
-                            self.othertrack_tree.set(cliked_track,cliked_column,inputdata)
-                    
+                            self.othertrack_tree.set(cliked_track,cliked_column,inputdata) # 他軌道リストの表示値変更
             self.mainwindow.plot_all()
+        def set_ottree_value(self):
+            if self.othertrack_tree.exists('root'):
+                self.othertrack_tree.delete('root')
+            self.othertrack_tree.insert("", "end", 'root', text='root', open=True)
+            colorix = 0
+            for i in self.mainwindow.result.othertrack.data.keys():
+                self.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'], '■■■'),tags=(i,))
+                self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i])
+            #self.subwindow.othertrack_tree.see('root')
+            #self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
             
     def __init__(self, master, parser):
         self.dmin = None
@@ -231,13 +260,7 @@ class mainwindow(ttk.Frame):
                 self.setdist_entry_val.set(self.dmin)
                 self.distance_scale.set(0)
                 
-            if self.subwindow.othertrack_tree.exists('root'):
-                self.subwindow.othertrack_tree.delete('root')
-            self.subwindow.othertrack_tree.insert("", "end", 'root', text='root', open=True)
-            for i in self.result.othertrack.data.keys():
-                self.subwindow.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.result.othertrack.data[i], key=lambda x: x['distance'])['distance']))
-            #self.subwindow.othertrack_tree.see('root')
-            self.subwindow.othertrack_tree.configure(yscrollcommand=self.subwindow.ottree_scrollbar.set)
+            self.subwindow.set_ottree_value()
             
             self.mplot = mapplot.Mapplot(self.result)
             self.plot_all()
