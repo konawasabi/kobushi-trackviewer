@@ -387,9 +387,11 @@ class mainwindow(ttk.Frame):
         key = value.split(',')[0]
         dist = [k for k, v in self.result.station.position.items() if v == key]
         if len(dist)>0:
-            print(value, dist[0])
+            #print(value, dist[0])
+            self.setdist_entry_val.set(dist[0]-self.dist_range_arb_val.get()/2)
+            self.distset_entry()
         else:
-            print('Not defined station')
+            tk.messagebox.showinfo(message=value+' はこのmap上に見つかりませんでした')
 
 if __name__ == '__main__':
     if not __debug__:
