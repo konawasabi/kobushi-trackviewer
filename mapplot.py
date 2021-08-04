@@ -218,7 +218,7 @@ class Mapplot():
                 othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
                 othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
                 othertrack = self.rotate_track(othertrack,-self.origin_angle)
-                ax_pl.plot(othertrack[:,1],othertrack[:,2],color=self.environment.othertrack_linecolor[key])
+                ax_pl.plot(othertrack[:,1],othertrack[:,2],color=self.environment.othertrack_linecolor[key]['current'])
                 
         if iswholemap:
             ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定

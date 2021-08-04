@@ -158,13 +158,6 @@ class ParseMap(Transformer):
             self.environment.controlpoints.relocate()
             self.environment.own_track.relocate()
             self.environment.othertrack.relocate()
-    
-            self.environment.othertrack_linecolor = {}
-            linecolor_default = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
-            color_ix = 0
-            for key in self.environment.othertrack.data.keys():
-                self.environment.othertrack_linecolor[key] = linecolor_default[color_ix%10]
-                color_ix += 1
         
         print(str(f_path.name)+' loaded.')
         return self.environment

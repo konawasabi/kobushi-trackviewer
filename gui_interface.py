@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as filedialog
 import tkinter.simpledialog as simpledialog
+import tkinter.colorchooser as colorchooser
 from ttkwidgets import CheckboxTreeview
 
 import matplotlib.pyplot as plt
@@ -89,23 +90,29 @@ class mainwindow(ttk.Frame):
             '''
             columnlabel = {'#0':'Check','#1':'From', '#2':'To', '#3':'Color'}
             if event != None:
-                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #数値部分クリックかどうか。チェックボックスだとimage
-                    cliked_column = self.othertrack_tree.identify_column(event.x)
-                    cliked_track = self.othertrack_tree.identify_row(event.y)
-                    #print(cliked_track,columnlabel[cliked_column])
-                    if cliked_column in ['#1','#2'] and cliked_track != 'root':
-                        if cliked_column == '#1':
-                            defaultval = min(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
-                        elif cliked_column == '#2':
-                            defaultval = max(self.mainwindow.result.othertrack.data[cliked_track], key=lambda x: x['distance'])['distance']
-                        inputdata = simpledialog.askfloat(cliked_track+': Distance', columnlabel[cliked_column]+' (default: '+str(defaultval)+' m)')
-                        #print(inputdata)
-                        if inputdata != None: # 入力値に問題なければ、描画範囲を変更する
-                            if cliked_column == '#1':
-                                self.mainwindow.result.othertrack.cp_range[cliked_track]['min'] = inputdata
-                            elif cliked_column == '#2':
-                                self.mainwindow.result.othertrack.cp_range[cliked_track]['max'] = inputdata
-                            self.othertrack_tree.set(cliked_track,cliked_column,inputdata) # 他軌道リストの表示値変更
+                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #パラメータ部分クリックかどうか。チェックボックスだとimage
+                    clicked_column = self.othertrack_tree.identify_column(event.x)
+                    clicked_track = self.othertrack_tree.identify_row(event.y)
+                    #print(clicked_track,columnlabel[clicked_column])
+                    if clicked_column in ['#1','#2','#3'] and clicked_track != 'root':
+                        if clicked_column == '#3': # ラインカラーかどうか？
+                            inputdata = colorchooser.askcolor(color=self.mainwindow.result.othertrack_linecolor[clicked_track]['current'],title=clicked_track+' ,default: '+self.mainwindow.result.othertrack_linecolor[clicked_track]['default'])
+                            if inputdata[1] != None:
+                                self.mainwindow.result.othertrack_linecolor[clicked_track]['current'] = inputdata[1]
+                                self.othertrack_tree.tag_configure(clicked_track,foreground=self.mainwindow.result.othertrack_linecolor[clicked_track]['current'])
+                        else:
+                            if clicked_column == '#1':
+                                defaultval = min(self.mainwindow.result.othertrack.data[clicked_track], key=lambda x: x['distance'])['distance']
+                            elif clicked_column == '#2':
+                                defaultval = max(self.mainwindow.result.othertrack.data[clicked_track], key=lambda x: x['distance'])['distance']
+                            inputdata = simpledialog.askfloat(clicked_track+': Distance', columnlabel[clicked_column]+' (default: '+str(defaultval)+' m)')
+                            #print(inputdata)
+                            if inputdata != None: # 入力値に問題なければ、描画範囲を変更する
+                                if clicked_column == '#1':
+                                    self.mainwindow.result.othertrack.cp_range[clicked_track]['min'] = inputdata
+                                elif clicked_column == '#2':
+                                    self.mainwindow.result.othertrack.cp_range[clicked_track]['max'] = inputdata
+                                self.othertrack_tree.set(clicked_track,clicked_column,inputdata) # 他軌道リストの表示値変更
             self.mainwindow.plot_all()
         def set_ottree_value(self):
             if self.othertrack_tree.exists('root'):
@@ -114,7 +121,7 @@ class mainwindow(ttk.Frame):
             colorix = 0
             for i in self.mainwindow.result.othertrack.data.keys():
                 self.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'], '■■■'),tags=(i,))
-                self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i])
+                self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i]['current'])
             #self.subwindow.othertrack_tree.see('root')
             #self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
             
@@ -259,6 +266,14 @@ class mainwindow(ttk.Frame):
                 self.distrange_max = self.dmax
                 self.setdist_entry_val.set(self.dmin)
                 self.distance_scale.set(0)
+                
+            # 他軌道のラインカラーを設定
+            self.result.othertrack_linecolor = {}
+            linecolor_default = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
+            color_ix = 0
+            for key in self.result.othertrack.data.keys():
+                self.result.othertrack_linecolor[key] = {'current':linecolor_default[color_ix%10], 'default':linecolor_default[color_ix%10]}
+                color_ix += 1
                 
             self.subwindow.set_ottree_value()
             
