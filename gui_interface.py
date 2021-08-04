@@ -195,7 +195,7 @@ class mainwindow(ttk.Frame):
         self.dist_range_all.grid(column=3, row=0, sticky=(tk.W, tk.E))
         self.dist_range_arb = ttk.Radiobutton(self.setdist_frame, text='',variable=self.dist_range_sel, value='arb', command=self.setdist_arbitrary)
         self.dist_range_arb.grid(column=4, row=0, sticky=(tk.W, tk.E))
-        self.dist_range_arb_val = tk.DoubleVar(value=5000)
+        self.dist_range_arb_val = tk.DoubleVar(value=500)
         self.dist_range_arb_entry = ttk.Entry(self.setdist_frame, width=5, textvariable=self.dist_range_arb_val)
         self.dist_range_arb_entry.grid(column=5, row=0, sticky=(tk.W, tk.E))
         
