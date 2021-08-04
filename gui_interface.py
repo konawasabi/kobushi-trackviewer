@@ -199,6 +199,10 @@ class mainwindow(ttk.Frame):
         self.dist_range_arb_entry = ttk.Entry(self.setdist_frame, width=5, textvariable=self.dist_range_arb_val)
         self.dist_range_arb_entry.grid(column=5, row=0, sticky=(tk.W, tk.E))
         
+        self.stationlist_val = tk.StringVar()
+        self.stationlist_cb = ttk.Combobox(self.setdist_frame, textvariable=self.stationlist_val, width = 20, state='readonly')
+        self.stationlist_cb.grid(column=6, row=0, sticky=(tk.W, tk.E))
+        self.stationlist_cb.bind('<<ComboboxSelected>>', self.jumptostation)
         
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -221,22 +225,24 @@ class mainwindow(ttk.Frame):
     def create_menubar(self):
         self.master.option_add('*tearOff', False)
         
-        menubar = tk.Menu(self.master)
+        self.menubar = tk.Menu(self.master)
         
-        menu_file = tk.Menu(menubar)
-        menu_option = tk.Menu(menubar)
+        self.menu_file = tk.Menu(self.menubar)
+        self.menu_option = tk.Menu(self.menubar)
+        self.menu_station = tk.Menu(self.menubar)
         
-        menubar.add_cascade(menu=menu_file, label='File')
-        menubar.add_cascade(menu=menu_option, label='Option')
+        self.menubar.add_cascade(menu=self.menu_file, label='File')
+        #self.menubar.add_cascade(menu=self.menu_station, label='駅ジャンプ')
+        self.menubar.add_cascade(menu=self.menu_option, label='Option')
         
-        menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
-        menu_file.add_separator()
-        menu_file.add_command(label='Save plots...', command=None, accelerator='Control+S')
-        menu_file.add_command(label='Save track data...', command=None)
-        menu_file.add_separator()
-        menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
+        self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
+        self.menu_file.add_separator()
+        self.menu_file.add_command(label='Save plots...', command=None, accelerator='Control+S')
+        self.menu_file.add_command(label='Save track data...', command=None)
+        self.menu_file.add_separator()
+        self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
         
-        self.master['menu'] = menubar
+        self.master['menu'] = self.menubar
     def bind_keyevent(self):
         self.bind_all("<Control-o>", self.open_mapfile)
         self.bind_all("<Alt-F4>", self.ask_quit)
@@ -274,6 +280,14 @@ class mainwindow(ttk.Frame):
             for key in self.result.othertrack.data.keys():
                 self.result.othertrack_linecolor[key] = {'current':linecolor_default[color_ix%10], 'default':linecolor_default[color_ix%10]}
                 color_ix += 1
+                
+            # 駅ジャンプメニュー更新
+            stnlist_tmp = []
+            self.stationlist_cb['values'] = ()
+            for stationkey in self.result.station.stationkey.keys():
+                stnlist_tmp.append(stationkey+', '+self.result.station.stationkey[stationkey])
+                #self.menu_station.add_command(label=stationkey+', '+self.result.station.stationkey[stationkey], command=lambda: print(stationkey))
+            self.stationlist_cb['values'] = tuple(stnlist_tmp)
                 
             self.subwindow.set_ottree_value()
             
@@ -368,6 +382,14 @@ class mainwindow(ttk.Frame):
             value = (self.setdist_entry_val.get() + self.dist_range_arb_val.get()/5 - self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100
             value = 100 if value > 100 else value
             self.distance_scale.set(value)
+    def jumptostation(self, event=None):
+        value = self.stationlist_cb.get()
+        key = value.split(',')[0]
+        dist = [k for k, v in self.result.station.position.items() if v == key]
+        if len(dist)>0:
+            print(value, dist[0])
+        else:
+            print('Not defined station')
 
 if __name__ == '__main__':
     if not __debug__:
