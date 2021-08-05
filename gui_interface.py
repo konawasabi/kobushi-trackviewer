@@ -230,7 +230,8 @@ class mainwindow(ttk.Frame):
         
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Save plots...', command=None, accelerator='Control+S')
+        self.menu_file.add_command(label='Save planer map...', command=self.save_planermap)
+        self.menu_file.add_command(label='Save vertical profile...', command=self.save_verticalprofile)
         self.menu_file.add_command(label='Save track data...', command=None)
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
@@ -388,7 +389,14 @@ class mainwindow(ttk.Frame):
             self.distset_entry()
         else:
             tk.messagebox.showinfo(message=value+' はこのmap上に見つかりませんでした')
-
+    def save_planermap(self):
+        filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')])
+        if filepath != '':
+            self.fig_plane.savefig(filepath)
+    def save_verticalprofile(self):
+        filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')])
+        if filepath != '':
+            self.fig_profile.savefig(filepath)
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
