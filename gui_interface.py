@@ -11,6 +11,7 @@ from ttkwidgets import CheckboxTreeview
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import rcParams
+import numpy as np
 
 import lark
 from lark import Lark, Transformer, v_args, exceptions
@@ -232,7 +233,7 @@ class mainwindow(ttk.Frame):
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
-        self.menu_file.add_command(label='Save track data...', command=None)
+        self.menu_file.add_command(label='Save track data...', command=self.save_trackdata)
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
         
@@ -396,6 +397,22 @@ class mainwindow(ttk.Frame):
             filepath = pathlib.Path(filepath)
             self.fig_plane.savefig(filepath.with_stem(filepath.stem + '_plane'))
             self.fig_profile.savefig(filepath.with_stem(filepath.stem + '_profile'))
+    def save_trackdata(self, event=None):
+        filepath = filedialog.askdirectory(initialdir='./')
+        if filepath != '':
+            filepath = pathlib.Path(filepath)
+            filename_base = filepath.stem
+            
+            output_filename = filepath.joinpath(str(filename_base)+'_owntrack'+'.csv')
+            output = self.result.owntrack_pos
+            header = 'distance,x,y,z,direction,radius,gradient'
+            np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
+            
+            for key in self.result.othertrack_pos.keys():
+                output_filename = filepath.joinpath(str(filename_base)+'_'+key+'.csv')
+                output = self.result.othertrack_pos[key]
+                header = 'distance,x,y,z'
+                np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
