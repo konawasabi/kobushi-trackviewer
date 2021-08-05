@@ -231,6 +231,7 @@ class mainwindow(ttk.Frame):
         self.menubar.add_cascade(menu=self.menu_option, label='Option')
         
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
+        self.menu_file.add_command(label='Reload', command=None, accelerator='F5')
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
         self.menu_file.add_command(label='Save track data...', command=self.save_trackdata)
@@ -392,7 +393,7 @@ class mainwindow(ttk.Frame):
         else:
             tk.messagebox.showinfo(message=value+' はこのmap上に見つかりませんでした')
     def save_plots(self, event=None):
-        filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')])
+        filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')], defaultextension='*.*')
         if filepath != '':
             filepath = pathlib.Path(filepath)
             #self.fig_plane.savefig(filepath.with_stem(filepath.stem + '_plane'))
