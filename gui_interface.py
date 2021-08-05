@@ -1,4 +1,5 @@
 import sys
+import pathlib
 
 import tkinter as tk
 from tkinter import ttk
@@ -230,8 +231,7 @@ class mainwindow(ttk.Frame):
         
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Save planer map...', command=self.save_planermap)
-        self.menu_file.add_command(label='Save vertical profile...', command=self.save_verticalprofile)
+        self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
         self.menu_file.add_command(label='Save track data...', command=None)
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
@@ -242,6 +242,7 @@ class mainwindow(ttk.Frame):
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
         self.bind_all("<Control-o>", self.open_mapfile)
+        self.bind_all("<Control-s>", self.save_plots)
         self.bind_all("<Alt-F4>", self.ask_quit)
         self.bind_all("<Return>", self.distset_entry)
         self.bind_all("<Shift-Left>", self.press_arrowkey)
@@ -389,14 +390,12 @@ class mainwindow(ttk.Frame):
             self.distset_entry()
         else:
             tk.messagebox.showinfo(message=value+' はこのmap上に見つかりませんでした')
-    def save_planermap(self):
+    def save_plots(self, event=None):
         filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')])
         if filepath != '':
-            self.fig_plane.savefig(filepath)
-    def save_verticalprofile(self):
-        filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')])
-        if filepath != '':
-            self.fig_profile.savefig(filepath)
+            filepath = pathlib.Path(filepath)
+            self.fig_plane.savefig(filepath.with_stem(filepath.stem + '_plane'))
+            self.fig_profile.savefig(filepath.with_stem(filepath.stem + '_profile'))
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
