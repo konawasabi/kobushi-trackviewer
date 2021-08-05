@@ -22,7 +22,7 @@ import mapinterpleter as interp
 import mapplot
 
 # http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
-class Catcher:
+class Catcher: # tkinter内で起きた例外をキャッチする
     def __init__(self, func, subst, widget):
         self.func = func
         self.subst = subst
@@ -34,10 +34,10 @@ class Catcher:
                args = self.subst(*args)
             return self.func(*args)
         except Exception as e:
-            if not __debug__:
+            if not __debug__: # デバッグモード(-O)なら素通し。pdbが起動する
                 raise e
             else:
-                print(e)
+                print(e) # 通常モードならダイアログ表示
                 tk.messagebox.showinfo(message=e)
 
 class mainwindow(ttk.Frame):
@@ -77,18 +77,7 @@ class mainwindow(ttk.Frame):
             self.ottree_scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
             self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S))
             self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
-            
-            '''
-            def fixed_map(option):
-                return [elm for elm in style.map('Treeview', query_opt=option) if elm[:2] != ('!disabled', '!selected')]
-            style = ttk.Style()
-            style.configure("Treeview.Heading", font=("YU Mincho", 12, "bold", "italic", "underline" ), rowheight=100, foreground="black")
-            style.configure("Treeview", font=("Arial", 10, "overstrike"), rowheight=50)
-            style.map('Treeview', foreground=fixed_map('foreground'), background=fixed_map('background'))
-            '''
-            
-            #self.otselect_btn = ttk.Button(self, text="Checked track", command=self.print_checkedtrack())
-            #self.otselect_btn.grid(column=1, row=0, sticky=(tk.N, tk.W, tk.E))
+
         def click_tracklist(self, event=None):
             '''他軌道リストをクリックしたときのイベント処理
             '''

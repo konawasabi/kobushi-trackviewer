@@ -198,14 +198,14 @@ class Othertrack():
     
     def position(self, *a):
         if(len(a)==3):
-            self.x.interpolate(a[0],a[1],0)
-            self.y.interpolate(a[0],a[2],0)
+            self.x.interpolate(a[0],a[1] if a[1] != None else 0,0)
+            self.y.interpolate(a[0],a[2] if a[2] != None else 0,0)
         elif(len(a)==4):
-            self.x.interpolate(a[0],a[1],a[3])
-            self.y.interpolate(a[0],a[2],0)
+            self.x.interpolate(a[0],a[1] if a[1] != None else 0,a[3] if a[3] != None else 0)
+            self.y.interpolate(a[0],a[2] if a[2] != None else 0,0)
         elif(len(a)>=5):
-            self.x.interpolate(a[0],a[1],a[3])
-            self.y.interpolate(a[0],a[2],a[4])
+            self.x.interpolate(a[0],a[1] if a[1] != None else 0,a[3] if a[3] != None else 0)
+            self.y.interpolate(a[0],a[2] if a[2] != None else 0,a[4] if a[4] != None else 0)
     def gauge(self, *a):
         pass
     def putdata(self,trackkey,elementkey,value,flag=''):
