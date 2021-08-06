@@ -454,7 +454,7 @@ class mainwindow(ttk.Frame):
                 header = 'distance,x,y,z'
                 np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
     def set_plotlimit(self, event=None):
-        if filepath != '':
+        if self.result != None:
             inputstr = simpledialog.askstring('Set plotlimit',\
                                                 'min,max \ndefault: '+str(min(self.result.station.position.keys()) - 500)+','+str(max(self.result.station.position.keys()) + 500)+\
                                                 '\nmap: '+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
@@ -462,7 +462,7 @@ class mainwindow(ttk.Frame):
                 inputval = inputstr.split(',')
                 self.distrange_min = float(inputval[0])
                 self.distrange_max = float(inputval[1])
-                self.plot_all()
+                self.setdist_all()
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
