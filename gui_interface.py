@@ -260,7 +260,7 @@ class mainwindow(ttk.Frame):
         self.menu_file.add_command(label='Quit', command=lambda: self.ask_quit(ask=False), accelerator='Alt+F4')
         
         self.menu_option.add_command(label='座標制御点...', command=None)
-        self.menu_option.add_command(label='描画範囲...', command=None)
+        self.menu_option.add_command(label='描画範囲...', command=self.set_plotlimit)
         
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
@@ -294,6 +294,11 @@ class mainwindow(ttk.Frame):
                 self.distrange_max = self.dmax
                 self.setdist_entry_val.set(self.dmin)
                 self.distance_scale.set(0)
+                
+            '''
+            self.distrange_min/max: 対象のマップで表示可能な距離程の最大最小値を示す
+            self.dmin/dmax : 実際に画面にプロットする距離程の範囲を示す
+            '''
                 
             # 他軌道のラインカラーを設定
             self.result.othertrack_linecolor = {}
@@ -448,6 +453,16 @@ class mainwindow(ttk.Frame):
                 output = self.result.othertrack_pos[key]
                 header = 'distance,x,y,z'
                 np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
+    def set_plotlimit(self, event=None):
+        if filepath != '':
+            inputstr = simpledialog.askstring('Set plotlimit',\
+                                                'min,max \ndefault: '+str(min(self.result.station.position.keys()) - 500)+','+str(max(self.result.station.position.keys()) + 500)+\
+                                                '\nmap: '+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
+            if inputstr != None:
+                inputval = inputstr.split(',')
+                self.distrange_min = float(inputval[0])
+                self.distrange_max = float(inputval[1])
+                self.plot_all()
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
