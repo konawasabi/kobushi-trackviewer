@@ -6,6 +6,7 @@ from tkinter import ttk
 import tkinter.filedialog as filedialog
 import tkinter.simpledialog as simpledialog
 import tkinter.colorchooser as colorchooser
+import tkinter.font as font
 from ttkwidgets import CheckboxTreeview
 
 import matplotlib.pyplot as plt
@@ -144,28 +145,60 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
+        self.ydim_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
+        self.ydim_control.grid(column=0, row=0, sticky=(tk.S, tk.W, tk.E))
+        self.ydim_cont_label =  ttk.Label(self.ydim_control, text='Y軸拡大率', font = font.Font(weight='bold'))
+        self.ydim_cont_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+        self.ydim_cont_val = tk.StringVar()
+        self.ydim_cont={}
+        i=1
+        for key in ['x0.5','x1','x2','x4', 'x6']:
+            self.ydim_cont[key] = ttk.Radiobutton(self.ydim_control, text=key, variable=self.ydim_cont_val, value=key, command=self.plot_all)
+            self.ydim_cont[key].grid(column=0, row=i, sticky=(tk.N, tk.W, tk.E))
+            i +=1
+        self.ydim_cont_val.set('x1')
+        
+        self.aux_values_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
+        self.aux_values_control.grid(column=0, row=1, sticky=(tk.S, tk.W, tk.E))
+        self.aux_val_label =  ttk.Label(self.aux_values_control, text='補助情報', font = font.Font(weight='bold'))
+        self.aux_val_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
         self.stationpos_val = tk.BooleanVar(value=True)
-        self.stationpos_chk = ttk.Checkbutton(self.control_frame, text='駅座標',onvalue=True, offvalue=False, variable=self.stationpos_val, command=self.plot_all)
-        self.stationpos_chk.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+        self.stationpos_chk = ttk.Checkbutton(self.aux_values_control, text='駅座標',onvalue=True, offvalue=False, variable=self.stationpos_val, command=self.plot_all)
+        self.stationpos_chk.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E))
         self.stationlabel_val = tk.BooleanVar(value=True)
-        self.stationlabel_chk = ttk.Checkbutton(self.control_frame, text='駅名',onvalue=True, offvalue=False, variable=self.stationlabel_val, command=self.plot_all)
-        self.stationlabel_chk.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E))
+        self.stationlabel_chk = ttk.Checkbutton(self.aux_values_control, text='駅名',onvalue=True, offvalue=False, variable=self.stationlabel_val, command=self.plot_all)
+        self.stationlabel_chk.grid(column=0, row=2, sticky=(tk.N, tk.W, tk.E))
         self.gradientpos_val = tk.BooleanVar(value=True)
-        self.gradientpos_chk = ttk.Checkbutton(self.control_frame, text='勾配変化点',onvalue=True, offvalue=False, variable=self.gradientpos_val, command=self.plot_all)
-        self.gradientpos_chk.grid(column=0, row=2, sticky=(tk.N, tk.W, tk.E))
+        self.gradientpos_chk = ttk.Checkbutton(self.aux_values_control, text='勾配変化点',onvalue=True, offvalue=False, variable=self.gradientpos_val, command=self.plot_all)
+        self.gradientpos_chk.grid(column=0, row=3, sticky=(tk.N, tk.W, tk.E))
         self.gradientval_val = tk.BooleanVar(value=True)
-        self.gradientval_chk = ttk.Checkbutton(self.control_frame, text='勾配値',onvalue=True, offvalue=False, variable=self.gradientval_val, command=self.plot_all)
-        self.gradientval_chk.grid(column=0, row=3, sticky=(tk.N, tk.W, tk.E))
+        self.gradientval_chk = ttk.Checkbutton(self.aux_values_control, text='勾配値',onvalue=True, offvalue=False, variable=self.gradientval_val, command=self.plot_all)
+        self.gradientval_chk.grid(column=0, row=4, sticky=(tk.N, tk.W, tk.E))
         self.curveval_val = tk.BooleanVar(value=True)
-        self.curveval_chk = ttk.Checkbutton(self.control_frame, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
-        self.curveval_chk.grid(column=0, row=4, sticky=(tk.N, tk.W, tk.E))
+        self.curveval_chk = ttk.Checkbutton(self.aux_values_control, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
+        self.curveval_chk.grid(column=0, row=5, sticky=(tk.N, tk.W, tk.E))
+        
+        self.distlimit_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
+        self.distlimit_control.grid(column=0, row=2, sticky=(tk.S, tk.W, tk.E))
+        self.distlimit_label =  ttk.Label(self.distlimit_control, text='描画区間', font = font.Font(weight='bold'))
+        self.distlimit_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+        self.dist_range_sel = tk.StringVar(value='all')
+        self.dist_range_all = ttk.Radiobutton(self.distlimit_control, text='全範囲',variable=self.dist_range_sel, value='all', command=self.setdist_all)
+        self.dist_range_all.grid(column=0, row=1, sticky=(tk.W, tk.E))
+        self.dist_range_arb_frame = ttk.Frame(self.distlimit_control, padding='0 0 0 0')
+        self.dist_range_arb_frame.grid(column=0, row=2, sticky=(tk.W, tk.E))
+        self.dist_range_arb = ttk.Radiobutton(self.dist_range_arb_frame, text='',variable=self.dist_range_sel, value='arb', command=self.setdist_arbitrary)
+        self.dist_range_arb.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        self.dist_range_arb_val = tk.DoubleVar(value=500)
+        self.dist_range_arb_entry = ttk.Entry(self.dist_range_arb_frame, width=5, textvariable=self.dist_range_arb_val)
+        self.dist_range_arb_entry.grid(column=1, row=0, sticky=(tk.W))
+        self.distlimit_label =  ttk.Label(self.dist_range_arb_frame, text='m')
+        self.distlimit_label.grid(column=2, row=0, sticky=(tk.W))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-        
         self.open_btn = ttk.Button(self.file_frame, text="Open", command=self.open_mapfile)
         self.open_btn.grid(column=0, row=0, sticky=(tk.W))
-        
         self.filedir_entry_val = tk.StringVar()
         self.filedir_entry = ttk.Entry(self.file_frame, width=75, textvariable=self.filedir_entry_val)
         self.filedir_entry.grid(column=1, row=0, sticky=(tk.W, tk.E))
@@ -183,20 +216,9 @@ class mainwindow(ttk.Frame):
         self.distance_scale = ttk.Scale(self.setdist_frame, orient=tk.HORIZONTAL, length=500, from_=0, to=100, command=self.setdist_scale)
         self.distance_scale.grid(column=2, row=0, sticky=(tk.W, tk.E))
         
-        self.dist_range_sel = tk.StringVar(value='all')
-        #self.dist_range = ttk.Combobox(self.setdist_frame, textvariable=self.dist_range_val, width = 6, state='readonly')
-        #self.dist_range['values'] = ('all', '10 km', '5 km', '2 km', '1 km', '500 m', '200 m', '100 m')
-        self.dist_range_all = ttk.Radiobutton(self.setdist_frame, text='all',variable=self.dist_range_sel, value='all', command=self.setdist_all)
-        self.dist_range_all.grid(column=3, row=0, sticky=(tk.W, tk.E))
-        self.dist_range_arb = ttk.Radiobutton(self.setdist_frame, text='',variable=self.dist_range_sel, value='arb', command=self.setdist_arbitrary)
-        self.dist_range_arb.grid(column=4, row=0, sticky=(tk.W, tk.E))
-        self.dist_range_arb_val = tk.DoubleVar(value=500)
-        self.dist_range_arb_entry = ttk.Entry(self.setdist_frame, width=5, textvariable=self.dist_range_arb_val)
-        self.dist_range_arb_entry.grid(column=5, row=0, sticky=(tk.W, tk.E))
-        
         self.stationlist_val = tk.StringVar()
         self.stationlist_cb = ttk.Combobox(self.setdist_frame, textvariable=self.stationlist_val, width = 20, state='readonly')
-        self.stationlist_cb.grid(column=6, row=0, sticky=(tk.W, tk.E))
+        self.stationlist_cb.grid(column=3, row=0, sticky=(tk.W, tk.E))
         self.stationlist_cb.bind('<<ComboboxSelected>>', self.jumptostation)
         
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
@@ -297,8 +319,13 @@ class mainwindow(ttk.Frame):
             self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
-        
-        self.mplot.plane(self.ax_plane,distmin=self.dmin,distmax=self.dmax,iswholemap = True if self.dist_range_sel.get()=='all' else False, othertrack_list = self.subwindow.othertrack_tree.get_checked())
+        ydimlim = {'x0.5':0.5,'x1':1,'x2':2,'x4':4,'x6':6}
+        self.mplot.plane(self.ax_plane,\
+                         distmin=self.dmin,\
+                         distmax=self.dmax,\
+                         iswholemap = True if self.dist_range_sel.get()=='all' else False,\
+                         othertrack_list = self.subwindow.othertrack_tree.get_checked(),\
+                         ydim_expansion = ydimlim[self.ydim_cont_val.get()])
         if self.stationpos_val.get():
             self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         

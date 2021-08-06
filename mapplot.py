@@ -194,7 +194,7 @@ class Mapplot():
             self.nostation = False
         else:
             self.nostation = True
-    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True, othertrack_list = None):
+    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True, othertrack_list = None, ydim_expansion = None):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['plane'][0] = distmin
@@ -223,13 +223,14 @@ class Mapplot():
         if iswholemap:
             ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定
         else:
+            ax_pl.set_aspect('auto')
             windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth()) # ax_plのアスペクト比を取得
             plotdistance = max(owntrack[:,0]) - min(owntrack[:,0]) # 描画距離を算出
             # 描画範囲始点の座標を求める
             yminval = owntrack[0][2]
             xminval = owntrack[0][1]
             # 描画範囲設定
-            ax_pl.set_ylim(yminval-plotdistance*windowratio/2,yminval + plotdistance*windowratio/2)
+            ax_pl.set_ylim(yminval-plotdistance*windowratio/(2*ydim_expansion),yminval + plotdistance*windowratio/(2*ydim_expansion))
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             
         ax_pl.invert_yaxis()
