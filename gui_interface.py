@@ -249,16 +249,15 @@ class mainwindow(ttk.Frame):
         self.menu_station = tk.Menu(self.menubar)
         
         self.menubar.add_cascade(menu=self.menu_file, label='File')
-        #self.menubar.add_cascade(menu=self.menu_station, label='駅ジャンプ')
         self.menubar.add_cascade(menu=self.menu_option, label='Option')
         
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
-        self.menu_file.add_command(label='Reload', command=None, accelerator='F5')
+        self.menu_file.add_command(label='Reload', command=self.reload_map, accelerator='F5')
         self.menu_file.add_separator()
         self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
         self.menu_file.add_command(label='Save track data...', command=self.save_trackdata)
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
+        self.menu_file.add_command(label='Quit', command=lambda: self.ask_quit(ask=False), accelerator='Alt+F4')
         
         self.menu_option.add_command(label='座標制御点...', command=None)
         self.menu_option.add_command(label='描画範囲...', command=None)
@@ -267,6 +266,7 @@ class mainwindow(ttk.Frame):
     def bind_keyevent(self):
         self.bind_all("<Control-o>", self.open_mapfile)
         self.bind_all("<Control-s>", self.save_plots)
+        self.bind_all("<F5>", self.reload_map)
         self.bind_all("<Alt-F4>", self.ask_quit)
         self.bind_all("<Return>", self.distset_entry)
         self.bind_all("<Shift-Left>", self.press_arrowkey)
@@ -317,6 +317,8 @@ class mainwindow(ttk.Frame):
             self.plot_all()
             
             self.print_debugdata()
+    def reload_map(self):
+        pass
     def draw_planerplot(self):
         self.ax_plane.cla()
         ydimlim = {'x0.5':0.5,'x1':1,'x2':2,'x4':4,'x6':6}
@@ -396,8 +398,11 @@ class mainwindow(ttk.Frame):
         if(self.result != None):
             self.draw_planerplot()
             self.draw_profileplot()
-    def ask_quit(self, event=None):
-        if tk.messagebox.askyesno(message='Kobushi Track Viewerを終了しますか？'):
+    def ask_quit(self, event=None, ask=True):
+        if ask:
+            if tk.messagebox.askyesno(message='Kobushi Track Viewerを終了しますか？'):
+                self.quit()
+        else:
             self.quit()
     def press_arrowkey(self, event=None):
         #print(event.keysym)
