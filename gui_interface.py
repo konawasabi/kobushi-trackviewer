@@ -145,9 +145,11 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
+        font_title = font.Font(weight='bold',size=14)
+        
         self.ydim_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.ydim_control.grid(column=0, row=0, sticky=(tk.S, tk.W, tk.E))
-        self.ydim_cont_label =  ttk.Label(self.ydim_control, text='Y軸拡大率', font = font.Font(weight='bold'))
+        self.ydim_cont_label =  ttk.Label(self.ydim_control, text='Y軸拡大率', font = font_title)
         self.ydim_cont_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
         self.ydim_cont_val = tk.StringVar()
         self.ydim_cont={}
@@ -160,7 +162,7 @@ class mainwindow(ttk.Frame):
         
         self.aux_values_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.aux_values_control.grid(column=0, row=1, sticky=(tk.S, tk.W, tk.E))
-        self.aux_val_label =  ttk.Label(self.aux_values_control, text='補助情報', font = font.Font(weight='bold'))
+        self.aux_val_label =  ttk.Label(self.aux_values_control, text='補助情報', font = font_title)
         self.aux_val_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
         self.stationpos_val = tk.BooleanVar(value=True)
         self.stationpos_chk = ttk.Checkbutton(self.aux_values_control, text='駅座標',onvalue=True, offvalue=False, variable=self.stationpos_val, command=self.plot_all)
@@ -177,10 +179,13 @@ class mainwindow(ttk.Frame):
         self.curveval_val = tk.BooleanVar(value=True)
         self.curveval_chk = ttk.Checkbutton(self.aux_values_control, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
         self.curveval_chk.grid(column=0, row=5, sticky=(tk.N, tk.W, tk.E))
+        self.prof_othert_val = tk.BooleanVar(value=False)
+        self.prof_othert_chk = ttk.Checkbutton(self.aux_values_control, text='縦断面図他軌道',onvalue=True, offvalue=False, variable=self.prof_othert_val, command=None)
+        self.prof_othert_chk.grid(column=0, row=6, sticky=(tk.N, tk.W, tk.E))
         
         self.distlimit_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.distlimit_control.grid(column=0, row=2, sticky=(tk.S, tk.W, tk.E))
-        self.distlimit_label =  ttk.Label(self.distlimit_control, text='描画区間', font = font.Font(weight='bold'))
+        self.distlimit_label =  ttk.Label(self.distlimit_control, text='描画区間', font = font_title)
         self.distlimit_label.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
         self.dist_range_sel = tk.StringVar(value='all')
         self.dist_range_all = ttk.Radiobutton(self.distlimit_control, text='全範囲',variable=self.dist_range_sel, value='all', command=self.setdist_all)
@@ -246,10 +251,11 @@ class mainwindow(ttk.Frame):
         
         self.menu_file = tk.Menu(self.menubar)
         self.menu_option = tk.Menu(self.menubar)
-        self.menu_station = tk.Menu(self.menubar)
+        self.menu_help = tk.Menu(self.menubar)
         
         self.menubar.add_cascade(menu=self.menu_file, label='File')
         self.menubar.add_cascade(menu=self.menu_option, label='Option')
+        self.menubar.add_cascade(menu=self.menu_help, label='About')
         
         self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
         self.menu_file.add_command(label='Reload', command=self.reload_map, accelerator='F5')
@@ -261,6 +267,8 @@ class mainwindow(ttk.Frame):
         
         self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
         self.menu_option.add_command(label='描画範囲...', command=self.set_plotlimit)
+        
+        self.menu_help.add_command(label='About...', command=None)
         
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
