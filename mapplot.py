@@ -235,7 +235,7 @@ class Mapplot():
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             
         ax_pl.invert_yaxis()
-    def vertical(self, ax_h, ax_r, distmin = None, distmax = None):
+    def vertical(self, ax_h, ax_r, distmin = None, distmax = None, othertrack_list = None):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['vertical'][0] = distmin
@@ -243,11 +243,25 @@ class Mapplot():
             self.distrange['vertical'][1] = distmax
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
+        
+        # 他軌道描画
+        if othertrack_list != None:
+            for key in othertrack_list:
+                othertrack = self.environment.othertrack_pos[key]
+                othertrack = othertrack[othertrack[:,0] >= self.environment.othertrack.cp_range[key]['min']]
+                othertrack = othertrack[othertrack[:,0] <= self.environment.othertrack.cp_range[key]['max']]
+                othertrack = othertrack[othertrack[:,0] >= self.distrange['plane'][0]]
+                othertrack = othertrack[othertrack[:,0] <= self.distrange['plane'][1]]
+                othertrack = self.rotate_track(othertrack,-self.origin_angle)
+                ax_h.plot(othertrack[:,0],othertrack[:,3],color=self.environment.othertrack_linecolor[key]['current'])
+        
         self.heightmax = max(owntrack[:,3])
         self.heightmin = min(owntrack[:,3])
         ax_h.plot(owntrack[:,0],owntrack[:,3],color='black')
         ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1,color='black')
+        
         ax_r.set_ylim(-6.5,6.5)
+        ax_h.set_ylim(self.heightmin - (self.heightmax - self.heightmin)*0.2,self.heightmax + (self.heightmax - self.heightmin)*0.1)
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):

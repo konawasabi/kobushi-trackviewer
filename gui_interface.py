@@ -180,7 +180,7 @@ class mainwindow(ttk.Frame):
         self.curveval_chk = ttk.Checkbutton(self.aux_values_control, text='曲線半径',onvalue=True, offvalue=False, variable=self.curveval_val, command=self.plot_all)
         self.curveval_chk.grid(column=0, row=5, sticky=(tk.N, tk.W, tk.E))
         self.prof_othert_val = tk.BooleanVar(value=False)
-        self.prof_othert_chk = ttk.Checkbutton(self.aux_values_control, text='縦断面図他軌道',onvalue=True, offvalue=False, variable=self.prof_othert_val, command=None)
+        self.prof_othert_chk = ttk.Checkbutton(self.aux_values_control, text='縦断面図他軌道',onvalue=True, offvalue=False, variable=self.prof_othert_val, command=self.plot_all)
         self.prof_othert_chk.grid(column=0, row=6, sticky=(tk.N, tk.W, tk.E))
         
         self.distlimit_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
@@ -407,7 +407,11 @@ class mainwindow(ttk.Frame):
         self.ax_profile_r.cla()
         self.ax_profile_s.cla()
         
-        self.mplot.vertical(self.ax_profile_g, self.ax_profile_r,distmin=self.dmin,distmax=self.dmax)
+        self.mplot.vertical(self.ax_profile_g,\
+                            self.ax_profile_r,\
+                            distmin=self.dmin,\
+                            distmax=self.dmax,\
+                            othertrack_list = self.subwindow.othertrack_tree.get_checked() if self.prof_othert_val.get() else None)
         self.mplot.stationpoint_height(self.ax_profile_g,self.ax_profile_s,labelplot=self.stationlabel_val.get())
         if self.gradientpos_val.get():
             self.mplot.gradient_value(self.ax_profile_g,labelplot=self.gradientval_val.get())
