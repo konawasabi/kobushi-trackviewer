@@ -8,8 +8,8 @@
 ?parameter: expression
 
 ?expression: term
-           | term  "+" expression -> add
-           | term  "-" expression -> sub
+           | expression "+" term -> add
+           | expression "-" term -> sub
            | "null"               -> null_value
 
 ?term: factor
