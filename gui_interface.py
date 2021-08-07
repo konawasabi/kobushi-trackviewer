@@ -146,7 +146,7 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
-        font_title = font.Font(weight='bold',size=14)
+        font_title = font.Font(weight='bold',size=12)
         
         self.ydim_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.ydim_control.grid(column=0, row=0, sticky=(tk.S, tk.W, tk.E))
@@ -254,23 +254,23 @@ class mainwindow(ttk.Frame):
         self.menu_option = tk.Menu(self.menubar)
         self.menu_help = tk.Menu(self.menubar)
         
-        self.menubar.add_cascade(menu=self.menu_file, label='File')
-        self.menubar.add_cascade(menu=self.menu_option, label='Option')
-        self.menubar.add_cascade(menu=self.menu_help, label='About')
+        self.menubar.add_cascade(menu=self.menu_file, label='ファイル')
+        self.menubar.add_cascade(menu=self.menu_option, label='オプション')
+        self.menubar.add_cascade(menu=self.menu_help, label='クレジット')
         
-        self.menu_file.add_command(label='Open...', command=self.open_mapfile, accelerator='Control+O')
-        self.menu_file.add_command(label='Reload', command=self.reload_map, accelerator='F5')
+        self.menu_file.add_command(label='開く...', command=self.open_mapfile, accelerator='Control+O')
+        self.menu_file.add_command(label='リロード', command=self.reload_map, accelerator='F5')
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
-        self.menu_file.add_command(label='Save track data...', command=self.save_trackdata)
+        self.menu_file.add_command(label='図を保存...', command=self.save_plots, accelerator='Control+S')
+        self.menu_file.add_command(label='軌道座標を保存...', command=self.save_trackdata)
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
+        self.menu_file.add_command(label='終了', command=self.ask_quit, accelerator='Alt+F4')
         
         self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
-        self.menu_option.add_command(label='平面図描画範囲...', command=self.set_plotlimit)
+        self.menu_option.add_command(label='描画可能区間...', command=self.set_plotlimit)
         self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
         
-        self.menu_help.add_command(label='About...', command=None)
+        self.menu_help.add_command(label='Kobushiについて...', command=self.aboutwindow)
         
         self.master['menu'] = self.menubar
     def bind_keyevent(self):
@@ -558,6 +558,13 @@ class mainwindow(ttk.Frame):
                     inputval = inputstr.split(',')
                     self.profYlim = [float(inputval[0]),float(inputval[1])]
                 self.plot_all()
+    def aboutwindow(self, event=None):
+        msg  = 'Kobushi Track Viewer\n'
+        msg += 'Version 0.1\n\n'
+        msg += 'Copyright © 2021 konawasabi\n'
+        msg += 'Released under the MIT licence.\n'
+        msg += 'https://opensource.org/licenses/mit-license.php'
+        tk.messagebox.showinfo(message=msg)
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
