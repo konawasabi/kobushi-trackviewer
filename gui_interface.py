@@ -322,7 +322,7 @@ class mainwindow(ttk.Frame):
             self.plot_all()
             
             self.print_debugdata()
-    def reload_map(self):
+    def reload_map(self, event=None):
         inputdir = self.filedir_entry_val.get()
         if inputdir != '':
             # マップ描画設定の退避
