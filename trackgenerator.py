@@ -14,16 +14,24 @@ class TrackGenerator():
         # 等間隔で距離程を追加する
         equaldist_unit = 25
         boundary_margin = 500
-        if(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後boundary_margin mに追加
+        if self.env.cp_arbdistribution != None: # 距離程等間隔配置区間が指定されている場合
+            cp_equaldist = np.arange(self.env.cp_arbdistribution[0],self.env.cp_arbdistribution[1],self.env.cp_arbdistribution[2])
+            self.list_cp.extend(cp_equaldist)
+            self.list_cp = sorted(list(set(self.list_cp)))
+        elif(len(self.env.station.position) > 0): # 駅が設定されている区間or距離程が存在する区間の前後boundary_margin mに追加
             self.stationdist_min = round(min(self.env.station.position.keys()),-2) - boundary_margin
             self.stationdist_max = round(max(self.env.station.position.keys()),-2) + boundary_margin
             cp_equaldist = np.arange(self.stationdist_min,self.stationdist_max,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
+            
+            self.env.cp_arbdistribution = [self.stationdist_min,self.stationdist_max,equaldist_unit]
         else:
             cp_equaldist = np.arange(round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
+            
+            self.env.cp_arbdistribution = [round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit]
         
         # 前回処理した地点の情報
         self.last_pos = {}

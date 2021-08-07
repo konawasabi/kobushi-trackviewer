@@ -172,8 +172,9 @@ def plot_planer_map(environment, ax):
 
 
 class Mapplot():
-    def __init__(self,env):
+    def __init__(self,env,cp_arbdistribution=None):
         self.environment = env
+        self.environment.cp_arbdistribution = cp_arbdistribution
         
         trackgenerator = tgen.TrackGenerator(self.environment)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()

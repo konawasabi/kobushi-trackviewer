@@ -257,9 +257,9 @@ class mainwindow(ttk.Frame):
         self.menu_file.add_command(label='Save plots...', command=self.save_plots, accelerator='Control+S')
         self.menu_file.add_command(label='Save track data...', command=self.save_trackdata)
         self.menu_file.add_separator()
-        self.menu_file.add_command(label='Quit', command=lambda: self.ask_quit(ask=False), accelerator='Alt+F4')
+        self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
         
-        self.menu_option.add_command(label='座標制御点...', command=None)
+        self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
         self.menu_option.add_command(label='描画範囲...', command=self.set_plotlimit)
         
         self.master['menu'] = self.menubar
@@ -323,7 +323,64 @@ class mainwindow(ttk.Frame):
             
             self.print_debugdata()
     def reload_map(self):
-        pass
+        inputdir = self.filedir_entry_val.get()
+        if inputdir != '':
+            # マップ描画設定の退避
+            tmp_cp_arbdistribution   = self.mplot.environment.cp_arbdistribution
+            tmp_othertrack_checked   = self.subwindow.othertrack_tree.get_checked()
+            tmp_othertrack_linecolor = self.result.othertrack_linecolor
+            tmp_othertrack_cprange   = self.result.othertrack.cp_range
+            
+            interpreter = interp.ParseMap(None,self.parser)
+            self.result = interpreter.load_files(inputdir)
+            
+            
+            if(len(self.result.station.position) > 0):
+                self.distrange_min = min(self.result.station.position.keys()) - 500
+                self.distrange_max = max(self.result.station.position.keys()) + 500
+            else:
+                self.distrange_min = min(self.result.controlpoints.list_cp)
+                self.distrange_max = max(self.result.controlpoints.list_cp)
+                
+            '''
+            self.distrange_min/max: 対象のマップで表示可能な距離程の最大最小値を示す
+            self.dmin/dmax : 実際に画面にプロットする距離程の範囲を示す
+            '''
+                
+            # 他軌道のラインカラーを設定
+            self.result.othertrack_linecolor = {}
+            linecolor_default = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
+            color_ix = 0
+            for key in self.result.othertrack.data.keys():
+                self.result.othertrack_linecolor[key] = {'current':linecolor_default[color_ix%10], 'default':linecolor_default[color_ix%10]}
+                color_ix += 1
+                
+            self.subwindow.set_ottree_value()
+            
+            # 他軌道の描画情報を復帰
+            for key in tmp_othertrack_cprange.keys():
+                if key in self.result.othertrack.data.keys():
+                    self.result.othertrack.cp_range[key] = tmp_othertrack_cprange[key]
+                    self.subwindow.othertrack_tree.set(key,'#1',tmp_othertrack_cprange[key]['min'])
+                    self.subwindow.othertrack_tree.set(key,'#2',tmp_othertrack_cprange[key]['max'])
+                    self.subwindow.othertrack_tree.tag_configure(key,foreground=tmp_othertrack_linecolor[key]['current'])
+                    self.result.othertrack_linecolor[key] = tmp_othertrack_linecolor[key]
+                    if key in tmp_othertrack_checked:
+                        self.subwindow.othertrack_tree._check_ancestor(key)
+                    
+                
+            # 駅ジャンプメニュー更新
+            stnlist_tmp = []
+            self.stationlist_cb['values'] = ()
+            for stationkey in self.result.station.stationkey.keys():
+                stnlist_tmp.append(stationkey+', '+self.result.station.stationkey[stationkey])
+                #self.menu_station.add_command(label=stationkey+', '+self.result.station.stationkey[stationkey], command=lambda: print(stationkey))
+            self.stationlist_cb['values'] = tuple(stnlist_tmp)
+            
+            self.mplot = mapplot.Mapplot(self.result,cp_arbdistribution = tmp_cp_arbdistribution)
+            self.plot_all()
+            
+            self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
         ydimlim = {'x0.5':0.5,'x1':1,'x2':2,'x4':4,'x6':6}
@@ -463,6 +520,16 @@ class mainwindow(ttk.Frame):
                 self.distrange_min = float(inputval[0])
                 self.distrange_max = float(inputval[1])
                 self.setdist_all()
+    def set_arbcpdist(self, event = None):
+        if self.result != None:
+            cp_arbdistribution = self.mplot.environment.cp_arbdistribution
+            inputstr = simpledialog.askstring('Set additional controlpoint',\
+                                                'min,max,interval \ndefault: '+str(cp_arbdistribution[0])+','+str(cp_arbdistribution[1])+','+str(cp_arbdistribution[2]))
+            if inputstr != None:
+                inputval = inputstr.split(',')
+                for ix in [0,1,2]:
+                    self.mplot.environment.cp_arbdistribution[ix] = float(inputval[ix])
+                self.reload_map()
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
