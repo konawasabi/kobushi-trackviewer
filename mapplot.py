@@ -262,7 +262,10 @@ class Mapplot():
         
         ax_r.set_ylim(-6.5,6.5)
         if ylim == None:
-            ax_h.set_ylim(self.heightmin - (self.heightmax - self.heightmin)*0.2,self.heightmax + (self.heightmax - self.heightmin)*0.1)
+            if (self.heightmax - self.heightmin) != 0:
+                ax_h.set_ylim(self.heightmin - (self.heightmax - self.heightmin)*0.2,self.heightmax + (self.heightmax - self.heightmin)*0.1)
+            else:
+                ax_h.set_ylim()
         else:
             ax_h.set_ylim(ylim[0],ylim[1])
 
