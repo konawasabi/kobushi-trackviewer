@@ -125,6 +125,7 @@ class mainwindow(ttk.Frame):
         self.dmin = None
         self.dmax = None
         self.result = None
+        self.profYlim = None
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi Track Viewer')
@@ -266,7 +267,8 @@ class mainwindow(ttk.Frame):
         self.menu_file.add_command(label='Quit', command=self.ask_quit, accelerator='Alt+F4')
         
         self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
-        self.menu_option.add_command(label='描画範囲...', command=self.set_plotlimit)
+        self.menu_option.add_command(label='平面図描画範囲...', command=self.set_plotlimit)
+        self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
         
         self.menu_help.add_command(label='About...', command=None)
         
@@ -325,6 +327,8 @@ class mainwindow(ttk.Frame):
             self.stationlist_cb['values'] = tuple(stnlist_tmp)
                 
             self.subwindow.set_ottree_value()
+            
+            self.profYlim = None
             
             self.mplot = mapplot.Mapplot(self.result)
             self.plot_all()
@@ -411,7 +415,8 @@ class mainwindow(ttk.Frame):
                             self.ax_profile_r,\
                             distmin=self.dmin,\
                             distmax=self.dmax,\
-                            othertrack_list = self.subwindow.othertrack_tree.get_checked() if self.prof_othert_val.get() else None)
+                            othertrack_list = self.subwindow.othertrack_tree.get_checked() if self.prof_othert_val.get() else None,\
+                            ylim = self.profYlim)
         self.mplot.stationpoint_height(self.ax_profile_g,self.ax_profile_s,labelplot=self.stationlabel_val.get())
         if self.gradientpos_val.get():
             self.mplot.gradient_value(self.ax_profile_g,labelplot=self.gradientval_val.get())
@@ -542,6 +547,17 @@ class mainwindow(ttk.Frame):
                 for ix in [0,1,2]:
                     self.mplot.environment.cp_arbdistribution[ix] = float(inputval[ix])
                 self.reload_map()
+    def set_profYlimit(self, event=None):
+        if self.result != None:
+            inputstr = simpledialog.askstring('Set profile Y limit',\
+                                              'min,max \ndefault: '+ ('auto' if self.profYlim == None else str(self.profYlim[0]) +','+str(self.profYlim[1])))
+            if inputstr != None:
+                if inputstr == 'auto':
+                    self.profYlim = None
+                else:
+                    inputval = inputstr.split(',')
+                    self.profYlim = [float(inputval[0]),float(inputval[1])]
+                self.plot_all()
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa

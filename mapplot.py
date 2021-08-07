@@ -235,7 +235,7 @@ class Mapplot():
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             
         ax_pl.invert_yaxis()
-    def vertical(self, ax_h, ax_r, distmin = None, distmax = None, othertrack_list = None):
+    def vertical(self, ax_h, ax_r, distmin = None, distmax = None, othertrack_list = None, ylim = None):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['vertical'][0] = distmin
@@ -261,7 +261,10 @@ class Mapplot():
         ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1,color='black')
         
         ax_r.set_ylim(-6.5,6.5)
-        ax_h.set_ylim(self.heightmin - (self.heightmax - self.heightmin)*0.2,self.heightmax + (self.heightmax - self.heightmin)*0.1)
+        if ylim == None:
+            ax_h.set_ylim(self.heightmin - (self.heightmax - self.heightmin)*0.2,self.heightmax + (self.heightmax - self.heightmin)*0.1)
+        else:
+            ax_h.set_ylim(ylim[0],ylim[1])
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
