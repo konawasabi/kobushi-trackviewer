@@ -146,7 +146,7 @@ class mainwindow(ttk.Frame):
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
-        font_title = font.Font(weight='bold',size=12)
+        font_title = font.Font(weight='bold',size=10)
         
         self.ydim_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.ydim_control.grid(column=0, row=0, sticky=(tk.S, tk.W, tk.E))
@@ -219,7 +219,7 @@ class mainwindow(ttk.Frame):
         
         self.setdist_entry_frame = ttk.Frame(self.setdist_frame, padding='0 0 0 0')
         self.setdist_entry_frame.grid(column=0, row=0, sticky=(tk.W, tk.E))
-        self.distset_btn = ttk.Button(self.setdist_entry_frame, text="距離程セット", command=self.distset_entry, width=9)
+        self.distset_btn = ttk.Button(self.setdist_entry_frame, text="距離程セット", command=self.distset_entry, width=10)
         self.distset_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
         self.setdist_entry_val = tk.DoubleVar()
         self.setdist_entry = ttk.Entry(self.setdist_entry_frame, width=7, textvariable=self.setdist_entry_val)
