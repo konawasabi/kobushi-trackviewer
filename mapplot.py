@@ -195,7 +195,7 @@ class Mapplot():
             self.nostation = False
         else:
             self.nostation = True
-    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True, othertrack_list = None, ydim_expansion = None):
+    def plane(self, ax_pl, distmin = None, distmax = None, iswholemap = True, othertrack_list = None, ydim_expansion = None, ydim_offset=0):
         owntrack = self.environment.owntrack_pos
         if (distmin != None):
             self.distrange['plane'][0] = distmin
@@ -231,7 +231,7 @@ class Mapplot():
             yminval = owntrack[0][2]
             xminval = owntrack[0][1]
             # 描画範囲設定
-            ax_pl.set_ylim(yminval-plotdistance*windowratio/(2*ydim_expansion),yminval + plotdistance*windowratio/(2*ydim_expansion))
+            ax_pl.set_ylim(yminval-plotdistance*windowratio/(2*ydim_expansion)+ydim_offset,yminval + plotdistance*windowratio/(2*ydim_expansion)+ydim_offset)
             ax_pl.set_xlim(xminval,xminval + plotdistance)
             
         ax_pl.invert_yaxis()

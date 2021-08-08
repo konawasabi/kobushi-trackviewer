@@ -160,6 +160,11 @@ class mainwindow(ttk.Frame):
             self.ydim_cont[key].grid(column=0, row=i, sticky=(tk.N, tk.W, tk.E))
             i +=1
         self.ydim_cont_val.set('x1')
+        self.ydim_offset_label =  ttk.Label(self.ydim_control, text='Y軸オフセット', font = font_title)
+        self.ydim_offset_label.grid(column=0, row=10, sticky=(tk.N, tk.W, tk.E))
+        self.ydim_offset_val = tk.DoubleVar(value=0)
+        self.ydim_offset_entry = ttk.Entry(self.ydim_control, width=6, textvariable=self.ydim_offset_val)
+        self.ydim_offset_entry.grid(column=0, row=11, sticky=(tk.W))
         
         self.aux_values_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.aux_values_control.grid(column=0, row=1, sticky=(tk.S, tk.W, tk.E))
@@ -203,7 +208,7 @@ class mainwindow(ttk.Frame):
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-        self.open_btn = ttk.Button(self.file_frame, text="Open", command=self.open_mapfile)
+        self.open_btn = ttk.Button(self.file_frame, text="開く", command=self.open_mapfile)
         self.open_btn.grid(column=0, row=0, sticky=(tk.W))
         self.filedir_entry_val = tk.StringVar()
         self.filedir_entry = ttk.Entry(self.file_frame, width=75, textvariable=self.filedir_entry_val)
@@ -212,19 +217,26 @@ class mainwindow(ttk.Frame):
         self.setdist_frame = ttk.Frame(self, padding='3 3 3 3')
         self.setdist_frame.grid(column=0, row=2, sticky=(tk.W, tk.E))
         
-        self.distset_btn = ttk.Button(self.setdist_frame, text="Set", command=self.distset_entry, width=3)
+        self.setdist_entry_frame = ttk.Frame(self.setdist_frame, padding='0 0 0 0')
+        self.setdist_entry_frame.grid(column=0, row=0, sticky=(tk.W, tk.E))
+        self.distset_btn = ttk.Button(self.setdist_entry_frame, text="距離程セット", command=self.distset_entry, width=9)
         self.distset_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
-        
         self.setdist_entry_val = tk.DoubleVar()
-        self.setdist_entry = ttk.Entry(self.setdist_frame, width=7, textvariable=self.setdist_entry_val)
+        self.setdist_entry = ttk.Entry(self.setdist_entry_frame, width=7, textvariable=self.setdist_entry_val)
         self.setdist_entry.grid(column=1, row=0, sticky=(tk.W, tk.E))
+        self.setdist_entry_label = ttk.Label(self.setdist_entry_frame, text='m')
+        self.setdist_entry_label.grid(column=2, row=0, sticky=(tk.E))
         
         self.distance_scale = ttk.Scale(self.setdist_frame, orient=tk.HORIZONTAL, length=500, from_=0, to=100, command=self.setdist_scale)
-        self.distance_scale.grid(column=2, row=0, sticky=(tk.W, tk.E))
+        self.distance_scale.grid(column=1, row=0, sticky=(tk.W, tk.E))
         
+        self.stationlist_frame = ttk.Frame(self.setdist_frame, padding='0 0 0 0')
+        self.stationlist_frame.grid(column=2, row=0, sticky=(tk.W, tk.E))
+        self.stationlist_label = ttk.Label(self.stationlist_frame, text='駅移動', font = font_title)
+        self.stationlist_label.grid(column=0, row=0, sticky=(tk.W))
         self.stationlist_val = tk.StringVar()
-        self.stationlist_cb = ttk.Combobox(self.setdist_frame, textvariable=self.stationlist_val, width = 20, state='readonly')
-        self.stationlist_cb.grid(column=3, row=0, sticky=(tk.W, tk.E))
+        self.stationlist_cb = ttk.Combobox(self.stationlist_frame, textvariable=self.stationlist_val, width = 20, state='readonly')
+        self.stationlist_cb.grid(column=1, row=0, sticky=(tk.W, tk.E))
         self.stationlist_cb.bind('<<ComboboxSelected>>', self.jumptostation)
         
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
@@ -256,7 +268,7 @@ class mainwindow(ttk.Frame):
         
         self.menubar.add_cascade(menu=self.menu_file, label='ファイル')
         self.menubar.add_cascade(menu=self.menu_option, label='オプション')
-        self.menubar.add_cascade(menu=self.menu_help, label='クレジット')
+        self.menubar.add_cascade(menu=self.menu_help, label='ヘルプ')
         
         self.menu_file.add_command(label='開く...', command=self.open_mapfile, accelerator='Control+O')
         self.menu_file.add_command(label='リロード', command=self.reload_map, accelerator='F5')
@@ -270,6 +282,7 @@ class mainwindow(ttk.Frame):
         self.menu_option.add_command(label='描画可能区間...', command=self.set_plotlimit)
         self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
         
+        self.menu_help.add_command(label='ヘルプ...', command=None)
         self.menu_help.add_command(label='Kobushiについて...', command=self.aboutwindow)
         
         self.master['menu'] = self.menubar
@@ -401,7 +414,8 @@ class mainwindow(ttk.Frame):
                          distmax=self.dmax,\
                          iswholemap = True if self.dist_range_sel.get()=='all' else False,\
                          othertrack_list = self.subwindow.othertrack_tree.get_checked(),\
-                         ydim_expansion = ydimlim[self.ydim_cont_val.get()])
+                         ydim_expansion = ydimlim[self.ydim_cont_val.get()],\
+                         ydim_offset = self.ydim_offset_val.get())
         if self.stationpos_val.get():
             self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         
