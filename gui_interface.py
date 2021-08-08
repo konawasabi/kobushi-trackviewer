@@ -344,7 +344,7 @@ class mainwindow(ttk.Frame):
             self.profYlim = None
             
             self.mplot = mapplot.Mapplot(self.result)
-            self.plot_all()
+            self.setdist_all()
             
             self.print_debugdata()
     def reload_map(self, event=None):
@@ -480,9 +480,16 @@ class mainwindow(ttk.Frame):
             self.dmin = self.distrange_min
             self.dmax = self.distrange_max
             
+            for key in ['x0.5','x1','x2','x4', 'x6']:
+                self.ydim_cont[key]['state']='disable'
+            self.ydim_offset_entry['state']='disable'
+            
             self.plot_all()
     def setdist_arbitrary(self):
         if self.result != None:
+            for key in ['x0.5','x1','x2','x4', 'x6']:
+                self.ydim_cont[key]['state']='normal'
+            self.ydim_offset_entry['state']='normal'
             self.setdist_scale(0)
     def distset_entry(self, event=None):
         if self.result != None:
