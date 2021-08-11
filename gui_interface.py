@@ -219,7 +219,7 @@ class mainwindow(ttk.Frame):
         
         self.setdist_entry_frame = ttk.Frame(self.setdist_frame, padding='0 0 0 0')
         self.setdist_entry_frame.grid(column=0, row=0, sticky=(tk.W, tk.E))
-        self.distset_btn = ttk.Button(self.setdist_entry_frame, text="距離程セット", command=self.distset_entry, width=10)
+        self.distset_btn = ttk.Button(self.setdist_entry_frame, text="距離程セット", command=self.distset_entry, width=12)
         self.distset_btn.grid(column=0, row=0, sticky=(tk.W, tk.E))
         self.setdist_entry_val = tk.DoubleVar()
         self.setdist_entry = ttk.Entry(self.setdist_entry_frame, width=7, textvariable=self.setdist_entry_val)
@@ -282,7 +282,7 @@ class mainwindow(ttk.Frame):
         self.menu_option.add_command(label='描画可能区間...', command=self.set_plotlimit)
         self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
         
-        self.menu_help.add_command(label='ヘルプ...', command=None)
+        self.menu_help.add_command(label='ヘルプ...', command=None, state=tk.DISABLED)
         self.menu_help.add_command(label='Kobushiについて...', command=self.aboutwindow)
         
         self.master['menu'] = self.menubar
