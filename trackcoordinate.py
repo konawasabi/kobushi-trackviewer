@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import integrate
 
 class gradient():
     def __init__(self):
@@ -156,7 +157,7 @@ class curve_intermediate(curve):
         r1 = np.inf if np.fabs(r1)>1e6 else r1
         r2 = np.inf if np.fabs(r2)>1e6  else r2
 
-        if True: # 直線逓減の場合
+        if func == 'line': # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
             rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate) if (1/r1 + (1/r2 - 1/r1)/L * l_intermediate) != 0 else np.inf
             
@@ -176,8 +177,19 @@ class curve_intermediate(curve):
                 dist = np.array([0,l_intermediate])+(-A**2/r1)
                 turn = -((l_intermediate-L0)**2-L0**2)/(2*A**2)
                 result=np.vstack((self.clothoid_dist(A,dist,'X'),self.clothoid_dist(A,dist,'Y')*(-1))).T
+        elif func == 'sin':
+            raise
+        else:
+            raise
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl if np.fabs(rl) < 1e6 else 0
-
+    def harfsin_intermediate(self, L, r1, r2, l_intermediate, dL=1):
+        def K(x,R1,R2,L):
+            return (1/R2-1/R1)/2*(np.sin(np.pi/L*x-np.pi/2)+1)+1/R1
+        tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
+        tau = integrate.cumtrapz(K(tau_X,R1,R2,L),tau_X,initial = 0)
+        X = integrate.cumtrapz(np.cos(tau),tau,initial = 0)
+        Y = integrate.cumtrapz(np.sin(tau),tau,initial = 0)
+        return np.array([l_intermediate,X[-1],Y[-1],tau[-1]])
 class OtherTrack():
     def __init__(self):
         pass
