@@ -365,15 +365,15 @@ class mainwindow(ttk.Frame):
             
             self.dist_range_sel.set('all')
             if(len(self.result.station.position) > 0):
-                self.dmin = min(self.result.station.position.keys()) - 500
-                self.dmax = max(self.result.station.position.keys()) + 500
+                self.dmin = round(min(self.result.station.position.keys()),-2) - 500
+                self.dmax = round(max(self.result.station.position.keys()),-2) + 500
                 self.distrange_min = self.dmin
                 self.distrange_max = self.dmax
                 self.setdist_entry_val.set(self.dmin)
                 self.distance_scale.set(0)
             else:
-                self.dmin = min(self.result.controlpoints.list_cp)
-                self.dmax = max(self.result.controlpoints.list_cp)
+                self.dmin = round(min(self.result.controlpoints.list_cp),-2) - 500
+                self.dmax = round(max(self.result.controlpoints.list_cp),-2) + 500
                 self.distrange_min = self.dmin
                 self.distrange_max = self.dmax
                 self.setdist_entry_val.set(self.dmin)
@@ -422,12 +422,12 @@ class mainwindow(ttk.Frame):
             
             
             if(len(self.result.station.position) > 0):
-                self.distrange_min = min(self.result.station.position.keys()) - 500
-                self.distrange_max = max(self.result.station.position.keys()) + 500
+                self.distrange_min = round(min(self.result.station.position.keys()),-2) - 500
+                self.distrange_max = round(max(self.result.station.position.keys()),-2) + 500
             else:
-                self.distrange_min = min(self.result.controlpoints.list_cp)
-                self.distrange_max = max(self.result.controlpoints.list_cp)
-                
+                self.distrange_min = round(min(self.result.controlpoints.list_cp),-2) - 500
+                self.distrange_max = round(max(self.result.controlpoints.list_cp),-2) + 500
+
             '''
             self.distrange_min/max: 対象のマップで表示可能な距離程の最大最小値を示す
             self.dmin/dmax : 実際に画面にプロットする距離程の範囲を示す
