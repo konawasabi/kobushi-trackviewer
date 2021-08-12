@@ -26,12 +26,14 @@ class TrackGenerator():
             self.list_cp = sorted(list(set(self.list_cp)))
             
             self.env.cp_arbdistribution = [self.stationdist_min,self.stationdist_max,equaldist_unit]
+            self.env.cp_defaultrange = [min(self.list_cp),max(self.list_cp)]
         else:
             cp_equaldist = np.arange(round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit)
             self.list_cp.extend(cp_equaldist)
             self.list_cp = sorted(list(set(self.list_cp)))
             
             self.env.cp_arbdistribution = [round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit]
+            self.env.cp_defaultrange = [min(self.list_cp),max(self.list_cp)]
         
         # 前回処理した地点の情報
         self.last_pos = {}

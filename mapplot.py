@@ -175,6 +175,7 @@ class Mapplot():
     def __init__(self,env,cp_arbdistribution=None):
         self.environment = env
         self.environment.cp_arbdistribution = cp_arbdistribution
+        self.environment.cp_defaultrange = [0,0]
         
         trackgenerator = tgen.TrackGenerator(self.environment)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()

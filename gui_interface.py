@@ -612,16 +612,16 @@ class mainwindow(ttk.Frame):
     def set_plotlimit(self, event=None):
         if self.result != None:
             dialog = self.dialog_multifields(self,\
-                                            [{'name':'min', 'type':'Double', 'label':'min (default:'+str(min(self.result.station.position.keys()) - 500)+')', 'default':self.distrange_min},\
-                                            {'name':'max', 'type':'Double', 'label':'max (default:'+str(max(self.result.station.position.keys()) + 500)+')', 'default':self.distrange_max}],
+                                            [{'name':'min', 'type':'Double', 'label':'min (default:'+str(self.result.cp_defaultrange[0])+')', 'default':self.distrange_min},\
+                                            {'name':'max', 'type':'Double', 'label':'max (default:'+str(self.result.cp_defaultrange[1])+')', 'default':self.distrange_max}],
                                             message ='Set plotlimit\n'+'map range:'+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
             if dialog.result == 'OK':
                 self.distrange_min = float(dialog.variables['min'].get())
                 self.distrange_max = float(dialog.variables['max'].get())
                 self.setdist_all()
             elif dialog.result == 'reset':
-                self.distrange_min = min(self.result.station.position.keys()) - 500
-                self.distrange_max = max(self.result.station.position.keys()) + 500
+                self.distrange_min = self.result.cp_defaultrange[0]
+                self.distrange_max = self.result.cp_defaultrange[1]
                 self.setdist_all()
     def set_arbcpdist(self, event = None):
         if self.result != None:
