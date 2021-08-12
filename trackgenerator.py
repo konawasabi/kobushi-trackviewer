@@ -46,6 +46,8 @@ class TrackGenerator():
         
         #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
+        
+        self.radius_dist = []
     def generate_owntrack(self):
         '''マップ要素が存在する全ての距離程(self.list_cp)に対して自軌道の座標データを生成する。
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
@@ -217,6 +219,37 @@ class TrackGenerator():
                 self.last_pos['gradient']])
             
         return np.array(self.result)
+    def generate_curveradius_dist(self):
+        radius_p = TrackPointer(self.env,'radius')
+        
+        previous_pos_radius = {'is_bt':False, 'value':0}
+        
+        self.radius_dist.append([min(self.list_cp),0])
+        
+        while (radius_p.pointer['next'] != None):
+            new_radius = self.data_ownt[radius_p.pointer['next']]['value']
+            flag = self.data_ownt[radius_p.pointer['next']]['flag']
+            distance = self.data_ownt[radius_p.pointer['next']]['distance']
+            if (new_radius == 'c'):
+                new_radius = previous_pos_radius['value']
+                self.radius_dist.append([distance,new_radius])
+            else:
+                if(previous_pos_radius['is_bt']): # 直前点がbegin_transitionなら、緩和曲線を出力
+                    self.radius_dist.append([distance,new_radius])
+                else:
+                    if(flag == 'i'): # 現在点がinterpolateなら、緩和曲線を出力
+                        self.radius_dist.append([distance,new_radius])
+                    else: # 現在点で階段状に変化する半径を出力
+                        self.radius_dist.append([distance,previous_pos_radius['value']])
+                        self.radius_dist.append([distance,new_radius])
+                        
+            previous_pos_radius['value'] = new_radius
+            previous_pos_radius['is_bt'] = True if flag == 'bt' else False
+            radius_p.seeknext()
+            
+        self.radius_dist.append([max(self.list_cp),0])
+        return np.array(self.radius_dist)
+        
 class TrackPointer():
     def __init__(self,environment,target):
         self.pointer = {'last':None, 'next':0}

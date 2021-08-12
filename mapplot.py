@@ -178,6 +178,7 @@ class Mapplot():
         
         trackgenerator = tgen.TrackGenerator(self.environment)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()
+        self.environment.owntrack_curve = trackgenerator.generate_curveradius_dist()
         
         otgenerator = {}
         self.environment.othertrack_pos = {}
@@ -237,12 +238,15 @@ class Mapplot():
         ax_pl.invert_yaxis()
     def vertical(self, ax_h, ax_r, distmin = None, distmax = None, othertrack_list = None, ylim = None):
         owntrack = self.environment.owntrack_pos
+        owntrack_curve = self.environment.owntrack_curve
         if (distmin != None):
             self.distrange['vertical'][0] = distmin
         if (distmax != None):
             self.distrange['vertical'][1] = distmax
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
         owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
+        owntrack_curve = owntrack_curve[owntrack_curve[:,0] >= self.distrange['vertical'][0]]
+        owntrack_curve = owntrack_curve[owntrack_curve[:,0] <= self.distrange['vertical'][1]]
         
         # 他軌道描画
         if othertrack_list != None:
@@ -258,7 +262,7 @@ class Mapplot():
         self.heightmax = max(owntrack[:,3])
         self.heightmin = min(owntrack[:,3])
         ax_h.plot(owntrack[:,0],owntrack[:,3],color='black')
-        ax_r.plot(owntrack[:,0],np.sign(owntrack[:,5]),lw=1,color='black')
+        ax_r.plot(owntrack_curve[:,0],np.sign(owntrack_curve[:,1]),lw=1,color='black')
         
         ax_r.set_ylim(-6.5,6.5)
         if ylim == None:
