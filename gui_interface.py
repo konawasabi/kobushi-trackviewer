@@ -155,7 +155,7 @@ class mainwindow(ttk.Frame):
         self.ydim_cont_val = tk.StringVar()
         self.ydim_cont={}
         i=1
-        for key in ['x0.5','x1','x2','x4', 'x6']:
+        for key in ['x0.5','x1','x2','x4', 'x8', 'x16']:
             self.ydim_cont[key] = ttk.Radiobutton(self.ydim_control, text=key, variable=self.ydim_cont_val, value=key, command=self.plot_all)
             self.ydim_cont[key].grid(column=0, row=i, sticky=(tk.N, tk.W, tk.E))
             i +=1
@@ -408,7 +408,7 @@ class mainwindow(ttk.Frame):
             self.print_debugdata()
     def draw_planerplot(self):
         self.ax_plane.cla()
-        ydimlim = {'x0.5':0.5,'x1':1,'x2':2,'x4':4,'x6':6}
+        ydimlim = {'x0.5':0.5,'x1':1,'x2':2,'x4':4,'x8':8,'x16':16}
         self.mplot.plane(self.ax_plane,\
                          distmin=self.dmin,\
                          distmax=self.dmax,\
@@ -480,14 +480,14 @@ class mainwindow(ttk.Frame):
             self.dmin = self.distrange_min
             self.dmax = self.distrange_max
             
-            for key in ['x0.5','x1','x2','x4', 'x6']:
+            for key in ['x0.5','x1','x2','x4', 'x8', 'x16']:
                 self.ydim_cont[key]['state']='disable'
             self.ydim_offset_entry['state']='disable'
             
             self.plot_all()
     def setdist_arbitrary(self):
         if self.result != None:
-            for key in ['x0.5','x1','x2','x4', 'x6']:
+            for key in ['x0.5','x1','x2','x4', 'x8', 'x16']:
                 self.ydim_cont[key]['state']='normal'
             self.ydim_offset_entry['state']='normal'
             self.setdist_scale(0)
