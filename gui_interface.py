@@ -120,6 +120,65 @@ class mainwindow(ttk.Frame):
                 self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i]['current'])
             #self.subwindow.othertrack_tree.see('root')
             #self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
+    class dialog_multifields(ttk.Frame):
+        def __init__(self, mainwindow, variable, title=None, message=None):
+            self.mainwindow = mainwindow
+            self.master = tk.Toplevel(self.mainwindow)
+            super().__init__(self.master, padding='3 3 3 3')
+            if title != None:
+                self.master.title(title)
+            else:
+                self.master.title('')
+            self.master.columnconfigure(0, weight=1)
+            self.master.rowconfigure(0, weight=1)
+            self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+            self.create_widgets(variable, message)
+            
+            self.result = False
+            
+            self.master.focus_set()
+            self.master.grab_set()
+            self.master.transient(self.mainwindow)
+            self.master.wait_window()
+        def create_widgets(self,variable,message):
+            self.variables = {}
+            self.entries = {}
+            self.labels = {}
+            
+            if message != None:
+                self.message_label = ttk.Label(self,text = message)
+                self.message_label.grid(column=0, row=0, sticky=(tk.W,tk.N))
+            
+            self.entry_frame = ttk.Frame(self, padding='3 3 3 3')
+            self.entry_frame.grid(column=0, row=1, sticky=(tk.N))
+            
+            ix=0
+            for key in variable:
+                if key['type'] == 'str':
+                    self.variables[key['name']] = tk.StringVar()
+                else:
+                    self.variables[key['name']] = tk.DoubleVar()
+                self.labels[key['name']] = ttk.Label(self.entry_frame,text = key['label'])
+                self.labels[key['name']].grid(column=0, row=ix, sticky=(tk.W))
+                self.entries[key['name']] = ttk.Entry(self.entry_frame,textvariable=self.variables[key['name']],width=7)
+                self.entries[key['name']].grid(column=1, row=ix, sticky=(tk.E))
+                self.variables[key['name']].set(key['default'])
+                ix+=1
+            
+            self.button_frame = ttk.Frame(self, padding='3 3 3 3')
+            self.button_frame.grid(column=0, row=2, sticky=(tk.E,tk.W))
+            self.button_ok = ttk.Button(self.button_frame, text="OK", command=self.clickOk)
+            self.button_ok.grid(column=0, row=0, sticky=(tk.S))
+            self.button_reset = ttk.Button(self.button_frame, text="Reset", command=self.clickreset)
+            self.button_reset.grid(column=1, row=0, sticky=(tk.S))
+            self.button_cancel = ttk.Button(self.button_frame, text="Cancel", command=self.master.destroy)
+            self.button_cancel.grid(column=2, row=0, sticky=(tk.S))
+        def clickOk(self):
+            self.result = 'OK'
+            self.master.destroy()
+        def clickreset(self):
+            self.result = 'reset'
+            self.master.destroy()
             
     def __init__(self, master, parser):
         self.dmin = None
@@ -281,6 +340,8 @@ class mainwindow(ttk.Frame):
         self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
         self.menu_option.add_command(label='描画可能区間...', command=self.set_plotlimit)
         self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
+        
+        #self.menu_option.add_command(label='customdialog...', command=self.customdialog_test)
         
         self.menu_help.add_command(label='ヘルプ...', command=None, state=tk.DISABLED)
         self.menu_help.add_command(label='Kobushiについて...', command=self.aboutwindow)
@@ -550,34 +611,54 @@ class mainwindow(ttk.Frame):
                 np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
     def set_plotlimit(self, event=None):
         if self.result != None:
-            inputstr = simpledialog.askstring('Set plotlimit',\
-                                                'min,max \ndefault: '+str(min(self.result.station.position.keys()) - 500)+','+str(max(self.result.station.position.keys()) + 500)+\
-                                                '\nmap: '+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
-            if inputstr != None:
-                inputval = inputstr.split(',')
-                self.distrange_min = float(inputval[0])
-                self.distrange_max = float(inputval[1])
+            dialog = self.dialog_multifields(self,\
+                                            [{'name':'min', 'type':'Double', 'label':'min (default:'+str(min(self.result.station.position.keys()) - 500)+')', 'default':self.distrange_min},\
+                                            {'name':'max', 'type':'Double', 'label':'max (default:'+str(max(self.result.station.position.keys()) + 500)+')', 'default':self.distrange_max}],
+                                            message ='Set plotlimit\n'+'map range:'+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
+            if dialog.result == 'OK':
+                self.distrange_min = float(dialog.variables['min'].get())
+                self.distrange_max = float(dialog.variables['max'].get())
+                self.setdist_all()
+            elif dialog.result == 'reset':
+                self.distrange_min = min(self.result.station.position.keys()) - 500
+                self.distrange_max = max(self.result.station.position.keys()) + 500
                 self.setdist_all()
     def set_arbcpdist(self, event = None):
         if self.result != None:
             cp_arbdistribution = self.mplot.environment.cp_arbdistribution
-            inputstr = simpledialog.askstring('Set additional controlpoint',\
-                                                'min,max,interval \ndefault: '+str(cp_arbdistribution[0])+','+str(cp_arbdistribution[1])+','+str(cp_arbdistribution[2]))
-            if inputstr != None:
-                inputval = inputstr.split(',')
+            list_cp = self.result.controlpoints.list_cp
+            boundary_margin = 500
+            equaldist_unit = 25
+            cp_arbcp_default = [round(min(list_cp),-2) - boundary_margin,round(max(list_cp),-2) + boundary_margin,equaldist_unit]
+            
+            dialog = self.dialog_multifields(self,\
+                                            [{'name':'min', 'type':'Double', 'label':'min', 'default':cp_arbdistribution[0]},\
+                                            {'name':'max', 'type':'Double', 'label':'max', 'default':cp_arbdistribution[1]},\
+                                            {'name':'interval', 'type':'Double', 'label':'interval', 'default':cp_arbdistribution[2]}],
+                                            message ='Set additional controlpoint')
+            if dialog.result == 'OK':
+                inputval = [dialog.variables['min'].get(),dialog.variables['max'].get(),dialog.variables['interval'].get()]
                 for ix in [0,1,2]:
                     self.mplot.environment.cp_arbdistribution[ix] = float(inputval[ix])
                 self.reload_map()
+            elif dialog.result == 'reset':
+                for ix in [0,1,2]:
+                    self.mplot.environment.cp_arbdistribution = None
+            self.reload_map()
     def set_profYlimit(self, event=None):
         if self.result != None:
-            inputstr = simpledialog.askstring('Set profile Y limit',\
-                                              'min,max \ndefault: '+ ('auto' if self.profYlim == None else str(self.profYlim[0]) +','+str(self.profYlim[1])))
-            if inputstr != None:
-                if inputstr == 'auto':
-                    self.profYlim = None
+            dialog = self.dialog_multifields(self,\
+                                            [{'name':'min', 'type':'str', 'label':'min (default:auto)', 'default':'auto' if self.profYlim == None else str(self.profYlim[0])},\
+                                            {'name':'max', 'type':'str', 'label':'max (default:auto)', 'default':'auto' if self.profYlim == None else str(self.profYlim[1])}],
+                                            message ='Set profile Y limit')
+            if dialog.result == 'reset':
+                self.profYlim = None
+                self.plot_all()
+            elif dialog.result == 'OK':
+                if dialog.variables['min'].get() != 'auto' and dialog.variables['max'].get() != 'auto':
+                    self.profYlim = [float(dialog.variables['min'].get()),float(dialog.variables['max'].get())]
                 else:
-                    inputval = inputstr.split(',')
-                    self.profYlim = [float(inputval[0]),float(inputval[1])]
+                    self.profYlim = None
                 self.plot_all()
     def aboutwindow(self, event=None):
         msg  = 'Kobushi Track Viewer\n'
@@ -586,6 +667,12 @@ class mainwindow(ttk.Frame):
         msg += 'Released under the MIT licence.\n'
         msg += 'https://opensource.org/licenses/mit-license.php'
         tk.messagebox.showinfo(message=msg)
+    def customdialog_test(self, event=None):
+        dialog_obj = self.dialog_multifields(self,\
+                                        [{'name':'A', 'type':'str', 'label':'test A', 'default':'alpha'},\
+                                        {'name':'B', 'type':'Double', 'label':'test B', 'default':100}],\
+                                        'Test Dialog')
+        print('Done', dialog_obj.result, dialog_obj.variables['A'].get())
 if __name__ == '__main__':
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
