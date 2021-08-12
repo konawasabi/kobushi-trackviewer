@@ -35,13 +35,14 @@ class TrackGenerator():
         
         # 前回処理した地点の情報
         self.last_pos = {}
-        self.last_pos['x']        = x0     if x0     != None else 0
-        self.last_pos['y']        = y0     if y0     != None else 0
-        self.last_pos['z']        = z0     if z0     != None else 0
-        self.last_pos['theta']    = theta0 if theta0 != None else 0
-        self.last_pos['radius']   = r0     if r0     != None else 0
-        self.last_pos['gradient'] = gr0    if gr0    != None else 0
-        self.last_pos['distance'] = dist0  if dist0  != None else min(self.list_cp)
+        self.last_pos['x']               = x0     if x0     != None else 0
+        self.last_pos['y']               = y0     if y0     != None else 0
+        self.last_pos['z']               = z0     if z0     != None else 0
+        self.last_pos['theta']           = theta0 if theta0 != None else 0
+        self.last_pos['radius']          = r0     if r0     != None else 0
+        self.last_pos['gradient']        = gr0    if gr0    != None else 0
+        self.last_pos['distance']        = dist0  if dist0  != None else min(self.list_cp)
+        self.last_pos['interpolatefunc'] = 'line'
         
         #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
@@ -50,9 +51,10 @@ class TrackGenerator():
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
         結果はself.result に[[distance,xpos,ypos,zpos,theta,radius,gradient],[d.,x.,y.,...],[...],...]として格納する。
         '''
-        radius_p   = TrackPointer(self.env,'radius')
-        gradient_p = TrackPointer(self.env,'gradient')
-        turn_p     = TrackPointer(self.env,'turn')
+        radius_p      = TrackPointer(self.env,'radius')
+        gradient_p    = TrackPointer(self.env,'gradient')
+        turn_p        = TrackPointer(self.env,'turn')
+        interpolate_p = TrackPointer(self.env, 'interpolate_func')
         
         grad_gen = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
@@ -65,6 +67,13 @@ class TrackGenerator():
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
         for dist in self.list_cp:
+            # curve.setfunction に対する処理
+            while (interpolate_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
+                #if(interpolate_p.pointer['next'] != None):
+                self.last_pos['interpolate_func'] = self.data_ownt[interpolate_p.pointer['next']]['value']
+                #print(self.data_ownt[interpolate_p.pointer['next']]['distance'],self.last_pos['interpolate_func'])
+                interpolate_p.seeknext()
+            
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
@@ -114,7 +123,7 @@ class TrackGenerator():
                                                                                 self.last_pos['radius'],\
                                                                                 self.data_ownt[radius_p.pointer['next']]['value'],\
                                                                                 self.last_pos['theta'],\
-                                                                                'line',\
+                                                                                self.last_pos['interpolatefunc'],\
                                                                                 dist - self.last_pos['distance'])
                         elif(self.data_ownt[radius_p.pointer['next']]['value'] != 0): # 曲線半径が変化せず、!=0の場合は円軌道を出力
                             [x, y], tau = curve_gen.circular_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
