@@ -243,11 +243,28 @@ class Mapplot():
             self.distrange['vertical'][0] = distmin
         if (distmax != None):
             self.distrange['vertical'][1] = distmax
-        owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
-        owntrack = owntrack[owntrack[:,0] <= self.distrange['vertical'][1]]
-        owntrack_curve = owntrack_curve[owntrack_curve[:,0] >= self.distrange['vertical'][0]]
-        owntrack_curve = owntrack_curve[owntrack_curve[:,0] <= self.distrange['vertical'][1]]
         
+        
+        ot_ix = np.where((owntrack[:,0] >= self.distrange['vertical'][0])&(owntrack[:,0] <= self.distrange['vertical'][1]))[0]
+        if len(ot_ix) == 0:
+            ot_ix_min = max(np.where((owntrack[:,0] < self.distrange['vertical'][0]))[0])
+            ot_ix_max = min(np.where((owntrack[:,0] > self.distrange['vertical'][1]))[0])
+        else:
+            ot_ix_min = min(ot_ix)
+            ot_ix_max = max(ot_ix)
+        #print(ot_ix_min,ot_ix_max,owntrack[ot_ix_min],owntrack[ot_ix_max])
+        owntrack = owntrack[ot_ix_min:ot_ix_max]
+        
+        '''
+        otc_ix = np.where((owntrack_curve[:,0] >= self.distrange['vertical'][0])&(owntrack_curve[:,0] <= self.distrange['vertical'][1]))[0]
+        if len(otc_ix) == 0:
+            otc_ix_min = max(np.where((owntrack_curve[:,0] < self.distrange['vertical'][0]))[0])-1
+            otc_ix_max = min(np.where((owntrack_curve[:,0] > self.distrange['vertical'][1]))[0])+1
+        else:
+            otc_ix_min = min(otc_ix)
+            otc_ix_max = max(otc_ix)
+        owntrack_curve = owntrack_curve[otc_ix_min:otc_ix_max]
+        '''
         # 他軌道描画
         if othertrack_list != None:
             for key in othertrack_list:
@@ -272,6 +289,9 @@ class Mapplot():
                 ax_h.set_ylim()
         else:
             ax_h.set_ylim(ylim[0],ylim[1])
+            
+        ax_h.set_xlim(self.distrange['vertical'][0],self.distrange['vertical'][1])
+        ax_r.set_xlim(self.distrange['vertical'][0],self.distrange['vertical'][1])
 
     def stationpoint_plane(self, ax_pl, labelplot = True):
         if(not self.nostation):
