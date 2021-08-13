@@ -644,7 +644,7 @@ class mainwindow(ttk.Frame):
             elif dialog.result == 'reset':
                 for ix in [0,1,2]:
                     self.mplot.environment.cp_arbdistribution = None
-            self.reload_map()
+                self.reload_map()
     def set_profYlimit(self, event=None):
         if self.result != None:
             dialog = self.dialog_multifields(self,\
