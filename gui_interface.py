@@ -626,15 +626,16 @@ class mainwindow(ttk.Frame):
     def set_arbcpdist(self, event = None):
         if self.result != None:
             cp_arbdistribution = self.mplot.environment.cp_arbdistribution
+            cp_arb_default = self.mplot.environment.cp_arbdistribution_default
             list_cp = self.result.controlpoints.list_cp
             boundary_margin = 500
             equaldist_unit = 25
             cp_arbcp_default = [round(min(list_cp),-2) - boundary_margin,round(max(list_cp),-2) + boundary_margin,equaldist_unit]
             
             dialog = self.dialog_multifields(self,\
-                                            [{'name':'min', 'type':'Double', 'label':'min', 'default':cp_arbdistribution[0]},\
-                                            {'name':'max', 'type':'Double', 'label':'max', 'default':cp_arbdistribution[1]},\
-                                            {'name':'interval', 'type':'Double', 'label':'interval', 'default':cp_arbdistribution[2]}],
+                                            [{'name':'min', 'type':'Double', 'label':'min (default: '+str(cp_arb_default[0])+')', 'default':cp_arbdistribution[0]},\
+                                            {'name':'max', 'type':'Double', 'label':'max (default: '+str(cp_arb_default[1])+')', 'default':cp_arbdistribution[1]},\
+                                            {'name':'interval', 'type':'Double', 'label':'interval (default: '+str(cp_arb_default[2])+')', 'default':cp_arbdistribution[2]}],
                                             message ='Set additional controlpoint')
             if dialog.result == 'OK':
                 inputval = [dialog.variables['min'].get(),dialog.variables['max'].get(),dialog.variables['interval'].get()]
