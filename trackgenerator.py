@@ -5,7 +5,7 @@ class TrackGenerator():
     def __init__(self,environment,x0=None,y0=None,z0=None,theta0=None,r0=None,gr0=None,dist0=None):
         self.env = environment
         self.data_ownt = self.env.own_track.data
-        self.list_cp = self.env.controlpoints.list_cp
+        self.list_cp = self.env.controlpoints.list_cp.copy()
         
         # マップ要素が存在する距離程の最小, 最大値
         self.cp_min = min(self.list_cp)
@@ -33,7 +33,8 @@ class TrackGenerator():
             self.list_cp = sorted(list(set(self.list_cp)))
             
             self.env.cp_arbdistribution = [round(self.cp_min,-2) - boundary_margin,round(self.cp_max,-2) + boundary_margin,equaldist_unit]
-            self.env.cp_defaultrange = [min(self.list_cp),max(self.list_cp)]
+            #self.env.cp_defaultrange = [min(self.list_cp),max(self.list_cp)]
+            self.env.cp_defaultrange = [self.env.cp_arbdistribution[0],self.env.cp_arbdistribution[1]]
         
         # 前回処理した地点の情報
         self.last_pos = {}
