@@ -2,8 +2,8 @@ from lark import Lark, Transformer, v_args, exceptions
 import math
 import random
 
-import loadheader
-import mapobj
+from . import loadheader
+from . import mapobj
 
 @v_args(inline=True)
 class ParseMap(Transformer):

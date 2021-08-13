@@ -1,4 +1,4 @@
-import loadheader
+from . import loadheader
 import re
 
 class Environment():

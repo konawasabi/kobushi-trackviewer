@@ -1,6 +1,6 @@
 import numpy as np
-import trackcoordinate as tc
-import trackgenerator as tgen
+from . import trackcoordinate as tc
+from . import trackgenerator as tgen
 import matplotlib.transforms
 
 def plot_vetical_profile(environment, ax_g, ax_r):

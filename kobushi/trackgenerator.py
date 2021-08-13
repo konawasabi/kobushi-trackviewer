@@ -1,5 +1,5 @@
 import numpy as np
-import trackcoordinate as tc
+from . import trackcoordinate as tc
 
 class TrackGenerator():
     def __init__(self,environment,x0=None,y0=None,z0=None,theta0=None,r0=None,gr0=None,dist0=None):

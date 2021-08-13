@@ -1,5 +1,6 @@
 import sys
 import pathlib
+import os
 
 import tkinter as tk
 from tkinter import ttk
@@ -21,8 +22,8 @@ from lark import Lark, Transformer, v_args, exceptions
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
-import mapinterpleter as interp
-import mapplot
+from . import mapinterpleter as interp
+from . import mapplot
 
 # http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
 class Catcher: # tkinter内で起きた例外をキャッチする
@@ -674,7 +675,8 @@ class mainwindow(ttk.Frame):
                                         {'name':'B', 'type':'Double', 'label':'test B', 'default':100}],\
                                         'Test Dialog')
         print('Done', dialog_obj.result, dialog_obj.variables['A'].get())
-if __name__ == '__main__':
+#if __name__ == '__main__':
+def main():
     if not __debug__:
         # エラーが発生した場合、デバッガを起動 https://gist.github.com/podhmo/5964702e7471ccaba969105468291efa
         def info(type, value, tb):
@@ -692,7 +694,7 @@ if __name__ == '__main__':
         import sys
         sys.excepthook = info
     
-    rule = open('map-grammer.lark', encoding='utf-8').read()
+    rule = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),'map-grammer.lark'), encoding='utf-8').read()
     
     tk.CallWrapper = Catcher
     root = tk.Tk()

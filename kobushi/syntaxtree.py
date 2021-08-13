@@ -8,8 +8,8 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
-import mapinterpleter as interp
-import mapplot
+from . import mapinterpleter as interp
+from . import mapplot
 
 if __name__ == '__main__':
     rule = open('map-grammer.lark', encoding='utf-8').read()
