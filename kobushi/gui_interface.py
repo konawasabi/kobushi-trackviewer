@@ -1,3 +1,18 @@
+'''
+    Copyright 2021 konawasabi
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+'''
 import sys
 import pathlib
 import os
@@ -664,10 +679,10 @@ class mainwindow(ttk.Frame):
                 self.plot_all()
     def aboutwindow(self, event=None):
         msg  = 'Kobushi Track Viewer\n'
-        msg += 'Version 0.1\n\n'
+        msg += 'Version 1.0\n\n'
         msg += 'Copyright © 2021 konawasabi\n'
-        msg += 'Released under the MIT licence.\n'
-        msg += 'https://opensource.org/licenses/mit-license.php'
+        msg += 'Released under the Apache License, Version 2.0 .\n'
+        msg += 'https://www.apache.org/licenses/LICENSE-2.0'
         tk.messagebox.showinfo(message=msg)
     def customdialog_test(self, event=None):
         dialog_obj = self.dialog_multifields(self,\
