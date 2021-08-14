@@ -153,7 +153,10 @@ class Station():
                 encode_retry = 'shift_jis'
             else:
                 encode_retry = 'utf-8'
-            self.stationkey = read_stationlist(f_path,encode_retry)
+            try:
+                self.stationkey = read_stationlist(f_path,encode_retry)
+            except Exception as e:
+                raise RuntimeError('File encoding error: '+str(f_path))
     def put(self, *argvs):
         #self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
         self.position[self.environment.variable['distance']]=argvs[0].lower()

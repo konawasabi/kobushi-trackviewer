@@ -23,7 +23,7 @@ def loadheader(path,HEAD_STR,HEAD_VER):
         header = f.readline().decode(header_encoding,'ignore') #一行目をheader_encodingでデコード
         f.close()
     except Exception as e:
-        raise OSError()
+        raise OSError('File open error: '+str(input))
 
     if(HEAD_STR.casefold() not in header.casefold()):
         raise RuntimeError(str(path) + ' is not ' + HEAD_STR)

@@ -183,7 +183,7 @@ class curve_intermediate(curve):
             turn = output[2]
             result = np.vstack((output[0],output[1])).T
         else:
-            raise
+            raise RuntimeError('invalid transition function')
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl if np.fabs(rl) < 1e6 else 0
     def harfsin_intermediate(self, L, r1, r2, l_intermediate, dL=1):
         def K(x,R1,R2,L):
