@@ -149,6 +149,8 @@ class mainwindow(ttk.Frame):
             self.master.rowconfigure(0, weight=1)
             self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
             self.create_widgets(variable, message)
+            self.master.bind("<Return>", self.clickOk)
+            self.master.bind("<Escape>", self.clickCancel)
             
             self.result = False
             
@@ -187,13 +189,15 @@ class mainwindow(ttk.Frame):
             self.button_ok.grid(column=0, row=0, sticky=(tk.S))
             self.button_reset = ttk.Button(self.button_frame, text="Reset", command=self.clickreset)
             self.button_reset.grid(column=1, row=0, sticky=(tk.S))
-            self.button_cancel = ttk.Button(self.button_frame, text="Cancel", command=self.master.destroy)
+            self.button_cancel = ttk.Button(self.button_frame, text="Cancel", command=self.clickCancel)
             self.button_cancel.grid(column=2, row=0, sticky=(tk.S))
-        def clickOk(self):
+        def clickOk(self, event=None):
             self.result = 'OK'
             self.master.destroy()
-        def clickreset(self):
+        def clickreset(self, event=None):
             self.result = 'reset'
+            self.master.destroy()
+        def clickCancel(self, event=None):
             self.master.destroy()
             
     def __init__(self, master, parser):
@@ -203,7 +207,7 @@ class mainwindow(ttk.Frame):
         self.profYlim = None
         
         super().__init__(master, padding='3 3 3 3')
-        self.master.title('Kobushi Track Viewer')
+        self.master.title('Kobushi trackviewer')
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
@@ -678,7 +682,7 @@ class mainwindow(ttk.Frame):
                     self.profYlim = None
                 self.plot_all()
     def aboutwindow(self, event=None):
-        msg  = 'Kobushi Track Viewer\n'
+        msg  = 'Kobushi trackviewer\n'
         msg += 'Version 1.0\n\n'
         msg += 'Copyright © 2021 konawasabi\n'
         msg += 'Released under the Apache License, Version 2.0 .\n'
