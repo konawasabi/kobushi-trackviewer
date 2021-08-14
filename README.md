@@ -11,13 +11,13 @@ Bve trainsim 5/6向けのマップファイルから、線路平面図・縦断�
 pip install kobushi-trackviewer
 ```
 
-動作に必要な下記パッケージを同時にインストールします。
+動作に必要な下記パッケージが自動でインストールされます。
 
-* numpy
-* scipy
-* matplotlib
-* lark
-* ttkwidgets
+* [numpy](https://numpy.org)
+* [matplotlib](https://matplotlib.org)
+* [scipy](https://www.scipy.org)
+* [lark](https://lark-parser.readthedocs.io/en/latest/)
+* [ttkwidgets](https://ttkwidgets.readthedocs.io/en/latest/)
 ## 使い方
 
 [こちら](manual.md)を参照
