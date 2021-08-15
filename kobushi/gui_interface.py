@@ -37,6 +37,7 @@ from lark import Lark, Transformer, v_args, exceptions
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
+from ._version import __version__
 from . import mapinterpleter as interp
 from . import mapplot
 
@@ -683,7 +684,7 @@ class mainwindow(ttk.Frame):
                 self.plot_all()
     def aboutwindow(self, event=None):
         msg  = 'Kobushi trackviewer\n'
-        msg += 'Version 1.0\n\n'
+        msg += 'Version '+__version__+'\n\n'
         msg += 'Copyright © 2021 konawasabi\n'
         msg += 'Released under the Apache License, Version 2.0 .\n'
         msg += 'https://www.apache.org/licenses/LICENSE-2.0'
