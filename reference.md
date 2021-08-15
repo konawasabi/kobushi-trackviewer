@@ -9,6 +9,8 @@
 * メニュー
     * [ファイル](#ファイル)
     * [オプション](#オプション)
+* [License](#License)
+* [Contact](#Contact)
 
 # 起動
 Powershellで以下のコマンドを実行します。
@@ -144,4 +146,14 @@ Kobushi では座標制御点を次のように設定しています。
 
 他軌道が範囲外に表示されてしまう場合に利用してください。
 
+# License
 
+Apache License, Version 2.0
+
+# Contact
+
+Author: Konawasabi
+
+Mail: webmaster@konawasabi.riceball.jp
+
+Website: https://konawasabi.riceball.jp/
