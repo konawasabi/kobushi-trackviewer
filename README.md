@@ -45,5 +45,7 @@ Apache Licence, Version 2.0に従う限り、本ソフトウェアの改変、�
 ## Contact
 
 Author: Konawasabi
+
 Mail: webmaster@konawasabi.riceball.jp
+
 Website: https://konawasabi.riceball.jp/
