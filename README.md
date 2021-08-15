@@ -18,7 +18,12 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 * [lark](https://lark-parser.readthedocs.io/en/latest/)
 * [ttkwidgets](https://ttkwidgets.readthedocs.io/en/latest/)
 
-## 使い方
+## 起動
+Powershellで以下のコマンドを実行します。
+```
+python -m kobushi
+```
+## リファレンス
 
 [こちら](reference.md)を参照
 
