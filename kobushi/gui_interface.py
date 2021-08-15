@@ -16,6 +16,7 @@
 import sys
 import pathlib
 import os
+import webbrowser
 
 import tkinter as tk
 from tkinter import ttk
@@ -364,7 +365,7 @@ class mainwindow(ttk.Frame):
         
         #self.menu_option.add_command(label='customdialog...', command=self.customdialog_test)
         
-        self.menu_help.add_command(label='ヘルプ...', command=None, state=tk.DISABLED)
+        self.menu_help.add_command(label='ヘルプ...', command=self.open_webdocument)
         self.menu_help.add_command(label='Kobushiについて...', command=self.aboutwindow)
         
         self.master['menu'] = self.menubar
@@ -695,6 +696,8 @@ class mainwindow(ttk.Frame):
                                         {'name':'B', 'type':'Double', 'label':'test B', 'default':100}],\
                                         'Test Dialog')
         print('Done', dialog_obj.result, dialog_obj.variables['A'].get())
+    def open_webdocument(self, event=None):
+        webbrowser.open('https://github.com/konawasabi/kobushi-trackviewer/reference.md')
 #if __name__ == '__main__':
 def main():
     if not __debug__:
