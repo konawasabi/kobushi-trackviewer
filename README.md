@@ -34,6 +34,14 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 
 [Apache License, Version 2.0](LICENSE)
 
+## 重要事項
+
+本プログラムの著作権は[konawasabi](#Contact) (以下、作者)が有します。
+
+本プログラムについて作者はいかなる保証もせず、またプログラムを実行して生じた結果についての責任を負いません。
+
+Apache Licence, Version 2.0に従う限り、本ソフトウェアの改変、再配布を自由に行うことができます。
+
 ## Contact
 
 Author: Konawasabi
