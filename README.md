@@ -17,6 +17,7 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 * [scipy](https://www.scipy.org)
 * [lark](https://lark-parser.readthedocs.io/en/latest/)
 * [ttkwidgets](https://ttkwidgets.readthedocs.io/en/latest/)
+
 ## 使い方
 
 [こちら](reference.md)を参照
@@ -29,6 +30,12 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 
 その他、BVE本体では読み込み可能なマップファイルがKobushiでは正しく読み込めない場合があります。ご了承ください。
 
-## LICENSE
+## License
 
 [Apache License, Version 2.0](LICENSE)
+
+## Contact
+
+Author: Konawasabi
+Mail: webmaster@konawasabi.riceball.jp
+Website: https://konawasabi.riceball.jp/
