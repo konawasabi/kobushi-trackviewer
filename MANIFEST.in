@@ -1,4 +1,1 @@
 include kobushi/map-grammer.lark
-include reference.md
-include w_main.png
-include w_ot.png
