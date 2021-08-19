@@ -39,7 +39,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
 from ._version import __version__
-from . import mapinterpleter as interp
+from . import mapinterpreter as interp
 from . import mapplot
 
 # http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
