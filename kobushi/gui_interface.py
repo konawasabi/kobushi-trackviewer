@@ -76,7 +76,7 @@ class mainwindow(ttk.Frame):
             self.master.title('Other tracks')
             self.master.columnconfigure(0, weight=1)
             self.master.rowconfigure(0, weight=1)
-            self.grid(sticky=(tk.N, tk.W, tk.E, tk.S))
+            self.grid(column=0, row=0,sticky=(tk.N, tk.W, tk.E, tk.S))
             self.columnconfigure(0,weight=1)
             self.rowconfigure(0,weight=1)
             self.create_widgets()
@@ -213,9 +213,9 @@ class mainwindow(ttk.Frame):
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi trackviewer')
+        self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
-        self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         
         master.protocol('WM_DELETE_WINDOW', self.ask_quit)
         
@@ -291,7 +291,7 @@ class mainwindow(ttk.Frame):
         self.distlimit_label.grid(column=2, row=0, sticky=(tk.W))
         
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
-        self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W))
         self.open_btn = ttk.Button(self.file_frame, text="開く", command=self.open_mapfile)
         self.open_btn.grid(column=0, row=0, sticky=(tk.W))
         self.filedir_entry_val = tk.StringVar()
@@ -299,7 +299,7 @@ class mainwindow(ttk.Frame):
         self.filedir_entry.grid(column=1, row=0, sticky=(tk.W, tk.E))
         
         self.setdist_frame = ttk.Frame(self, padding='3 3 3 3')
-        self.setdist_frame.grid(column=0, row=2, sticky=(tk.W, tk.E))
+        self.setdist_frame.grid(column=0, row=2, sticky=(tk.S, tk.W, tk.E))
         
         self.setdist_entry_frame = ttk.Frame(self.setdist_frame, padding='0 0 0 0')
         self.setdist_entry_frame.grid(column=0, row=0, sticky=(tk.W, tk.E))
@@ -341,6 +341,12 @@ class mainwindow(ttk.Frame):
         self.profile_canvas = FigureCanvasTkAgg(self.fig_profile, master=self.canvas_frame)
         self.profile_canvas.draw()
         self.profile_canvas.get_tk_widget().grid(row = 1, column = 0)
+        
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=0)
+        self.rowconfigure(0, weight=0)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=0)
     def create_menubar(self):
         self.master.option_add('*tearOff', False)
         
