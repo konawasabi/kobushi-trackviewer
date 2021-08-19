@@ -76,13 +76,19 @@ class mainwindow(ttk.Frame):
             self.master.title('Other tracks')
             self.master.columnconfigure(0, weight=1)
             self.master.rowconfigure(0, weight=1)
-            self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+            self.grid(sticky=(tk.N, tk.W, tk.E, tk.S))
+            self.columnconfigure(0,weight=1)
+            self.rowconfigure(0,weight=1)
             self.create_widgets()
             self.master.geometry('+1100+0')
         def create_widgets(self):
-            self.othertrack_tree = CheckboxTreeview(self, show='tree headings', columns=['mindist', 'maxdist', 'linecolor'],selectmode='browse')
+            self.frame = ttk.Frame(self, padding=0)
+            self.frame.grid(sticky=(tk.N, tk.W, tk.E, tk.S))
+            self.frame.columnconfigure(0,weight=1)
+            self.frame.rowconfigure(0,weight=1)
+            self.othertrack_tree = CheckboxTreeview(self.frame, show='tree headings', columns=['mindist', 'maxdist', 'linecolor'],selectmode='browse')
             self.othertrack_tree.bind("<ButtonRelease>", self.click_tracklist)
-            self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+            self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
             self.othertrack_tree.column('#0', width=200)
             self.othertrack_tree.column('mindist', width=100)
             self.othertrack_tree.column('maxdist', width=100)
@@ -92,8 +98,8 @@ class mainwindow(ttk.Frame):
             self.othertrack_tree.heading('maxdist', text='To')
             self.othertrack_tree.heading('linecolor', text='Color')
             
-            self.ottree_scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
-            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S))
+            self.ottree_scrollbar = ttk.Scrollbar(self.frame, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
+            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S, tk.E))
             self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
 
         def click_tracklist(self, event=None):
