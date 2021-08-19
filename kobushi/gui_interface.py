@@ -227,6 +227,7 @@ class mainwindow(ttk.Frame):
         self.parser = parser
 
     def create_widgets(self):
+        # 補助情報フレーム
         self.control_frame = ttk.Frame(self, padding='3 3 3 3')
         self.control_frame.grid(column=1, row=1, sticky=(tk.S))
         
@@ -273,6 +274,7 @@ class mainwindow(ttk.Frame):
         self.prof_othert_chk = ttk.Checkbutton(self.aux_values_control, text='縦断面図他軌道',onvalue=True, offvalue=False, variable=self.prof_othert_val, command=self.plot_all)
         self.prof_othert_chk.grid(column=0, row=6, sticky=(tk.N, tk.W, tk.E))
         
+        # 描画区間フレーム
         self.distlimit_control = ttk.Frame(self.control_frame, padding='3 3 3 3', borderwidth=1, relief='ridge')
         self.distlimit_control.grid(column=0, row=2, sticky=(tk.S, tk.W, tk.E))
         self.distlimit_label =  ttk.Label(self.distlimit_control, text='描画区間', font = font_title)
@@ -290,6 +292,7 @@ class mainwindow(ttk.Frame):
         self.distlimit_label =  ttk.Label(self.dist_range_arb_frame, text='m')
         self.distlimit_label.grid(column=2, row=0, sticky=(tk.W))
         
+        # ファイルパスフレーム
         self.file_frame = ttk.Frame(self, padding='3 3 3 3')
         self.file_frame.grid(column=0, row=0, sticky=(tk.N, tk.W))
         self.open_btn = ttk.Button(self.file_frame, text="開く", command=self.open_mapfile)
@@ -311,6 +314,7 @@ class mainwindow(ttk.Frame):
         self.setdist_entry_label = ttk.Label(self.setdist_entry_frame, text='m')
         self.setdist_entry_label.grid(column=2, row=0, sticky=(tk.W))
         
+        # 距離程フレーム
         self.distance_scale = ttk.Scale(self.setdist_frame, orient=tk.HORIZONTAL, from_=0, to=100, command=self.setdist_scale)#,length=500)
         self.distance_scale.grid(column=1, row=0, sticky=(tk.W, tk.E))
         
@@ -327,6 +331,7 @@ class mainwindow(ttk.Frame):
         self.setdist_frame.columnconfigure(1, weight=1)
         self.setdist_frame.rowconfigure(0, weight=1)
         
+        # プロットフレーム
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
@@ -346,6 +351,7 @@ class mainwindow(ttk.Frame):
         self.profile_canvas.draw()
         self.profile_canvas.get_tk_widget().grid(row = 1, column = 0)
         
+        # ウィンドウリサイズに対する設定
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=0)
         self.rowconfigure(0, weight=0)
