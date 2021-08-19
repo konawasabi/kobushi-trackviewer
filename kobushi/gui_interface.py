@@ -31,9 +31,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import rcParams
 import numpy as np
 
-import lark
-from lark import Lark, Transformer, v_args, exceptions
-
 # https://qiita.com/yniji/items/3fac25c2ffa316990d0c matplotlibで日本語を使う
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
@@ -717,9 +714,7 @@ def main():
         import sys
         sys.excepthook = info
     
-    rule = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),'map-grammer.lark'), encoding='utf-8').read()
-    
     tk.CallWrapper = Catcher
     root = tk.Tk()
-    app = mainwindow(master=root, parser = Lark(rule, parser='lalr', maybe_placeholders=True))
+    app = mainwindow(master=root, parser = None)
     app.mainloop()

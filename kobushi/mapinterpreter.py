@@ -16,6 +16,7 @@
 from lark import Lark, Transformer, v_args, exceptions
 import math
 import random
+import os
 
 from . import loadheader
 from . import mapobj
@@ -29,7 +30,11 @@ class ParseMap(Transformer):
 
     def __init__(self,env,parser,prompt=False):
         self.promptmode = prompt
-        self.parser = parser
+        
+        grammer_fp = open(os.path.join(os.path.abspath(os.path.dirname(__file__)),'map-grammer.lark'), encoding='utf-8')
+        self.parser = Lark(grammer_fp.read(), parser='lalr', maybe_placeholders=True) if parser == None else parser
+        grammer_fp.close()
+        
         if(env==None):
             self.environment = mapobj.Environment()
             self.isroot=True
