@@ -199,14 +199,27 @@ class mainwindow(ttk.Frame):
         self.ax_profile_g = self.fig_plane.add_subplot(gs2[1, :], sharex=self.ax_profile_s)
         self.ax_profile_r = self.fig_plane.add_subplot(gs2[2, :], sharex=self.ax_profile_s)
         
-        #self.fig_plane.subplots_adjust(hspace=0)
         self.ax_profile_s.tick_params(labelleft=False, left=False, labelbottom=False, bottom=False)
         self.ax_profile_g.tick_params(labelbottom=False, bottom=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
         
-        self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.canvas_frame)
+        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=1000, height=800)
+        self.plt_canvas_base.grid(row = 0, column = 0)
+        
+        self.fig_xscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL, command=self.plt_canvas_base.xview)
+        self.fig_xscroll.grid(row = 1, column = 0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.fig_yscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL, command=self.plt_canvas_base.yview)
+        self.fig_yscroll.grid(row = 0, column = 1, sticky=(tk.N, tk.W, tk.E, tk.S))
+        
+        self.fig_frame = tk.Frame(self.plt_canvas_base)
+        self.plt_canvas_base.create_window((0, 0), window=self.fig_frame, anchor="nw")
+        self.fig_frame.bind("<Configure>",lambda e: self.plt_canvas_base.configure(scrollregion=self.plt_canvas_base.bbox("all")))
+        self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set)
+        self.plt_canvas_base.configure(xscrollcommand=self.fig_xscroll.set)
+        
+        self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.fig_frame)
         self.fig_canvas.draw()
-        self.fig_canvas.get_tk_widget().grid(row = 0, column = 0)
+        self.fig_canvas.get_tk_widget().grid(row=0, column=0, sticky='news')
         
         # ウィンドウリサイズに対する設定
         self.columnconfigure(0, weight=1)
