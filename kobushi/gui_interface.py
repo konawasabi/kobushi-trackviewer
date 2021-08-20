@@ -194,10 +194,10 @@ class mainwindow(ttk.Frame):
         
         gs1 = self.fig_plane.add_gridspec(nrows=2,ncols=1,height_ratios=[22, 13])
         gs2 = gs1[1].subgridspec(nrows=3,ncols=1,height_ratios=[3, 6, 4],hspace=0)
-        self.ax_plane = self.fig_plane.add_subplot(gs1[0,:])
-        self.ax_profile_s = self.fig_plane.add_subplot(gs2[0,:])
-        self.ax_profile_g = self.fig_plane.add_subplot(gs2[1, :], sharex=self.ax_profile_s)
-        self.ax_profile_r = self.fig_plane.add_subplot(gs2[2, :], sharex=self.ax_profile_s)
+        self.ax_plane = self.fig_plane.add_subplot(gs1[0])
+        self.ax_profile_s = self.fig_plane.add_subplot(gs2[0])
+        self.ax_profile_g = self.fig_plane.add_subplot(gs2[1], sharex=self.ax_profile_s)
+        self.ax_profile_r = self.fig_plane.add_subplot(gs2[2], sharex=self.ax_profile_s)
         
         self.ax_profile_s.tick_params(labelleft=False, left=False, labelbottom=False, bottom=False)
         self.ax_profile_g.tick_params(labelbottom=False, bottom=False)

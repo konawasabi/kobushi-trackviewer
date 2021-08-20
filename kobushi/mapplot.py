@@ -75,7 +75,7 @@ class Mapplot():
             ax_pl.set_aspect('equal') # 全区間表示の場合は、アスペクト比1:1でオートレンジ設定
         else:
             ax_pl.set_aspect('auto')
-            windowratio = (ax_pl.get_figure().get_figheight() / ax_pl.get_figure().get_figwidth()) # ax_plのアスペクト比を取得
+            windowratio =ax_pl.bbox.height/ax_pl.bbox.width # 平面図のアスペクト比を取得
             plotdistance = max(owntrack[:,0]) - min(owntrack[:,0]) # 描画距離を算出
             # 描画範囲始点の座標を求める
             yminval = owntrack[0][2]
