@@ -203,7 +203,7 @@ class mainwindow(ttk.Frame):
         self.ax_profile_g.tick_params(labelbottom=False, bottom=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
         
-        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=1000, height=800)
+        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=400, height=400)
         self.plt_canvas_base.grid(row = 0, column = 0)
         
         self.fig_xscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL, command=self.plt_canvas_base.xview)
@@ -214,8 +214,7 @@ class mainwindow(ttk.Frame):
         self.fig_frame = tk.Frame(self.plt_canvas_base)
         self.plt_canvas_base.create_window((0, 0), window=self.fig_frame, anchor="nw")
         self.fig_frame.bind("<Configure>",lambda e: self.plt_canvas_base.configure(scrollregion=self.plt_canvas_base.bbox("all")))
-        self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set)
-        self.plt_canvas_base.configure(xscrollcommand=self.fig_xscroll.set)
+        self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set, xscrollcommand=self.fig_xscroll.set)
         
         self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.fig_frame)
         self.fig_canvas.draw()
