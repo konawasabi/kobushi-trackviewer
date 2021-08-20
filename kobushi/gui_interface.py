@@ -190,7 +190,7 @@ class mainwindow(ttk.Frame):
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        self.fig_plane = plt.figure(figsize=(10,8))
+        self.fig_plane = plt.figure(figsize=(9,7),tight_layout=True)
         
         gs1 = self.fig_plane.add_gridspec(nrows=2,ncols=1,height_ratios=[22, 13])
         gs2 = gs1[1].subgridspec(nrows=3,ncols=1,height_ratios=[3, 6, 4],hspace=0)
@@ -203,14 +203,15 @@ class mainwindow(ttk.Frame):
         self.ax_profile_g.tick_params(labelbottom=False, bottom=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
         
-        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=1000, height=800)
+        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=900, height=700)
         self.plt_canvas_base.grid(row = 0, column = 0)
         
+        '''
         self.fig_xscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL, command=self.plt_canvas_base.xview)
         self.fig_xscroll.grid(row = 1, column = 0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.fig_yscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL, command=self.plt_canvas_base.yview)
         self.fig_yscroll.grid(row = 0, column = 1, sticky=(tk.N, tk.W, tk.E, tk.S))
-        
+        '''
         def on_canvas_resize(event):
             self.plt_canvas_base.itemconfigure(self.fig_frame_id, width=event.width, height=event.height)
             #print(event)
@@ -219,9 +220,9 @@ class mainwindow(ttk.Frame):
         self.fig_frame_id = self.plt_canvas_base.create_window((0, 0), window=self.fig_frame, anchor="nw")
         self.fig_frame.columnconfigure(0, weight=1)
         self.fig_frame.rowconfigure(0, weight=1)
-        self.fig_frame.bind("<Configure>",lambda e: self.plt_canvas_base.configure(scrollregion=self.plt_canvas_base.bbox("all")))
+        #self.fig_frame.bind("<Configure>",lambda e: self.plt_canvas_base.configure(scrollregion=self.plt_canvas_base.bbox("all")))
         self.plt_canvas_base.bind("<Configure>", on_canvas_resize)
-        self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set, xscrollcommand=self.fig_xscroll.set)
+        #self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set, xscrollcommand=self.fig_xscroll.set)
         
         self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.fig_frame)
         self.fig_canvas.draw()
