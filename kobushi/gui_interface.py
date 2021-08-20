@@ -203,7 +203,7 @@ class mainwindow(ttk.Frame):
         self.ax_profile_g.tick_params(labelbottom=False, bottom=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
         
-        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=400, height=400)
+        self.plt_canvas_base = tk.Canvas(self.canvas_frame, bg="white", width=1000, height=800)
         self.plt_canvas_base.grid(row = 0, column = 0)
         
         self.fig_xscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.HORIZONTAL, command=self.plt_canvas_base.xview)
@@ -211,14 +211,26 @@ class mainwindow(ttk.Frame):
         self.fig_yscroll = ttk.Scrollbar(self.canvas_frame, orient=tk.VERTICAL, command=self.plt_canvas_base.yview)
         self.fig_yscroll.grid(row = 0, column = 1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
+        def on_canvas_resize(event):
+            self.plt_canvas_base.itemconfigure(self.fig_frame_id, width=event.width, height=event.height)
+            #print(event)
+        
         self.fig_frame = tk.Frame(self.plt_canvas_base)
-        self.plt_canvas_base.create_window((0, 0), window=self.fig_frame, anchor="nw")
+        self.fig_frame_id = self.plt_canvas_base.create_window((0, 0), window=self.fig_frame, anchor="nw")
+        self.fig_frame.columnconfigure(0, weight=1)
+        self.fig_frame.rowconfigure(0, weight=1)
         self.fig_frame.bind("<Configure>",lambda e: self.plt_canvas_base.configure(scrollregion=self.plt_canvas_base.bbox("all")))
+        self.plt_canvas_base.bind("<Configure>", on_canvas_resize)
         self.plt_canvas_base.configure(yscrollcommand=self.fig_yscroll.set, xscrollcommand=self.fig_xscroll.set)
         
         self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.fig_frame)
         self.fig_canvas.draw()
         self.fig_canvas.get_tk_widget().grid(row=0, column=0, sticky='news')
+        
+        self.canvas_frame.columnconfigure(0, weight=1)
+        self.canvas_frame.columnconfigure(1, weight=1)
+        self.canvas_frame.rowconfigure(0, weight=1)
+        self.canvas_frame.rowconfigure(1, weight=1)
         
         # ウィンドウリサイズに対する設定
         self.columnconfigure(0, weight=1)
