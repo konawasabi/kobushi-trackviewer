@@ -198,7 +198,8 @@ class Mapplot():
                     else:
                         value = 0
                 value = str(np.fabs(value)) if value != 0 else 'Lv.'
-                ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=6.5, transform=trans_offs)
+                if (pos_start+pos_end)/2 > self.distrange['vertical'][0] and (pos_start+pos_end)/2 < self.distrange['vertical'][1]:
+                    ax_h.text((pos_start+pos_end)/2,gradline_min, value, rotation=90, size=6.5, transform=trans_offs)
             
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
@@ -253,7 +254,8 @@ class Mapplot():
                 if(value == None):
                     value = rad_p.data[rad_p.seekoriginofcontinuous(rad_p.pointer['last'])]['value']
                 if(value != 0):
-                    ax_r.text((pos_start+pos_end)/2,1.2*np.sign(value), '{:.0f}'.format(np.fabs(value)), rotation=90, size=6.5, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
+                    if (pos_start+pos_end)/2 > self.distrange['vertical'][0] and (pos_start+pos_end)/2 < self.distrange['vertical'][1]:
+                        ax_r.text((pos_start+pos_end)/2,1.2*np.sign(value), '{:.0f}'.format(np.fabs(value)), rotation=90, size=6.5, transform=trans_offs, va='bottom' if np.sign(value) > 0 else 'top')
         
         owntrack = self.environment.owntrack_pos
         owntrack = owntrack[owntrack[:,0] >= self.distrange['vertical'][0]]
