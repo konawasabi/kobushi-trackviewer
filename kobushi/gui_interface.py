@@ -27,6 +27,7 @@ import tkinter.font as font
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import rcParams
+import matplotlib.gridspec
 import numpy as np
 
 # https://qiita.com/yniji/items/3fac25c2ffa316990d0c matplotlibで日本語を使う
@@ -189,21 +190,23 @@ class mainwindow(ttk.Frame):
         self.canvas_frame = ttk.Frame(self, padding='3 3 3 3')
         self.canvas_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
         
-        self.fig_plane = plt.figure(figsize=(10,5))
-        self.ax_plane = self.fig_plane.add_subplot()
+        self.fig_plane = plt.figure(figsize=(10,8))
         
-        self.plane_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.canvas_frame)
-        self.plane_canvas.draw()
-        self.plane_canvas.get_tk_widget().grid(row = 0, column = 0)
+        gs1 = self.fig_plane.add_gridspec(nrows=2,ncols=1,height_ratios=[22, 13])
+        gs2 = gs1[1].subgridspec(nrows=3,ncols=1,height_ratios=[3, 6, 4],hspace=0)
+        self.ax_plane = self.fig_plane.add_subplot(gs1[0,:])
+        self.ax_profile_s = self.fig_plane.add_subplot(gs2[0,:])
+        self.ax_profile_g = self.fig_plane.add_subplot(gs2[1, :], sharex=self.ax_profile_s)
+        self.ax_profile_r = self.fig_plane.add_subplot(gs2[2, :], sharex=self.ax_profile_s)
         
-        self.fig_profile, ((self.ax_profile_s, self.ax_profile_g, self.ax_profile_r)) = plt.subplots(3,1, figsize=(10,3), sharex='col', gridspec_kw={'height_ratios': [3, 6, 4]})
-        self.fig_profile.subplots_adjust(hspace=0)
-        self.ax_profile_s.tick_params(labelleft=False, left=False)
+        #self.fig_plane.subplots_adjust(hspace=0)
+        self.ax_profile_s.tick_params(labelleft=False, left=False, labelbottom=False, bottom=False)
+        self.ax_profile_g.tick_params(labelbottom=False, bottom=False)
         self.ax_profile_r.tick_params(labelleft=False, left=False)
         
-        self.profile_canvas = FigureCanvasTkAgg(self.fig_profile, master=self.canvas_frame)
-        self.profile_canvas.draw()
-        self.profile_canvas.get_tk_widget().grid(row = 1, column = 0)
+        self.fig_canvas = FigureCanvasTkAgg(self.fig_plane, master=self.canvas_frame)
+        self.fig_canvas.draw()
+        self.fig_canvas.get_tk_widget().grid(row = 0, column = 0)
         
         # ウィンドウリサイズに対する設定
         self.columnconfigure(0, weight=1)
@@ -375,7 +378,7 @@ class mainwindow(ttk.Frame):
         if self.stationpos_val.get():
             self.mplot.stationpoint_plane(self.ax_plane,labelplot=self.stationlabel_val.get())
         
-        self.plane_canvas.draw()
+        self.fig_canvas.draw()
     def draw_profileplot(self):
         self.ax_profile_g.cla()
         self.ax_profile_r.cla()
@@ -392,7 +395,7 @@ class mainwindow(ttk.Frame):
             self.mplot.gradient_value(self.ax_profile_g,labelplot=self.gradientval_val.get())
         self.mplot.radius_value(self.ax_profile_r,labelplot=self.curveval_val.get())
         
-        self.profile_canvas.draw()
+        self.fig_canvas.draw()
     def print_debugdata(self):
         if not __debug__:
             print('own_track data')
