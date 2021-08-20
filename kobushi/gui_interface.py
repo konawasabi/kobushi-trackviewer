@@ -22,9 +22,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog as filedialog
 import tkinter.simpledialog as simpledialog
-import tkinter.colorchooser as colorchooser
 import tkinter.font as font
-from ttkwidgets import CheckboxTreeview
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -38,6 +36,8 @@ rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 
 from ._version import __version__
 from . import mapinterpreter as interp
 from . import mapplot
+from . import dialog_multifields
+from . import othertrack_window
 
 # http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
 class Catcher: # tkinter内で起きた例外をキャッチする
@@ -59,152 +59,6 @@ class Catcher: # tkinter内で起きた例外をキャッチする
                 tk.messagebox.showinfo(message=e)
 
 class mainwindow(ttk.Frame):
-    class SubWindow(ttk.Frame):
-        def __init__(self, master, mainwindow):
-            self.mainwindow = mainwindow
-            self.parent = master
-            super().__init__(master, padding='3 3 3 3')
-            
-            self.mainwindow.tk.eval("""
-                ttk::style map Treeview \
-                -foreground {disabled SystemGrayText \
-                             selected SystemHighlightText} \
-                -background {disabled SystemButtonFace \
-                             selected SystemHighlight}
-            """)
-            
-            self.master.title('Other tracks')
-            self.master.columnconfigure(0, weight=1)
-            self.master.rowconfigure(0, weight=1)
-            self.grid(column=0, row=0,sticky=(tk.N, tk.W, tk.E, tk.S))
-            self.columnconfigure(0,weight=1)
-            self.rowconfigure(0,weight=1)
-            self.create_widgets()
-            self.master.geometry('+1100+0')
-        def create_widgets(self):
-            self.frame = ttk.Frame(self, padding=0)
-            self.frame.grid(sticky=(tk.N, tk.W, tk.E, tk.S))
-            self.frame.columnconfigure(0,weight=1)
-            self.frame.rowconfigure(0,weight=1)
-            self.othertrack_tree = CheckboxTreeview(self.frame, show='tree headings', columns=['mindist', 'maxdist', 'linecolor'],selectmode='browse')
-            self.othertrack_tree.bind("<ButtonRelease>", self.click_tracklist)
-            self.othertrack_tree.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-            self.othertrack_tree.column('#0', width=200)
-            self.othertrack_tree.column('mindist', width=100)
-            self.othertrack_tree.column('maxdist', width=100)
-            self.othertrack_tree.column('linecolor', width=50)
-            self.othertrack_tree.heading('#0', text='track key')
-            self.othertrack_tree.heading('mindist', text='From')
-            self.othertrack_tree.heading('maxdist', text='To')
-            self.othertrack_tree.heading('linecolor', text='Color')
-            
-            self.ottree_scrollbar = ttk.Scrollbar(self.frame, orient=tk.VERTICAL, command=self.othertrack_tree.yview)
-            self.ottree_scrollbar.grid(column=1, row=0, sticky=(tk.N, tk.S, tk.E))
-            self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
-
-        def click_tracklist(self, event=None):
-            '''他軌道リストをクリックしたときのイベント処理
-            '''
-            columnlabel = {'#0':'Check','#1':'From', '#2':'To', '#3':'Color'}
-            if event != None:
-                if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #パラメータ部分クリックかどうか。チェックボックスだとimage
-                    clicked_column = self.othertrack_tree.identify_column(event.x)
-                    clicked_track = self.othertrack_tree.identify_row(event.y)
-                    #print(clicked_track,columnlabel[clicked_column])
-                    if clicked_column in ['#1','#2','#3'] and clicked_track != 'root':
-                        if clicked_column == '#3': # ラインカラーかどうか？
-                            inputdata = colorchooser.askcolor(color=self.mainwindow.result.othertrack_linecolor[clicked_track]['current'],title=clicked_track+' ,default: '+self.mainwindow.result.othertrack_linecolor[clicked_track]['default'])
-                            if inputdata[1] != None:
-                                self.mainwindow.result.othertrack_linecolor[clicked_track]['current'] = inputdata[1]
-                                self.othertrack_tree.tag_configure(clicked_track,foreground=self.mainwindow.result.othertrack_linecolor[clicked_track]['current'])
-                        else:
-                            if clicked_column == '#1':
-                                defaultval = min(self.mainwindow.result.othertrack.data[clicked_track], key=lambda x: x['distance'])['distance']
-                            elif clicked_column == '#2':
-                                defaultval = max(self.mainwindow.result.othertrack.data[clicked_track], key=lambda x: x['distance'])['distance']
-                            inputdata = simpledialog.askfloat(clicked_track+': Distance', columnlabel[clicked_column]+' (default: '+str(defaultval)+' m)')
-                            #print(inputdata)
-                            if inputdata != None: # 入力値に問題なければ、描画範囲を変更する
-                                if clicked_column == '#1':
-                                    self.mainwindow.result.othertrack.cp_range[clicked_track]['min'] = inputdata
-                                elif clicked_column == '#2':
-                                    self.mainwindow.result.othertrack.cp_range[clicked_track]['max'] = inputdata
-                                self.othertrack_tree.set(clicked_track,clicked_column,inputdata) # 他軌道リストの表示値変更
-            self.mainwindow.plot_all()
-        def set_ottree_value(self):
-            if self.othertrack_tree.exists('root'):
-                self.othertrack_tree.delete('root')
-            self.othertrack_tree.insert("", "end", 'root', text='root', open=True)
-            colorix = 0
-            for i in self.mainwindow.result.othertrack.data.keys():
-                self.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'], '■■■'),tags=(i,))
-                self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i]['current'])
-            #self.subwindow.othertrack_tree.see('root')
-            #self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)
-    class dialog_multifields(ttk.Frame):
-        def __init__(self, mainwindow, variable, title=None, message=None):
-            self.mainwindow = mainwindow
-            self.master = tk.Toplevel(self.mainwindow)
-            super().__init__(self.master, padding='3 3 3 3')
-            if title != None:
-                self.master.title(title)
-            else:
-                self.master.title('')
-            self.master.columnconfigure(0, weight=1)
-            self.master.rowconfigure(0, weight=1)
-            self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-            self.create_widgets(variable, message)
-            self.master.bind("<Return>", self.clickOk)
-            self.master.bind("<Escape>", self.clickCancel)
-            
-            self.result = False
-            
-            self.master.focus_set()
-            self.master.grab_set()
-            self.master.transient(self.mainwindow)
-            self.master.wait_window()
-        def create_widgets(self,variable,message):
-            self.variables = {}
-            self.entries = {}
-            self.labels = {}
-            
-            if message != None:
-                self.message_label = ttk.Label(self,text = message)
-                self.message_label.grid(column=0, row=0, sticky=(tk.W,tk.N))
-            
-            self.entry_frame = ttk.Frame(self, padding='3 3 3 3')
-            self.entry_frame.grid(column=0, row=1, sticky=(tk.N))
-            
-            ix=0
-            for key in variable:
-                if key['type'] == 'str':
-                    self.variables[key['name']] = tk.StringVar()
-                else:
-                    self.variables[key['name']] = tk.DoubleVar()
-                self.labels[key['name']] = ttk.Label(self.entry_frame,text = key['label'])
-                self.labels[key['name']].grid(column=0, row=ix, sticky=(tk.W))
-                self.entries[key['name']] = ttk.Entry(self.entry_frame,textvariable=self.variables[key['name']],width=7)
-                self.entries[key['name']].grid(column=1, row=ix, sticky=(tk.E))
-                self.variables[key['name']].set(key['default'])
-                ix+=1
-            
-            self.button_frame = ttk.Frame(self, padding='3 3 3 3')
-            self.button_frame.grid(column=0, row=2, sticky=(tk.E,tk.W))
-            self.button_ok = ttk.Button(self.button_frame, text="OK", command=self.clickOk)
-            self.button_ok.grid(column=0, row=0, sticky=(tk.S))
-            self.button_reset = ttk.Button(self.button_frame, text="Reset", command=self.clickreset)
-            self.button_reset.grid(column=1, row=0, sticky=(tk.S))
-            self.button_cancel = ttk.Button(self.button_frame, text="Cancel", command=self.clickCancel)
-            self.button_cancel.grid(column=2, row=0, sticky=(tk.S))
-        def clickOk(self, event=None):
-            self.result = 'OK'
-            self.master.destroy()
-        def clickreset(self, event=None):
-            self.result = 'reset'
-            self.master.destroy()
-        def clickCancel(self, event=None):
-            self.master.destroy()
-            
     def __init__(self, master, parser):
         self.dmin = None
         self.dmax = None
@@ -222,7 +76,7 @@ class mainwindow(ttk.Frame):
         self.create_widgets()
         self.create_menubar()
         self.bind_keyevent()
-        self.subwindow = self.SubWindow(tk.Toplevel(master), self)
+        self.subwindow = othertrack_window.SubWindow(tk.Toplevel(master), self)
         
         self.parser = parser
 
@@ -652,7 +506,7 @@ class mainwindow(ttk.Frame):
                 np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
     def set_plotlimit(self, event=None):
         if self.result != None:
-            dialog = self.dialog_multifields(self,\
+            dialog = dialog_multifields.dialog_multifields(self,\
                                             [{'name':'min', 'type':'Double', 'label':'min (default:'+str(self.result.cp_defaultrange[0])+')', 'default':self.distrange_min},\
                                             {'name':'max', 'type':'Double', 'label':'max (default:'+str(self.result.cp_defaultrange[1])+')', 'default':self.distrange_max}],
                                             message ='Set plotlimit\n'+'map range:'+str(min(self.result.controlpoints.list_cp))+','+str(max(self.result.controlpoints.list_cp)))
@@ -673,7 +527,7 @@ class mainwindow(ttk.Frame):
             equaldist_unit = 25
             cp_arbcp_default = [round(min(list_cp),-2) - boundary_margin,round(max(list_cp),-2) + boundary_margin,equaldist_unit]
             
-            dialog = self.dialog_multifields(self,\
+            dialog = dialog_multifields.dialog_multifields(self,\
                                             [{'name':'min', 'type':'Double', 'label':'min (default: '+str(cp_arb_default[0])+')', 'default':cp_arbdistribution[0]},\
                                             {'name':'max', 'type':'Double', 'label':'max (default: '+str(cp_arb_default[1])+')', 'default':cp_arbdistribution[1]},\
                                             {'name':'interval', 'type':'Double', 'label':'interval (default: '+str(cp_arb_default[2])+')', 'default':cp_arbdistribution[2]}],
@@ -689,7 +543,7 @@ class mainwindow(ttk.Frame):
                 self.reload_map()
     def set_profYlimit(self, event=None):
         if self.result != None:
-            dialog = self.dialog_multifields(self,\
+            dialog = dialog_multifields.dialog_multifields(self,\
                                             [{'name':'min', 'type':'str', 'label':'min (default:auto)', 'default':'auto' if self.profYlim == None else str(self.profYlim[0])},\
                                             {'name':'max', 'type':'str', 'label':'max (default:auto)', 'default':'auto' if self.profYlim == None else str(self.profYlim[1])}],
                                             message ='Set profile Y limit')
@@ -710,7 +564,7 @@ class mainwindow(ttk.Frame):
         msg += 'https://www.apache.org/licenses/LICENSE-2.0'
         tk.messagebox.showinfo(message=msg)
     def customdialog_test(self, event=None):
-        dialog_obj = self.dialog_multifields(self,\
+        dialog_obj = dialog_multifields.dialog_multifields(self,\
                                         [{'name':'A', 'type':'str', 'label':'test A', 'default':'alpha'},\
                                         {'name':'B', 'type':'Double', 'label':'test B', 'default':100}],\
                                         'Test Dialog')
