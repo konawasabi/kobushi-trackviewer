@@ -617,6 +617,7 @@ def main():
                 pdb.pm()
         import sys
         sys.excepthook = info
+        print('Debug mode')
     
     tk.CallWrapper = Catcher
     root = tk.Tk()
