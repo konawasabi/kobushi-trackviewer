@@ -69,7 +69,7 @@ class TrackGenerator():
         self.last_pos['radius']          = r0     if r0     != None else 0
         self.last_pos['gradient']        = gr0    if gr0    != None else 0
         self.last_pos['distance']        = dist0  if dist0  != None else min(self.list_cp)
-        self.last_pos['interpolatefunc'] = 'line'
+        self.last_pos['interpolate_func'] = 'line'
         
         #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
@@ -83,7 +83,7 @@ class TrackGenerator():
         radius_p      = TrackPointer(self.env,'radius')
         gradient_p    = TrackPointer(self.env,'gradient')
         turn_p        = TrackPointer(self.env,'turn')
-        interpolate_p = TrackPointer(self.env, 'interpolate_func')
+        interpolate_p = TrackPointer(self.env,'interpolate_func')
         
         grad_gen = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
@@ -151,7 +151,7 @@ class TrackGenerator():
                                                                                 self.last_pos['radius'],\
                                                                                 self.data_ownt[radius_p.pointer['next']]['value'],\
                                                                                 self.last_pos['theta'],\
-                                                                                self.last_pos['interpolatefunc'],\
+                                                                                self.last_pos['interpolate_func'],\
                                                                                 dist - self.last_pos['distance'])
                         elif(self.data_ownt[radius_p.pointer['next']]['value'] != 0): # 曲線半径が変化せず、!=0の場合は円軌道を出力
                             [x, y], tau = curve_gen.circular_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
