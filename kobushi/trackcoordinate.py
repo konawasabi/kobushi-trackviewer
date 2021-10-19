@@ -196,20 +196,28 @@ class curve_intermediate(curve):
             output = self.harfsin_intermediate(L, r1, r2, l_intermediate)
             tau1 = 0
             turn = output[2]
+            rl = output[3]
             result = np.vstack((output[0],output[1])).T
         else:
             raise RuntimeError('invalid transition function')
         return (np.dot(self.rotate(theta), np.dot(self.rotate(-tau1),(result-result[0]).T)).T)[-1], turn, rl if np.fabs(rl) < 1e6 else 0
     def harfsin_intermediate(self, L, r1, r2, l_intermediate, dL=1):
         def K(x,R1,R2,L):
+            '''sin半波長逓減の緩和曲線に対する曲率を返す。
+            x: 始点からの距離
+            R1: 始点での曲率半径
+            R2: 終点での曲率半径
+            L: 緩和曲線の全長
+            '''
             return (1/R2-1/R1)/2*(np.sin(np.pi/L*x-np.pi/2)+1)+1/R1
         if l_intermediate/5 <= dL:
             dL = l_intermediate/5
         tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
-        tau = integrate.cumtrapz(K(tau_X,R1,R2,L),tau_X,initial = 0)
-        X = integrate.cumtrapz(np.cos(tau),tau,initial = 0)
-        Y = integrate.cumtrapz(np.sin(tau),tau,initial = 0)
-        return (X,Y,tau[-1])
+        tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
+        X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
+        Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
+        r_interm = 1/K(l_intermediate,r1,r2,L)
+        return (X,Y,tau[-1],r_interm)
 class OtherTrack():
     def __init__(self):
         pass
