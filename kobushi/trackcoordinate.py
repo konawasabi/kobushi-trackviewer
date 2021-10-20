@@ -172,6 +172,8 @@ class curve_intermediate(curve):
         r1 = np.inf if np.fabs(r1)>1e6 else r1
         r2 = np.inf if np.fabs(r2)>1e6  else r2
 
+        #print(L, r1, r2, theta, func, l_intermediate)
+
         if func == 'line': # 直線逓減の場合
             L0 = L*(1-(1/(1-(r2)/(r1)))) #曲率が0となる距離。始終点の曲率が同符号の場合はL0<0 or L0>L、異符号の場合は0<L0<Lとなる。
             rl = 1/(1/r1 + (1/r2 - 1/r1)/L * l_intermediate) if (1/r1 + (1/r2 - 1/r1)/L * l_intermediate) != 0 else np.inf
@@ -196,7 +198,7 @@ class curve_intermediate(curve):
             output = self.harfsin_intermediate(L, r1, r2, l_intermediate)
             tau1 = 0
             turn = output[2]
-            rl = output[3]
+            rl = output[3] #if output[3] != 0 else np.inf
             result = np.vstack((output[0],output[1])).T
         else:
             raise RuntimeError('invalid transition function')
@@ -216,7 +218,7 @@ class curve_intermediate(curve):
         tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
         X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
         Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
-        r_interm = 1/K(l_intermediate,r1,r2,L)
+        r_interm = 1/K(l_intermediate,r1,r2,L) if K(l_intermediate,r1,r2,L) != 0 else np.inf
         return (X,Y,tau[-1],r_interm)
 class OtherTrack():
     def __init__(self):
