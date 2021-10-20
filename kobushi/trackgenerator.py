@@ -69,6 +69,8 @@ class TrackGenerator():
         self.last_pos['radius']          = r0     if r0     != None else 0
         self.last_pos['gradient']        = gr0    if gr0    != None else 0
         self.last_pos['distance']        = dist0  if dist0  != None else min(self.list_cp)
+        self.last_pos['dist_r']          = dist0  if dist0  != None else min(self.list_cp)
+        self.last_pos['dist_grad']       = dist0  if dist0  != None else min(self.list_cp)
         self.last_pos['interpolate_func'] = 'line'
         
         #座標情報を格納するリスト
@@ -106,6 +108,7 @@ class TrackGenerator():
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
                     self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
+                    self.last_pos['dist_r'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['distance']
                 radius_p.seeknext()
             if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
                 if(self.last_pos['radius'] == 0):
@@ -145,14 +148,15 @@ class TrackGenerator():
                                                                 dist - self.last_pos['distance'])
                     radius = self.last_pos['radius']
                 else: # 曲線半径が変化する場合
+                    last_radius = self.data_ownt[radius_p.pointer['last']]['value'] if self.data_ownt[radius_p.pointer['last']]['value'] != 'c' else
                     if(self.data_ownt[radius_p.pointer['next']]['flag'] == 'i' or self.data_ownt[radius_p.pointer['last']]['flag'] == 'bt'): # interpolateフラグがある
                         if(self.last_pos['radius'] != self.data_ownt[radius_p.pointer['next']]['value']): # 注目区間前後で異なる曲線半径を取るなら緩和曲線を出力
-                            [x, y], tau, radius = curve_gen.transition_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
+                            [x, y], tau, radius = curve_gen.transition_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.data_ownt[radius_p.pointer['last']]['distance'],\
                                                                                 self.last_pos['radius'],\
                                                                                 self.data_ownt[radius_p.pointer['next']]['value'],\
                                                                                 self.last_pos['theta'],\
                                                                                 self.last_pos['interpolate_func'],\
-                                                                                dist - self.last_pos['distance'])
+                                                                                dist - self.data_ownt[radius_p.pointer['last']]['distance'])
                         elif(self.data_ownt[radius_p.pointer['next']]['value'] != 0): # 曲線半径が変化せず、!=0の場合は円軌道を出力
                             [x, y], tau = curve_gen.circular_curve(self.data_ownt[radius_p.pointer['next']]['distance'] - self.last_pos['distance'],\
                                                                     self.last_pos['radius'],\
@@ -186,7 +190,8 @@ class TrackGenerator():
             # gradientに対する処理
             while(gradient_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(gradient_p.seekoriginofcontinuous(gradient_p.pointer['next']) != None):
-                    self.last_pos['gradient'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
+                    self.last_pos['gradient']  = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
+                    self.last_pos['dist_grad'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['distance']
                 gradient_p.seeknext()
             if(gradient_p.pointer['last'] == None): #最初の勾配要素に到達していない
                 if(gradient_p.pointer['next'] == None): # 勾配が存在しないmapの場合の処理
@@ -232,17 +237,17 @@ class TrackGenerator():
             self.last_pos['y']       += y
             self.last_pos['z']       += z
             self.last_pos['theta']   += tau
-            self.last_pos['radius']   = radius
-            self.last_pos['gradient'] = gradient
+            #self.last_pos['radius']   = radius
+            #self.last_pos['gradient'] = gradient
             self.last_pos['distance'] = dist
             # 座標リストに追加
-            self.result.append([self.last_pos['distance'],\
+            self.result.append([dist,\
                 self.last_pos['x'],\
                 self.last_pos['y'],\
                 self.last_pos['z'],\
                 self.last_pos['theta'],\
-                self.last_pos['radius'],\
-                self.last_pos['gradient']])
+                radius,\
+                gradient])
             
         return np.array(self.result)
     def generate_curveradius_dist(self):
