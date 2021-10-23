@@ -120,7 +120,19 @@ class TrackGenerator():
                     self.radius_lastpos['theta']    = self.last_pos['theta']
                 radius_p.seeknext()
             if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
-                if(self.last_pos['radius'] == 0):
+                if(radius_p.pointer['next'] == None): # curve要素が存在しないマップの場合
+                    if(self.last_pos['radius'] == 0):
+                        [x, y] =curve_gen.straight(self.cp_max - self.cp_min,\
+                                                    self.last_pos['theta'],\
+                                                    dist - self.last_pos['distance'])
+                        tau = 0
+                        radius = self.last_pos['radius']
+                    else:
+                        [x, y], tau =curve_gen.circular_curve(self.cp_max - self.cp_min,\
+                                                                self.last_pos['theta'],\
+                                                                dist - self.last_pos['distance'])
+                        radius = self.last_pos['radius']
+                elif(self.last_pos['radius'] == 0):
                     [x, y] =curve_gen.straight(self.data_ownt[radius_p.pointer['next']]['distance'] - self.cp_min,\
                                                 self.last_pos['theta'],\
                                                 dist - self.last_pos['distance'])
