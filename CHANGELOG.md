@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.2] - 2021-10-23
+* 平面緩和曲線算出ルーチンの修正
+    * sin半波長逓減関数を有効化
+
 ## [1.0.1] - 2021-08-21
 * グラフサイズ、余白の調整
 * ウィンドウリサイズに対応
@@ -12,3 +16,4 @@
 * 1st release
 
 [1.0.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0...ver1.0.1
+[1.0.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.1...ver1.0.2
