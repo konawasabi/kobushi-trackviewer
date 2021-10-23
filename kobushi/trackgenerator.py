@@ -99,6 +99,10 @@ class TrackGenerator():
                 raise RuntimeWarning('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(dist))
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
+            
+        #import pdb
+        #pdb.set_trace()
+        
         for dist in self.list_cp:
             # curve.setfunction に対する処理
             while (interpolate_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
@@ -110,6 +114,7 @@ class TrackGenerator():
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
+                    self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                     self.radius_lastpos['radius']  = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                     self.radius_lastpos['distance'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['distance']
                     self.radius_lastpos['theta']    = self.last_pos['theta']
