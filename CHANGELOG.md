@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.3] - 2021-10-23
+* 緩和曲線が存在しない円軌道の算出ルーチンを修正
+* Curve要素が存在しないマップファイルを読み込めない問題を修正
+
 ## [1.0.2] - 2021-10-23
 * 平面緩和曲線算出ルーチンの修正
     * sin半波長逓減関数を有効化
@@ -17,3 +21,4 @@
 
 [1.0.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0...ver1.0.1
 [1.0.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.1...ver1.0.2
+[1.0.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.2...ver1.0.3
