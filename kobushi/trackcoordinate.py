@@ -212,13 +212,19 @@ class curve_intermediate(curve):
             L: 緩和曲線の全長
             '''
             return (1/R2-1/R1)/2*(np.sin(np.pi/L*x-np.pi/2)+1)+1/R1
-        if l_intermediate/5 <= dL:
-            dL = l_intermediate/5
-        tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
-        tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
-        X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
-        Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
-        r_interm = 1/K(l_intermediate,r1,r2,L) if K(l_intermediate,r1,r2,L) != 0 else np.inf
+        if l_intermediate > 0:
+            if l_intermediate/5 <= dL:
+                dL = l_intermediate/5
+            tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
+            tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
+            X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
+            Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
+            r_interm = 1/K(l_intermediate,r1,r2,L) if K(l_intermediate,r1,r2,L) != 0 else np.inf
+        else:
+            X = 0
+            Y = 0
+            tau = np.array([0])
+            r_interm = r1 if r1 != 0 else np.inf
         return (X,Y,tau[-1],r_interm)
 class OtherTrack():
     def __init__(self):
