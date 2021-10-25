@@ -70,28 +70,50 @@ class TrackGenerator():
         self.last_pos['gradient']        = gr0    if gr0    != None else 0
         self.last_pos['distance']        = dist0  if dist0  != None else min(self.list_cp)
         self.last_pos['interpolate_func'] = 'line'
+        self.last_pos['cant']            = 0
+        self.last_pos['center']          = 0
+        self.last_pos['gauge']           = 0
         
         self.radius_lastpos = {}
         self.radius_lastpos['distance'] = self.last_pos['distance']
         self.radius_lastpos['theta']    = self.last_pos['theta']
-        self.radius_lastpos['radius']  = self.last_pos['radius']
+        self.radius_lastpos['radius']   = self.last_pos['radius']
+        
+        self.cant_lastpos = {}
+        self.cant_lastpos['distance'] = self.last_pos['distance']
+        self.cant_lastpos['value']    = self.last_pos['cant']
         
         #座標情報を格納するリスト
-        self.result = [[self.last_pos['distance'],self.last_pos['x'],self.last_pos['y'],self.last_pos['z'],self.last_pos['theta'],self.last_pos['radius'],self.last_pos['gradient']]]
+        self.result = [[self.last_pos['distance'],\
+                        self.last_pos['x'],\
+                        self.last_pos['y'],\
+                        self.last_pos['z'],\
+                        self.last_pos['theta'],\
+                        self.last_pos['radius'],\
+                        self.last_pos['gradient'],\
+                        1,\
+                        self.last_pos['cant'],\
+                        self.last_pos['center'],\
+                        self.last_pos['gauge']]]
         
+        #縦断面図曲線半径情報を格納するリスト
         self.radius_dist = []
     def generate_owntrack(self):
         '''マップ要素が存在する全ての距離程(self.list_cp)に対して自軌道の座標データを生成する。
         self.env: マップ要素が格納されたEnvironmentオブジェクト。
-        結果はself.result に[[distance,xpos,ypos,zpos,theta,radius,gradient],[d.,x.,y.,...],[...],...]として格納する。
+        結果はself.result に[[distance,xpos,ypos,zpos,theta,radius,gradient,interpolate_func,cant,center,gauge],[d.,x.,y.,...],[...],...]として格納する。
         '''
         radius_p      = TrackPointer(self.env,'radius')
         gradient_p    = TrackPointer(self.env,'gradient')
         turn_p        = TrackPointer(self.env,'turn')
         interpolate_p = TrackPointer(self.env,'interpolate_func')
+        cant_p        = TrackPointer(self.env,'cant')
+        center_p      = TrackPointer(self.env,'center')
+        gauge_p       = TrackPointer(self.env,'gauge')
         
-        grad_gen = tc.gradient_intermediate()
+        grad_gen  = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
+        cant_gen  = tc.Cant()
         
         if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
             # numpy RuntimeWarning発生時に当該点の距離程を印字
@@ -106,10 +128,18 @@ class TrackGenerator():
         for dist in self.list_cp:
             # curve.setfunction に対する処理
             while (interpolate_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
-                #if(interpolate_p.pointer['next'] != None):
                 self.last_pos['interpolate_func'] = self.data_ownt[interpolate_p.pointer['next']]['value']
-                #print(self.data_ownt[interpolate_p.pointer['next']]['distance'],self.last_pos['interpolate_func'])
                 interpolate_p.seeknext()
+                
+            # curve.setcenter に対する処理
+            while (center_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
+                center_tmp = self.data_ownt[center_p.pointer['next']]['value']
+                center_p.seeknext()
+                
+            # curve.setgauge に対する処理
+            while (gauge_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
+                gauge_tmp = self.data_ownt[gauge_p.pointer['next']]['value']
+                gauge_p.seeknext()
             
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
@@ -269,6 +299,8 @@ class TrackGenerator():
                                                 self.last_pos['gradient'],\
                                                 dist - self.last_pos['distance'])
                         gradient = self.last_pos['gradient']
+                        
+            #Cantに対する処理
             
             # 地点情報を更新
             self.last_pos['x']       += x
@@ -277,7 +309,10 @@ class TrackGenerator():
             self.last_pos['theta']   += tau
             self.last_pos['radius']   = radius
             self.last_pos['gradient'] = gradient
-            self.last_pos['distance'] = dist
+            #self.last_pos['interpolate_func'] = 'line'
+            self.last_pos['cant']            = 0
+            self.last_pos['center']          = center_tmp
+            self.last_pos['gauge']           = gauge_tmp
             # 座標リストに追加
             self.result.append([dist,\
                 self.last_pos['x'],\
@@ -285,7 +320,11 @@ class TrackGenerator():
                 self.last_pos['z'],\
                 self.last_pos['theta'],\
                 self.last_pos['radius'],\
-                self.last_pos['gradient']])
+                self.last_pos['gradient'],\
+                0 if self.last_pos['interpolate_func'] == 'sin' else 1,\
+                self.last_pos['cant'],\
+                self.last_pos['center'],\
+                self.last_pos['gauge']])
             
         return np.array(self.result)
     def generate_curveradius_dist(self):
