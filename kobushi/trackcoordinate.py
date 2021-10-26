@@ -226,6 +226,48 @@ class curve_intermediate(curve):
             tau = np.array([0])
             r_interm = r1 if r1 != 0 else np.inf
         return (X,Y,tau[-1],r_interm)
+        
+class Cant():
+    def __init__(self, pointer, data, last_pos):
+        self.pointer       = pointer
+        self.data_ownt     = data
+        #self.last_pos      = last_pos
+        
+        self.cant_lastpos = {}
+        self.cant_lastpos['distance'] = last_pos['distance']
+        self.cant_lastpos['value']    = last_pos['cant']
+    def process(self, dist, func):
+        while (self.pointer.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
+            if(self.pointer.seekoriginofcontinuous(self.pointer.pointer['next']) != None):
+                self.cant_lastpos['distance'] = self.data_ownt[self.pointer.seekoriginofcontinuous(self.pointer.pointer['next'])]['distance']
+                self.cant_lastpos['value']    = self.data_ownt[self.pointer.seekoriginofcontinuous(self.pointer.pointer['next'])]['value']
+            self.pointer.seeknext()
+        
+        result = 0
+        if(self.pointer.pointer['last'] == None): #最初の要素に到達していない
+            result = self.cant_lastpos['value']
+        elif(self.pointer.pointer['next'] == None): #最後の要素を通過した
+            result = self.cant_lastpos['value']
+        else: # 一般の場合の処理
+            if(self.data_ownt[self.pointer.pointer['next']]['value'] == 'c'): # 注目区間の前後でvalueが変化しない場合
+                result = self.cant_lastpos['value']
+            else:
+                if(self.data_ownt[self.pointer.pointer['next']]['flag'] == 'i' or self.data_ownt[self.pointer.pointer['last']]['flag'] == 'bt'): # interpolateフラグがある場合
+                    result = self.transition(self.data_ownt[self.pointer.pointer['next']]['distance'] - self.cant_lastpos['distance'],\
+                                             self.cant_lastpos['value'],\
+                                             self.data_ownt[self.pointer.pointer['next']]['value'],\
+                                             func,\
+                                             dist - self.cant_lastpos['distance'])
+                else: # interpolateでない場合、lastposのvalueを出力
+                    result = self.cant_lastpos['value']
+        return result
+    def transition(self, L, c1, c2, func, l_intermediate):
+        if(func == 'sin'):
+            result = (c2-c1)/2*(np.sin(np.pi/L*l_intermediate-np.pi/2)+1)+c1
+        else:
+            result = (c2-c1)/L*l_intermediate + c1
+        return result
+        
 class OtherTrack():
     def __init__(self):
         pass
@@ -281,3 +323,4 @@ class OtherTrack():
         '''
         posrel = np.array([0,self.relative_position(L, radius, ya, yb, l_intermediate)])
         return posrel + np.array([pos_ownt[1],pos_ownt[3]]) # 計算結果を自軌道座標に加算する
+

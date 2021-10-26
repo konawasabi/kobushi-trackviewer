@@ -79,10 +79,6 @@ class TrackGenerator():
         self.radius_lastpos['theta']    = self.last_pos['theta']
         self.radius_lastpos['radius']   = self.last_pos['radius']
         
-        self.cant_lastpos = {}
-        self.cant_lastpos['distance'] = self.last_pos['distance']
-        self.cant_lastpos['value']    = self.last_pos['cant']
-        
         #座標情報を格納するリスト
         self.result = [[self.last_pos['distance'],\
                         self.last_pos['x'],\
@@ -107,13 +103,12 @@ class TrackGenerator():
         gradient_p    = TrackPointer(self.env,'gradient')
         turn_p        = TrackPointer(self.env,'turn')
         interpolate_p = TrackPointer(self.env,'interpolate_func')
-        cant_p        = TrackPointer(self.env,'cant')
         center_p      = TrackPointer(self.env,'center')
         gauge_p       = TrackPointer(self.env,'gauge')
         
         grad_gen  = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
-        cant_gen  = tc.Cant()
+        cant_gen  = tc.Cant(TrackPointer(self.env,'cant'), self.data_ownt, self.last_pos)
         
         if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
             # numpy RuntimeWarning発生時に当該点の距離程を印字
@@ -132,11 +127,13 @@ class TrackGenerator():
                 interpolate_p.seeknext()
                 
             # curve.setcenter に対する処理
+            center_tmp = self.last_pos['center']
             while (center_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
                 center_tmp = self.data_ownt[center_p.pointer['next']]['value']
                 center_p.seeknext()
                 
             # curve.setgauge に対する処理
+            gauge_tmp = self.last_pos['gauge']
             while (gauge_p.onNextpoint(dist)): #注目している要素区間の終端に到達？
                 gauge_tmp = self.data_ownt[gauge_p.pointer['next']]['value']
                 gauge_p.seeknext()
@@ -301,6 +298,7 @@ class TrackGenerator():
                         gradient = self.last_pos['gradient']
                         
             #Cantに対する処理
+            cant_tmp = cant_gen.process(dist, self.last_pos['interpolate_func'])
             
             # 地点情報を更新
             self.last_pos['x']       += x
@@ -309,8 +307,9 @@ class TrackGenerator():
             self.last_pos['theta']   += tau
             self.last_pos['radius']   = radius
             self.last_pos['gradient'] = gradient
+            self.last_pos['distance'] = dist
             #self.last_pos['interpolate_func'] = 'line'
-            self.last_pos['cant']            = 0
+            self.last_pos['cant']            = cant_tmp
             self.last_pos['center']          = center_tmp
             self.last_pos['gauge']           = gauge_tmp
             # 座標リストに追加
