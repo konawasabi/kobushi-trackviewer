@@ -103,12 +103,13 @@ class TrackGenerator():
         gradient_p    = TrackPointer(self.env,'gradient')
         turn_p        = TrackPointer(self.env,'turn')
         interpolate_p = TrackPointer(self.env,'interpolate_func')
+        cant_p        = TrackPointer(self.env,'cant')
         center_p      = TrackPointer(self.env,'center')
         gauge_p       = TrackPointer(self.env,'gauge')
         
         grad_gen  = tc.gradient_intermediate()
         curve_gen = tc.curve_intermediate()
-        cant_gen  = tc.Cant(TrackPointer(self.env,'cant'), self.data_ownt, self.last_pos)
+        cant_gen  = tc.Cant(cant_p, self.data_ownt, self.last_pos)
         
         if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
             # numpy RuntimeWarning発生時に当該点の距離程を印字
@@ -141,8 +142,8 @@ class TrackGenerator():
             # radiusに対する処理
             while (radius_p.overNextpoint(dist)): #注目している要素区間の終端を超えたか？
                 if(radius_p.seekoriginofcontinuous(radius_p.pointer['next']) != None):
-                    self.last_pos['radius'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
-                    self.radius_lastpos['radius']  = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
+                    self.last_pos['radius']         = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
+                    self.radius_lastpos['radius']   = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['value']
                     self.radius_lastpos['distance'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['distance']
                     self.radius_lastpos['theta']    = self.last_pos['theta']
                 radius_p.seeknext()

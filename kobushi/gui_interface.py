@@ -524,7 +524,7 @@ class mainwindow(ttk.Frame):
             
             output_filename = filepath.joinpath(str(filename_base)+'_owntrack'+'.csv')
             output = self.result.owntrack_pos
-            header = 'distance,x,y,z,direction,radius,gradient'
+            header = 'distance,x,y,z,direction,radius,gradient,interpolate_func,cant,gauge,center'
             np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
             
             for key in self.result.othertrack_pos.keys():

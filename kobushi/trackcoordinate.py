@@ -231,7 +231,7 @@ class Cant():
     def __init__(self, pointer, data, last_pos):
         self.pointer       = pointer
         self.data_ownt     = data
-        #self.last_pos      = last_pos
+        self.last_pos      = last_pos
         
         self.cant_lastpos = {}
         self.cant_lastpos['distance'] = last_pos['distance']
@@ -253,11 +253,14 @@ class Cant():
                 result = self.cant_lastpos['value']
             else:
                 if(self.data_ownt[self.pointer.pointer['next']]['flag'] == 'i' or self.data_ownt[self.pointer.pointer['last']]['flag'] == 'bt'): # interpolateフラグがある場合
-                    result = self.transition(self.data_ownt[self.pointer.pointer['next']]['distance'] - self.cant_lastpos['distance'],\
-                                             self.cant_lastpos['value'],\
-                                             self.data_ownt[self.pointer.pointer['next']]['value'],\
-                                             func,\
-                                             dist - self.cant_lastpos['distance'])
+                    if(self.cant_lastpos['value'] != self.data_ownt[self.pointer.pointer['next']]['value']):
+                        result = self.transition(self.data_ownt[self.pointer.pointer['next']]['distance'] - self.data_ownt[self.pointer.pointer['last']]['distance'],\
+                                                 self.cant_lastpos['value'],\
+                                                 self.data_ownt[self.pointer.pointer['next']]['value'],\
+                                                 func,\
+                                                 dist - self.data_ownt[self.pointer.pointer['last']]['distance'])
+                    else:
+                        result = self.cant_lastpos['value']
                 else: # interpolateでない場合、lastposのvalueを出力
                     result = self.cant_lastpos['value']
         return result
