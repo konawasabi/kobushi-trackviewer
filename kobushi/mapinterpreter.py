@@ -114,7 +114,8 @@ class ParseMap(Transformer):
                     temp_argv.extend(argument[-1].children[1:])
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
             elif(first_obj in ['track']):
-                if(argument[1].children[0].lower() != 'cant'):
+                #if(argument[1].children[0].lower() != 'cant'):
+                if True:
                     key = argument[0].children[1] # trackKeyを取得
                     temp = getattr(self.environment, 'othertrack') # othertrackオブジェクトを取得する
                     for elem in argument[1:]: # 2番目以降もマップ要素かどうか(例: Track.X.Interpolate(...) or Track.Position(...) )

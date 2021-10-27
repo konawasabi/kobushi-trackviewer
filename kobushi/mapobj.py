@@ -208,11 +208,29 @@ class Othertrack():
             elif(len(a)>=3):
                 self.parent.putdata(a[0],self.dimension+'.position',a[1])
                 self.parent.putdata(a[0],self.dimension+'.radius',a[2])
+    class cantfunc():
+        def __init__(self, parent):
+            self.parent = parent
+        def setgauge(self, *a):
+            pass
+        def setcenter(self, *a):
+            pass
+        def setfunction(self, *a):
+            pass
+        def begintransition(self, *a):
+            pass
+        def begin(self, *a):
+            pass
+        def end(self, *a):
+            pass
+        def interpolate(self, *a):
+            pass
     def __init__(self,p):
         self.data = {}
         self.environment = p
         self.x = self.setposition(self, 'x')
         self.y = self.setposition(self, 'y')
+        self.cant = self.cantfunc(self)
     
     def position(self, *a):
         if(len(a)==3):
@@ -225,6 +243,8 @@ class Othertrack():
             self.x.interpolate(a[0],a[1] if a[1] != None else 0,a[3] if a[3] != None else 0)
             self.y.interpolate(a[0],a[2] if a[2] != None else 0,a[4] if a[4] != None else 0)
     def gauge(self, *a):
+        '''Cant.SetGaugeの旧表記
+        '''
         pass
     def putdata(self,trackkey,elementkey,value,flag=''):
         '''dataリストへ要素をdictとして追加する。
