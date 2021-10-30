@@ -114,17 +114,19 @@ class ParseMap(Transformer):
                     temp_argv.extend(argument[-1].children[1:])
                 getattr(temp, argument[-1].children[0].lower())(*temp_argv)
             elif(first_obj in ['track']):
-                #if(argument[1].children[0].lower() != 'cant'):
-                if True:
-                    key = argument[0].children[1] # trackKeyを取得
-                    temp = getattr(self.environment, 'othertrack') # othertrackオブジェクトを取得する
+                key = argument[0].children[1] # trackKeyを取得
+                temp_argv = [key] # マップファイル指定の引数の先頭にkeyを追加する
+                temp_argv.extend(argument[-1].children[1:])
+                temp = getattr(self.environment, 'othertrack') # othertrackオブジェクトを取得する
+                if(argument[1].children[0].lower() == 'cant' and argument[1].data == 'mapfunc'): # Track[key].Cant(x)かどうか
+                    temp = getattr(temp, 'cant')
+                    getattr(temp, 'interpolate')(*temp_argv)
+                else: # 一般の要素の場合
                     for elem in argument[1:]: # 2番目以降もマップ要素かどうか(例: Track.X.Interpolate(...) or Track.Position(...) )
                         if(elem.data == 'mapfunc'): # 関数なら探索終了
                             break
                         temp = getattr(temp, elem.children[0].lower()) # 対応するオブジェクトを取得
-                    temp_argv = [key] # マップファイル指定の引数の先頭にkeyを追加する
-                    temp_argv.extend(argument[-1].children[1:])
-                    getattr(temp, argument[-1].children[0].lower())(*temp_argv)
+                    getattr(temp, argument[-1].children[0].lower())(*temp_argv) 
     def include_file(self, path): #外部ファイルインクルード
         input = loadheader.joinpath(self.environment.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)
