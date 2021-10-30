@@ -212,19 +212,22 @@ class Othertrack():
         def __init__(self, parent):
             self.parent = parent
         def setgauge(self, *a):
-            pass
+            self.parent.putdata(a[0],'gauge',a[1])
         def setcenter(self, *a):
-            pass
+            self.parent.putdata(a[0],'center',a[1])
         def setfunction(self, *a):
-            pass
+            self.parent.putdata(a[0],'interpolate_func','sin' if a[1] == 0 else 'line')
         def begintransition(self, *a):
-            pass
+            self.parent.putdata(a[0],'cant',None,'bt')
         def begin(self, *a):
-            pass
+            self.parent.putdata(a[0],'cant',a[1],'i')
         def end(self, *a):
-            pass
+            self.parent.putdata(a[0],'cant',0,'i')
         def interpolate(self, *a):
-            pass
+            if len(a) == 1:
+                self.parent.putdata(a[0],'cant',None,'i')
+            else:
+                self.parent.putdata(a[0],'cant',a[1],'i')
     def __init__(self,p):
         self.data = {}
         self.environment = p
@@ -245,12 +248,12 @@ class Othertrack():
     def gauge(self, *a):
         '''Cant.SetGaugeの旧表記
         '''
-        pass
+        self.cant.setgauge(*a)
     def putdata(self,trackkey,elementkey,value,flag=''):
         '''dataリストへ要素をdictとして追加する。
-        distance
-            呼び出された時点でのdistance変数の値
-        key
+        trackkey
+            他軌道キー
+        elementkey
             マップ要素の種別
                 'x.position' : x方向座標
                 'x.radius'   : x方向相対半径

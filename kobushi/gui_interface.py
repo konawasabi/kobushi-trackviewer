@@ -524,13 +524,13 @@ class mainwindow(ttk.Frame):
             
             output_filename = filepath.joinpath(str(filename_base)+'_owntrack'+'.csv')
             output = self.result.owntrack_pos
-            header = 'distance,x,y,z,direction,radius,gradient,interpolate_func,cant,gauge,center'
+            header = 'distance,x,y,z,direction,radius,gradient,interpolate_func,cant,center,gauge'
             np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
             
             for key in self.result.othertrack_pos.keys():
                 output_filename = filepath.joinpath(str(filename_base)+'_'+key+'.csv')
                 output = self.result.othertrack_pos[key]
-                header = 'distance,x,y,z'
+                header = 'distance,x,y,z,interpolate_func,cant,center,gauge'
                 np.savetxt(output_filename, output, delimiter=',',header=header,fmt='%.6f')
     def set_plotlimit(self, event=None):
         if self.result != None:

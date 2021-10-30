@@ -234,7 +234,7 @@ class Cant():
         self.last_pos      = last_pos
         
         self.cant_lastpos = {}
-        self.cant_lastpos['distance'] = last_pos['distance']
+        self.cant_lastpos['distance'] = 0 #last_pos['distance']
         self.cant_lastpos['value']    = last_pos['cant']
     def process(self, dist, func):
         while (self.pointer.overNextpoint(dist)): #注目している要素区間の終端を超えたか？

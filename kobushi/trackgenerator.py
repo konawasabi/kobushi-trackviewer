@@ -446,7 +446,7 @@ class OtherTrackGenerator():
         self.distrange={'min':min(self.data, key=lambda x: x['distance'])['distance'], 'max':max(self.data, key=lambda x: x['distance'])['distance']}
         # 前回処理した地点の情報
         self.pos = {'last':{}, 'next':{}}
-        for key in ['x.position','x.radius','x.distance','y.position','y.radius','y.distance']:
+        for key in ['x.position','x.radius','x.distance','y.position','y.radius','y.distance','interpolate_func','cant','center','gauge']:
             self.pos['last'][key] = 0
             self.pos['next'][key] = 0
     
@@ -454,24 +454,26 @@ class OtherTrackGenerator():
         '''他軌道座標を計算する。
         対象はインスタンス作成時に指定したkeyの軌道。
         '''
-        track_gen = tc.OtherTrack() # 座標計算オブジェクト
         # 軌道要素ポインタの作成
         trackptr = {}
-        trackptr['x.position'] = self.OtherTrackPointer(self.env,'x.position',self.trackkey)
-        trackptr['x.radius']   = self.OtherTrackPointer(self.env,'x.radius',self.trackkey)
-        trackptr['y.position'] = self.OtherTrackPointer(self.env,'y.position',self.trackkey)
-        trackptr['y.radius']   = self.OtherTrackPointer(self.env,'y.radius',self.trackkey)
+        for tpkey in ['x.position','x.radius','y.position','y.radius','interpolate_func','cant','center','gauge']:
+            trackptr[tpkey] = self.OtherTrackPointer(self.env,tpkey,self.trackkey)
+            
+        track_gen = tc.OtherTrack() # 座標計算オブジェクト
+        cant_gen  = tc.Cant(trackptr['cant'], self.data, self.pos['last']) # カント計算オブジェクト
+        
         #tp_keys = ['x.position','x.radius','y.position','y.radius']
         #skip_dimension = {'x.position':False, 'x.radius':False, 'y.position':False, 'y.radius':False}
-        for tpkey in trackptr.keys():
+        for tpkey in trackptr.keys(): # ポインタ初期値設定
             if trackptr[tpkey].pointer['next'] != None:
                 for k in ['last','next']:
                     newval = self.data[trackptr[tpkey].pointer['next']]['value']
                     self.pos[k][tpkey] = newval if newval != 'c' else 0
+                    
         for element in self.owntrack_position: # 自軌道が指定されている全ての距離程について計算する
             if self.distrange['min'] > element[0]: # 対象となる軌道が最初に現れる距離程にまだ達していないか？
                 continue
-            for tpkey in trackptr.keys(): # ポインタを進める
+            for tpkey in ['x.position','x.radius','y.position','y.radius']: # ポインタを進める
                 while trackptr[tpkey].overNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
                     if trackptr[tpkey].pointer['next'] != None:
@@ -479,6 +481,15 @@ class OtherTrackGenerator():
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
+            for tpkey in ['interpolate_func','cant','center','gauge']: # ポインタを進める
+                while trackptr[tpkey].onNextpoint(element[0]):
+                    trackptr[tpkey].seeknext()
+                    if trackptr[tpkey].pointer['next'] != None:
+                        self.pos['last'][tpkey] = self.pos['next'][tpkey]
+                        k = 'next'
+                        newval = self.data[trackptr[tpkey].pointer[k]]['value']
+                        self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
+            
             if trackptr['x.position'].pointer['last'] != None and trackptr['x.position'].pointer['next'] != None: # skip_dimension に従って計算するかどうか判断する
                 for k in ['last','next']:
                     self.pos[k]['x.distance'] = self.data[trackptr['x.position'].pointer[k]]['distance']
@@ -502,5 +513,15 @@ class OtherTrackGenerator():
                                                                 element)
             else:
                 temp_result_Y = [0,self.pos['last']['y.position']]+ np.array([element[1],element[3]])
-            self.result.append([element[0],temp_result_X[0],temp_result_X[1],temp_result_Y[1]])
+                
+            temp_result_cant = cant_gen.process(element[0], self.pos['last']['interpolate_func'])
+            
+            self.result.append([element[0],\
+                                temp_result_X[0],\
+                                temp_result_X[1],\
+                                temp_result_Y[1],\
+                                0 if self.pos['last']['interpolate_func'] == 'sin' else 1,\
+                                self.pos['last']['cant'],\
+                                self.pos['last']['center'],\
+                                self.pos['last']['gauge']])
         return np.array(self.result)
