@@ -481,7 +481,7 @@ class OtherTrackGenerator():
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
-            for tpkey in ['interpolate_func','cant','center','gauge']: # ポインタを進める
+            for tpkey in ['interpolate_func','center','gauge']: # ポインタを進める
                 while trackptr[tpkey].onNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
                     if trackptr[tpkey].pointer['next'] != None:
@@ -521,7 +521,7 @@ class OtherTrackGenerator():
                                 temp_result_X[1],\
                                 temp_result_Y[1],\
                                 0 if self.pos['last']['interpolate_func'] == 'sin' else 1,\
-                                self.pos['last']['cant'],\
+                                temp_result_cant,\
                                 self.pos['last']['center'],\
                                 self.pos['last']['gauge']])
         return np.array(self.result)
