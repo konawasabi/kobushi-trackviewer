@@ -612,7 +612,7 @@ def main():
                 traceback.print_exception(type, value, tb)
                 # ...then start the debugger in post-mortem mode
                 pdb.pm()
-        import sys
+        #import sys
         sys.excepthook = info
         print('Debug mode')
     
