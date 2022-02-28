@@ -278,8 +278,8 @@ class mainwindow(ttk.Frame):
         self.bind_all("<Return>", self.distset_entry)
         self.bind_all("<Shift-Left>", self.press_arrowkey)
         self.bind_all("<Shift-Right>", self.press_arrowkey)
-    def open_mapfile(self, event=None):
-        inputdir = filedialog.askopenfilename()
+    def open_mapfile(self, event=None,inputdir=None):
+        inputdir = filedialog.askopenfilename() if inputdir == None else inputdir
         if inputdir != '':
             self.filedir_entry_val.set(inputdir)
             
@@ -619,4 +619,7 @@ def main():
     tk.CallWrapper = Catcher
     root = tk.Tk()
     app = mainwindow(master=root, parser = None)
+
+    if len(sys.argv)>1:
+        app.open_mapfile(inputdir=sys.argv[1])
     app.mainloop()
