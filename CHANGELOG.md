@@ -2,7 +2,7 @@
 
 ## to be implemented
 
-## [1.1.0] - to be released
+## [Unreleased] - Unreleased
 - 自軌道のカント算出
 - 他軌道のカント算出
 - ロードするmapファイルを起動時引数で指定
