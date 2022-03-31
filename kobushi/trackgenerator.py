@@ -1,18 +1,22 @@
+#
+#    Copyright 2021 konawasabi
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 '''
-    Copyright 2021 konawasabi
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
 '''
+
 import numpy as np
 from . import trackcoordinate as tc
 
@@ -113,10 +117,13 @@ class TrackGenerator():
         
         if not __debug__: # -O オプションが指定されている時のみ、デバッグ情報を処理
             # numpy RuntimeWarning発生時に当該点の距離程を印字
-            def print_warning_position(err,flag):
+            def raise_warning_position(err,flag):
                 raise RuntimeWarning('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(dist))
+            def print_warning_position(err,flag):
+                print('Numpy warning: '+str(err)+', '+str(flag)+' at '+str(dist))
             np.seterr(all='call')
             np.seterrcall(print_warning_position)
+            #np.seterrcall(raise_warning_position)
             
         #import pdb
         #pdb.set_trace()
