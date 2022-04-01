@@ -84,7 +84,7 @@ class TrackGenerator():
         self.radius_lastpos['radius']   = self.last_pos['radius']
         
         #座標情報を格納するリスト
-        self.result = None
+        self.result = []
         '''
         self.result = [[self.last_pos['distance'],\
                         self.last_pos['x'],\
@@ -324,6 +324,7 @@ class TrackGenerator():
             self.last_pos['center']          = center_tmp
             self.last_pos['gauge']           = gauge_tmp
             # 座標リストに追加
+            '''
             if self.result is None:
                 self.result = [dist,\
                     self.last_pos['x'],\
@@ -348,6 +349,18 @@ class TrackGenerator():
                     self.last_pos['cant'],\
                     self.last_pos['center'],\
                     self.last_pos['gauge']])
+            '''
+            self.result.append([dist,\
+                self.last_pos['x'],\
+                self.last_pos['y'],\
+                self.last_pos['z'],\
+                self.last_pos['theta'],\
+                self.last_pos['radius'],\
+                self.last_pos['gradient'],\
+                0 if self.last_pos['interpolate_func'] == 'sin' else 1,\
+                self.last_pos['cant'],\
+                self.last_pos['center'],\
+                self.last_pos['gauge']])
             
         return np.array(self.result)
     def generate_curveradius_dist(self):
