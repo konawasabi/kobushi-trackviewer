@@ -84,6 +84,8 @@ class TrackGenerator():
         self.radius_lastpos['radius']   = self.last_pos['radius']
         
         #座標情報を格納するリスト
+        self.result = None
+        '''
         self.result = [[self.last_pos['distance'],\
                         self.last_pos['x'],\
                         self.last_pos['y'],\
@@ -95,6 +97,7 @@ class TrackGenerator():
                         self.last_pos['cant'],\
                         self.last_pos['center'],\
                         self.last_pos['gauge']]]
+        '''
         
         #縦断面図曲線半径情報を格納するリスト
         self.radius_dist = []
@@ -154,8 +157,8 @@ class TrackGenerator():
                     self.radius_lastpos['distance'] = self.data_ownt[radius_p.seekoriginofcontinuous(radius_p.pointer['next'])]['distance']
                     self.radius_lastpos['theta']    = self.last_pos['theta']
                 radius_p.seeknext()
-            if(radius_p.pointer['last'] == None): # 最初のcurve要素に到達していない場合
-                if(radius_p.pointer['next'] == None): # curve要素が存在しないマップの場合
+            if(radius_p.pointer['last'] is None): # 最初のcurve要素に到達していない場合
+                if(radius_p.pointer['next'] is None): # curve要素が存在しないマップの場合
                     if(self.last_pos['radius'] == 0):
                         [x, y] =curve_gen.straight(self.cp_max - self.cp_min,\
                                                     self.last_pos['theta'],\
@@ -178,7 +181,7 @@ class TrackGenerator():
                                                             self.last_pos['theta'],\
                                                             dist - self.last_pos['distance'])
                     radius = self.last_pos['radius']
-            elif(radius_p.pointer['next'] == None): # curve要素リスト終端に到達
+            elif(radius_p.pointer['next'] is None): # curve要素リスト終端に到達
                 if(self.last_pos['radius'] == 0): # 曲線半径が0 (直線)の場合
                     [x, y] = curve_gen.straight(self.cp_max - self.last_pos['distance'],\
                                               self.last_pos['theta'],\
@@ -266,8 +269,8 @@ class TrackGenerator():
                     self.last_pos['gradient']  = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['value']
                     self.last_pos['dist_grad'] = self.data_ownt[gradient_p.seekoriginofcontinuous(gradient_p.pointer['next'])]['distance']
                 gradient_p.seeknext()
-            if(gradient_p.pointer['last'] == None): #最初の勾配要素に到達していない
-                if(gradient_p.pointer['next'] == None): # 勾配が存在しないmapの場合の処理
+            if(gradient_p.pointer['last'] is None): #最初の勾配要素に到達していない
+                if(gradient_p.pointer['next'] is None): # 勾配が存在しないmapの場合の処理
                     z = grad_gen.straight(self.cp_max - self.cp_min,\
                                             self.last_pos['gradient'],\
                                             dist - self.last_pos['distance'])
@@ -276,7 +279,7 @@ class TrackGenerator():
                                             self.last_pos['gradient'],\
                                             dist - self.last_pos['distance'])
                 gradient = self.last_pos['gradient']
-            elif(gradient_p.pointer['next'] == None): #最後の勾配要素を通過した
+            elif(gradient_p.pointer['next'] is None): #最後の勾配要素を通過した
                 z = grad_gen.straight(self.cp_max - self.last_pos['distance'],\
                                         self.last_pos['gradient'],\
                                         dist - self.last_pos['distance'])
@@ -321,17 +324,30 @@ class TrackGenerator():
             self.last_pos['center']          = center_tmp
             self.last_pos['gauge']           = gauge_tmp
             # 座標リストに追加
-            self.result.append([dist,\
-                self.last_pos['x'],\
-                self.last_pos['y'],\
-                self.last_pos['z'],\
-                self.last_pos['theta'],\
-                self.last_pos['radius'],\
-                self.last_pos['gradient'],\
-                0 if self.last_pos['interpolate_func'] == 'sin' else 1,\
-                self.last_pos['cant'],\
-                self.last_pos['center'],\
-                self.last_pos['gauge']])
+            if self.result is None:
+                self.result = [dist,\
+                    self.last_pos['x'],\
+                    self.last_pos['y'],\
+                    self.last_pos['z'],\
+                    self.last_pos['theta'],\
+                    self.last_pos['radius'],\
+                    self.last_pos['gradient'],\
+                    0 if self.last_pos['interpolate_func'] == 'sin' else 1,\
+                    self.last_pos['cant'],\
+                    self.last_pos['center'],\
+                    self.last_pos['gauge']]
+            else:
+                self.result.append([dist,\
+                    self.last_pos['x'],\
+                    self.last_pos['y'],\
+                    self.last_pos['z'],\
+                    self.last_pos['theta'],\
+                    self.last_pos['radius'],\
+                    self.last_pos['gradient'],\
+                    0 if self.last_pos['interpolate_func'] == 'sin' else 1,\
+                    self.last_pos['cant'],\
+                    self.last_pos['center'],\
+                    self.last_pos['gauge']])
             
         return np.array(self.result)
     def generate_curveradius_dist(self):
@@ -393,7 +409,7 @@ class TrackPointer():
         self.pointer['next'] = self.seek(0)
     def seeknext(self):
         '''次の要素が存在するインデックスを探し、self.pointer['last', 'next']を書き換える。
-        self.pointer['next'] == None の場合は何もしない。
+        self.pointer['next'] is None の場合は何もしない。
         '''
         if(self.pointer['next'] != None):
             self.pointer['last'] = self.pointer['next']
@@ -406,19 +422,19 @@ class TrackPointer():
     def onNextpoint(self,distance):
         '''注目している要素区間の終端にいるか調べる。
         与えられたdistance == 注目しているpointer['next'] ならTrue。
-        pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
+        pointer['next'] is None (要素リスト終端に到達した) なら必ずFalse。
         '''
         return (self.data[self.pointer['next']]['distance'] == distance) if self.pointer['next'] != None else False
     def overNextpoint(self,distance):
         '''注目している要素区間を超えたか調べる。
         与えられたdistance > 注目しているpointer['next'] ならTrue。
-        pointer['next'] == None (要素リスト終端に到達した) なら必ずFalse。
+        pointer['next'] is None (要素リスト終端に到達した) なら必ずFalse。
         '''
         return (self.data[self.pointer['next']]['distance'] < distance) if self.pointer['next'] != None else False
     def beforeLastpoint(self,distance):
         '''注目している要素区間にまだ到達していないか調べる。
         与えられたdistance <= 注目しているpointer['last'] ならTrue。
-        pointer['last'] == None (リスト始端の要素地点に到達していない) なら必ずTrue。
+        pointer['last'] is None (リスト始端の要素地点に到達していない) なら必ずTrue。
         '''
         return (self.data[self.pointer['last']]['distance'] >= distance) if self.pointer['last'] != None else True
     def seekoriginofcontinuous(self,index):
