@@ -18,11 +18,21 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 * [lark](https://lark-parser.readthedocs.io/en/latest/)
 * [ttkwidgets](https://ttkwidgets.readthedocs.io/en/latest/)
 
+### アップデート
+
+すでに旧バージョンのkobushiをインストール済みの方は、次のコマンドで最新版へアップデートできます。
+```
+pip install -U kobushi-trackviewer
+```
+
 ## 起動
 Powershellで以下のコマンドを実行します。
 ```
 python -m kobushi
 ```
+
+`python -m kobushi hoge.txt`として、読み込みたいマップファイルを指定して起動することも可能です。
+
 ## リファレンス
 
 [こちら](reference.md)を参照

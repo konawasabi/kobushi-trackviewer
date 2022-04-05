@@ -2,7 +2,7 @@
 
 ## to be implemented
 
-## [1.1.0] - Unreleased
+## [1.1.0] - 2022-04-05
 - 自軌道のカント算出
 - 他軌道のカント算出
 - ロードするmapファイルを起動時引数で指定
@@ -31,3 +31,4 @@
 [1.0.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0...ver1.0.1
 [1.0.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.1...ver1.0.2
 [1.0.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.2...ver1.0.3
+[1.1.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.3...ver1.1.0
