@@ -512,7 +512,7 @@ class mainwindow(ttk.Frame):
         filepath = filedialog.asksaveasfilename(filetypes=[('portable network graphics (png)','*.png'), ('scalable vector graphics (svg)','*.svg'), ('any format','*')], defaultextension='*.*')
         if filepath != '':
             filepath = pathlib.Path(filepath)
-            self.fig_plane.savefig(filepath.parent.joinpath(str(filepath.stem) + '_plane' + str(filepath.suffix)))
+            self.fig_plane.savefig(filepath.parent.joinpath(str(filepath.stem) + '' + str(filepath.suffix)))
     def save_trackdata(self, event=None):
         filepath = filedialog.askdirectory(initialdir='./')
         if filepath != '':
