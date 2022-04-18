@@ -51,4 +51,5 @@ string: /'[^']*'/ -> remquote
 %ignore NEWLINE
 %ignore "\""
 %ignore "\xa0" // 半角カナのスペース
-
+%ignore "\u3000" //ユニコードの全角スペース
+%ignore "\x8140" //sjisの全角スペース
