@@ -137,7 +137,10 @@ class curve():
             tau1 = 0
             turn = output[2]
             rl = output[3] #if output[3] != 0 else np.inf
-            result = np.vstack((output[0],output[1])).T
+
+            result_temp = np.vstack((output[0],output[1])).T
+            result = result_temp[::int(np.ceil(len(output[0])/n))]
+            result = np.vstack((result,result_temp[-1]))
         else:
             raise RuntimeError('invalid transition function')
         
