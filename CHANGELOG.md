@@ -40,3 +40,4 @@
 [1.0.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.2...ver1.0.3
 [1.1.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.3...ver1.1.0
 [1.1.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.0...ver1.1.1
+[1.1.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.1...ver1.1.2
