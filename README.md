@@ -22,7 +22,7 @@ Kobushi本体と、動作に必要な下記パッケージが自動でインス�
 
 すでに旧バージョンのkobushiをインストール済みの方は、次のコマンドで最新版へアップデートできます。
 ```
-pip install -U kobushi-trackviewer
+pip install --upgrade kobushi-trackviewer
 ```
 
 ## 起動
