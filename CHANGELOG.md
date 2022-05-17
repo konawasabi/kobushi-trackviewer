@@ -2,6 +2,10 @@
 
 ## to be implemented
 
+## [1.1.3] - not released yet
+- mapinterpleter.load_filesで、文字列を受け取ってパースする機能を実装
+  - tsutsuji-trackcomputer向け
+
 ## [1.1.2] - 2022-04-29
 - Sin半波長逓減関数に対応していないルーチンの修正
   - tsutsuji-trackcomputer向け
@@ -41,3 +45,5 @@
 [1.1.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.0.3...ver1.1.0
 [1.1.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.0...ver1.1.1
 [1.1.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.1...ver1.1.2
+[1.1.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.2...ver1.1.3
+

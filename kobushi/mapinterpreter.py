@@ -134,32 +134,38 @@ class ParseMap(Transformer):
     def start(self, *argument):
         if(all(elem == None for elem in argument)):
             return self.environment
-    def load_files(self, path):
-        f_path, rootpath_tmp, f_encoding = loadheader.loadheader(path,'BveTs Map ',2)
-        def readfile(filepath,fileencode):
-            try:
-                f=open(filepath,'r',encoding=fileencode)
-                f.readline() #ヘッダー行空読み
-                linecount = 1
-                
-                filebuffer = f.read()
-                f.close()
-            except:
-                f.close()
-                raise
-            return filebuffer
-        if(self.isroot):
-            self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
-        
-        try: #ファイルオープン
-            filebuffer = readfile(f_path,f_encoding)
-        except UnicodeDecodeError as e: #ファイル指定のエンコードでオープンできない時
-            if f_encoding.casefold() == 'utf-8':
-                encode_retry = 'CP932'
-            else:
-                encode_retry = 'utf-8'
-            print('Warning: '+str(f_path.name)+' cannot be decoded with '+f_encoding+'. Kobushi tries to decode with '+encode_retry+'.')
-            filebuffer = readfile(f_path,encode_retry)
+    def load_files(self, path, datastring = None, virtualroot = None, virtualfilename = None):
+        if datastring is None:
+            f_path, rootpath_tmp, f_encoding = loadheader.loadheader(path,'BveTs Map ',2)
+            def readfile(filepath,fileencode):
+                try:
+                    f=open(filepath,'r',encoding=fileencode)
+                    f.readline() #ヘッダー行空読み
+                    linecount = 1
+
+                    filebuffer = f.read()
+                    f.close()
+                except:
+                    f.close()
+                    raise
+                return filebuffer
+            if(self.isroot):
+                self.environment.rootpath = rootpath_tmp #最上層のマップファイルの場合のみ、ルートパスを記録
+
+            try: #ファイルオープン
+                filebuffer = readfile(f_path,f_encoding)
+            except UnicodeDecodeError as e: #ファイル指定のエンコードでオープンできない時
+                if f_encoding.casefold() == 'utf-8':
+                    encode_retry = 'CP932'
+                else:
+                    encode_retry = 'utf-8'
+                print('Warning: '+str(f_path.name)+' cannot be decoded with '+f_encoding+'. Kobushi tries to decode with '+encode_retry+'.')
+                filebuffer = readfile(f_path,encode_retry)
+        else: # 実ファイルの代わりに文字列をパースする場合の処理
+            filebuffer = datastring
+            rootpath_tmp = virtualroot
+            f_path = virtualfilename
+            self.environment.rootpath = rootpath_tmp
             
         try: #構文解析
             tree = self.parser.parse(filebuffer)
