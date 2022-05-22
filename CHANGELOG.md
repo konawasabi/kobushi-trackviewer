@@ -2,9 +2,10 @@
 
 ## to be implemented
 
-## [1.1.3] - not released yet
+## [1.1.3] - 2022-05-22
 - mapinterpleter.load_filesで、文字列を受け取ってパースする機能を実装
   - tsutsuji-trackcomputer向け
+- コマンドライン引数(-s)で軌道座標の計算間隔を指定
 
 ## [1.1.2] - 2022-04-29
 - Sin半波長逓減関数に対応していないルーチンの修正
