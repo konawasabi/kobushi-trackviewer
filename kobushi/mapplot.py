@@ -20,12 +20,12 @@ import matplotlib.transforms
 
 
 class Mapplot():
-    def __init__(self,env,cp_arbdistribution=None):
+    def __init__(self,env,cp_arbdistribution=None,unitdist_default=None):
         self.environment = env
         self.environment.cp_arbdistribution = cp_arbdistribution
         self.environment.cp_defaultrange = [0,0]
         
-        trackgenerator = tgen.TrackGenerator(self.environment)
+        trackgenerator = tgen.TrackGenerator(self.environment,unitdist_default=unitdist_default)
         self.environment.owntrack_pos = trackgenerator.generate_owntrack()
         self.environment.owntrack_curve = trackgenerator.generate_curveradius_dist()
         

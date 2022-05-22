@@ -21,7 +21,7 @@ import numpy as np
 from . import trackcoordinate as tc
 
 class TrackGenerator():
-    def __init__(self,environment,x0=None,y0=None,z0=None,theta0=None,r0=None,gr0=None,dist0=None):
+    def __init__(self,environment,x0=None,y0=None,z0=None,theta0=None,r0=None,gr0=None,dist0=None,unitdist_default=None):
         self.env = environment
         self.data_ownt = self.env.own_track.data
         self.list_cp = self.env.controlpoints.list_cp.copy()
@@ -31,7 +31,7 @@ class TrackGenerator():
         self.cp_max = max(self.list_cp)
         
         # 等間隔で距離程を追加する
-        equaldist_unit = 25
+        equaldist_unit = 25 if unitdist_default is None else unitdist_default
         boundary_margin = 500
         if self.env.cp_arbdistribution != None: # 距離程等間隔配置区間が指定されている場合
             if(len(self.env.station.position) > 0):

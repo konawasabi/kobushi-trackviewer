@@ -17,6 +17,7 @@ import sys
 import pathlib
 import os
 import webbrowser
+import argparse
 
 import tkinter as tk
 from tkinter import ttk
@@ -60,11 +61,12 @@ class Catcher: # tkinter内で起きた例外をキャッチする
                 tk.messagebox.showinfo(message=e)
 
 class mainwindow(ttk.Frame):
-    def __init__(self, master, parser):
+    def __init__(self, master, parser, stepdist = 25):
         self.dmin = None
         self.dmax = None
         self.result = None
         self.profYlim = None
+        self.default_track_interval = stepdist
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi trackviewer')
@@ -279,7 +281,7 @@ class mainwindow(ttk.Frame):
         self.bind_all("<Shift-Left>", self.press_arrowkey)
         self.bind_all("<Shift-Right>", self.press_arrowkey)
     def open_mapfile(self, event=None,inputdir=None):
-        inputdir = filedialog.askopenfilename() if inputdir == None else inputdir
+        inputdir = filedialog.askopenfilename() if inputdir is None else inputdir
         if inputdir != '':
             self.filedir_entry_val.set(inputdir)
             
@@ -327,7 +329,7 @@ class mainwindow(ttk.Frame):
             
             self.profYlim = None
             
-            self.mplot = mapplot.Mapplot(self.result)
+            self.mplot = mapplot.Mapplot(self.result, unitdist_default=self.default_track_interval)
             self.setdist_all()
             
             self.print_debugdata()
@@ -615,11 +617,16 @@ def main():
         #import sys
         sys.excepthook = info
         print('Debug mode')
+
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('filepath', metavar='F', type=str, help='input mapfile', nargs='?')
+    argparser.add_argument('-s', '--step', help='distance interval for track calculation', type=float, default=25)
+    args = argparser.parse_args()
     
     tk.CallWrapper = Catcher
     root = tk.Tk()
-    app = mainwindow(master=root, parser = None)
+    app = mainwindow(master=root, parser = None, stepdist = args.step)
 
-    if len(sys.argv)>1:
-        app.open_mapfile(inputdir=sys.argv[1])
+    if args.filepath is not None:
+        app.open_mapfile(inputdir=args.filepath)
     app.mainloop()
