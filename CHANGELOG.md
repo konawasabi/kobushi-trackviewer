@@ -2,6 +2,9 @@
 
 ## to be implemented
 
+## [1.1.4] - 2022-10-15
+- ライブラリ外からmap-grammer.larkを呼び出すため、マップ文法ファイルをopenするルーチンを独立。
+
 ## [1.1.3] - 2022-05-22
 - mapinterpleter.load_filesで、文字列を受け取ってパースする機能を実装
   - tsutsuji-trackcomputer向け
@@ -47,4 +50,5 @@
 [1.1.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.0...ver1.1.1
 [1.1.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.1...ver1.1.2
 [1.1.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.2...ver1.1.3
+[1.1.4]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.3...ver1.1.4
 
