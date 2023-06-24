@@ -586,7 +586,7 @@ class mainwindow(ttk.Frame):
     def aboutwindow(self, event=None):
         msg  = 'Kobushi trackviewer\n'
         msg += 'Version '+__version__+'\n\n'
-        msg += 'Copyright © 2021-2022 konawasabi\n'
+        msg += 'Copyright © 2021-2023 konawasabi\n'
         msg += 'Released under the Apache License, Version 2.0 .\n'
         msg += 'https://www.apache.org/licenses/LICENSE-2.0'
         tk.messagebox.showinfo(message=msg)

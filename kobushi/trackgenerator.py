@@ -512,16 +512,16 @@ class OtherTrackGenerator():
             for tpkey in ['x.position','x.radius','y.position','y.radius']: # ポインタを進める
                 while trackptr[tpkey].overNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
+                    self.pos['last'][tpkey] = self.pos['next'][tpkey]
                     if trackptr[tpkey].pointer['next'] != None:
-                        self.pos['last'][tpkey] = self.pos['next'][tpkey]
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]
             for tpkey in ['interpolate_func','center','gauge']: # ポインタを進める
                 while trackptr[tpkey].onNextpoint(element[0]):
                     trackptr[tpkey].seeknext()
+                    self.pos['last'][tpkey] = self.pos['next'][tpkey]
                     if trackptr[tpkey].pointer['next'] != None:
-                        self.pos['last'][tpkey] = self.pos['next'][tpkey]
                         k = 'next'
                         newval = self.data[trackptr[tpkey].pointer[k]]['value']
                         self.pos[k][tpkey] = newval if newval != 'c' else self.pos['last'][tpkey]

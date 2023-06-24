@@ -17,10 +17,13 @@ import numpy as np
 from . import trackcoordinate as tc
 from . import trackgenerator as tgen
 import matplotlib.transforms
+import pdb
 
 
 class Mapplot():
     def __init__(self,env,cp_arbdistribution=None,unitdist_default=None):
+        if False:
+            pdb.set_trace()
         self.environment = env
         self.environment.cp_arbdistribution = cp_arbdistribution
         self.environment.cp_defaultrange = [0,0]

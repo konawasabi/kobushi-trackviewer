@@ -2,6 +2,10 @@
 
 ## to be implemented
 
+## [1.1.5] - 2023-06-25
+- 他軌道のパラメータ計算方法を修正
+  - 最終制御点のデータが反映されない問題の解消
+
 ## [1.1.4] - 2022-10-15
 - ライブラリ外からmap-grammer.larkを呼び出すため、マップ文法ファイルをopenするルーチンを独立。
 
@@ -51,4 +55,5 @@
 [1.1.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.1...ver1.1.2
 [1.1.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.2...ver1.1.3
 [1.1.4]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.3...ver1.1.4
+[1.1.5]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.4...ver1.1.5
 
