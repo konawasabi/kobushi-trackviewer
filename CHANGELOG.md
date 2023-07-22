@@ -3,8 +3,9 @@
 ## to be implemented
 
 ## [1.1.6] - 2023-07-22
-- 規定変数、ユーザー定義変数を別個に扱うように修正
-  - 規定変数: $記号をつけずに呼び出せる変数。BveTs Map 2.02 ではdistanceのみ
+- 既定変数、ユーザー定義変数を別個に扱うように修正
+  - 既定変数: $記号をつけずに呼び出せる変数。BveTs Map 2.02 ではdistanceのみ
+  - https://github.com/konawasabi/tsutsuji-trackcomputer/issues/1 への対応
 
 ## [1.1.5] - 2023-06-25
 - 他軌道のパラメータ計算方法を修正
