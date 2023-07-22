@@ -1,5 +1,5 @@
 '''
-    Copyright 2021 konawasabi
+    Copyright 2021-2023 konawasabi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ class Environment():
     '''
     def __init__(self):
         self.rootpath = ''
-        self.variable = {'distance':0.0}
+        self.predef_vars = {'distance':0.0}
+        self.variable = {}
         self.own_track = Owntrack(self)
         self.station = Station(self)
         self.controlpoints = ControlPoints(self)
@@ -131,7 +132,7 @@ class Owntrack():
         flag
             '':change, 'i':interpolate, 'bt':begintransition
         '''
-        self.data.append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':key, 'flag':flag})
+        self.data.append({'distance':self.environment.predef_vars['distance'], 'value':'c' if value == None else value, 'key':key, 'flag':flag})
     def relocate(self):
         self.data = sorted(self.data, key=lambda x: x['distance'])
         
@@ -174,7 +175,7 @@ class Station():
                 raise RuntimeError('File encoding error: '+str(f_path))
     def put(self, *argvs):
         #self.position.append({'distance':self.environment.variable['distance'], 'stationkey':argvs[0].lower()})
-        self.position[self.environment.variable['distance']]=argvs[0].lower()
+        self.position[self.environment.predef_vars['distance']]=argvs[0].lower()
     def __init__(self, parent):
         self.position = {}
         self.stationkey = {}
@@ -270,7 +271,7 @@ class Othertrack():
             trackkey_lc = str(trackkey).lower()
         if trackkey_lc not in self.data.keys():
             self.data[trackkey_lc] = []
-        self.data[trackkey_lc].append({'distance':self.environment.variable['distance'], 'value':'c' if value == None else value, 'key':elementkey, 'flag':flag})
+        self.data[trackkey_lc].append({'distance':self.environment.predef_vars['distance'], 'value':'c' if value == None else value, 'key':elementkey, 'flag':flag})
     def relocate(self):
         self.cp_range = {}
         for trackkey in self.data.keys():

@@ -2,6 +2,10 @@
 
 ## to be implemented
 
+## [1.1.6] - 2023-07-22
+- 規定変数、ユーザー定義変数を別個に扱うように修正
+  - 規定変数: $記号をつけずに呼び出せる変数。BveTs Map 2.02 ではdistanceのみ
+
 ## [1.1.5] - 2023-06-25
 - 他軌道のパラメータ計算方法を修正
   - 最終制御点のデータが反映されない問題の解消
@@ -56,4 +60,5 @@
 [1.1.3]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.2...ver1.1.3
 [1.1.4]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.3...ver1.1.4
 [1.1.5]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.4...ver1.1.5
+[1.1.6]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.5...ver1.1.6
 

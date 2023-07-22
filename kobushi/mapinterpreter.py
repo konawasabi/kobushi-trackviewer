@@ -1,5 +1,5 @@
 '''
-    Copyright 2021-2022 konawasabi
+    Copyright 2021-2023 konawasabi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -43,10 +43,10 @@ class ParseMap(Transformer):
             self.environment = env
             self.isroot=False
     def set_distance(self, value): #距離程設定
-        self.environment.variable['distance'] = float(value)
+        self.environment.predef_vars['distance'] = float(value)
         self.environment.controlpoints.add(float(value))
     def call_predefined_variable(self, argument): #規定変数呼び出し（現実的にはdistanceのみ）
-        return self.environment.variable[argument.lower()]
+        return self.environment.predef_vars[argument.lower()]
     def set_variable(self, *argument): #変数設定
         self.environment.variable[argument[0].lower()]=argument[1]
     def call_variable(self, argument): #変数呼び出し
@@ -179,7 +179,7 @@ class ParseMap(Transformer):
         try: #ツリー処理
             self.transform(tree)
         except Exception as e:
-            raise RuntimeError('IntepretationError: in file '+str(f_path)+', distance='+str(self.environment.variable['distance'])+'\n'+str(e))
+            raise RuntimeError('IntepretationError: in file '+str(f_path)+', distance='+str(self.environment.predef_vars['distance'])+'\n'+str(e))
             #print(self.environment.variable)
             
         
