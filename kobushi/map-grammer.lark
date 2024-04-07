@@ -31,9 +31,11 @@
 ?mapobject: label ["[" parameter "]"] // [key]が指定されていない場合もNoneを返す
 
 ?label: CNAME
-VALNAME: ("_"|LETTER|DIGIT) ("_"|LETTER|DIGIT)*
+VALNAME: ("_"|LETTER|SIMCH_LETTER|DIGIT) ("_"|LETTER|SIMCH_LETTER|DIGIT)*
 
 string: /'[^']*'/ -> remquote
+
+SIMCH_LETTER: ("\u0080".."\u07ff") | ("\u0800".."\uffff")
 
 %import common.CNAME
 %import common.LETTER
