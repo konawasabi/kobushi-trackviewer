@@ -2,6 +2,11 @@
 
 ## to be implemented
 
+## [1.1.7] - 2024-04-08
+- ASCII文字以外を変数名に用いたマップに対応
+- 空文字列を軌道キーに設定したマップに対応
+  - 暫定的な対応であり、十分なテストを行っていない
+
 ## [1.1.6] - 2023-07-22
 - 既定変数、ユーザー定義変数を別個に扱うように修正
   - 既定変数: $記号をつけずに呼び出せる変数。BveTs Map 2.02 ではdistanceのみ
@@ -62,4 +67,5 @@
 [1.1.4]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.3...ver1.1.4
 [1.1.5]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.4...ver1.1.5
 [1.1.6]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.5...ver1.1.6
+[1.1.7]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.6...ver1.1.7
 
