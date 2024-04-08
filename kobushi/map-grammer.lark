@@ -35,7 +35,7 @@ VALNAME: ("_"|LETTER|SIMCH_LETTER|DIGIT) ("_"|LETTER|SIMCH_LETTER|DIGIT)*
 
 string: /'[^']*'/ -> remquote
 
-SIMCH_LETTER: ("\u0080".."\u07ff") | ("\u0800".."\uffff")
+SIMCH_LETTER: ("\u0080".."\u07ff") | ("\u0800".."\uffff") | ("\U00010000".."\U0010ffff")
 
 %import common.CNAME
 %import common.LETTER
