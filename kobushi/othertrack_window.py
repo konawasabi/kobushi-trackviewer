@@ -71,6 +71,9 @@ class SubWindow(ttk.Frame):
             if getattr(event, 'widget').identify("element", event.x, event.y) == 'text': #パラメータ部分クリックかどうか。チェックボックスだとimage
                 clicked_column = self.othertrack_tree.identify_column(event.x)
                 clicked_track = self.othertrack_tree.identify_row(event.y)
+                if clicked_track == '\\':
+                    clicked_track = ''
+                    # クリックされた要素のidがバックスラッシュなら軌道キーを''に置き換える。通常は要素id = 軌道キー
                 #print(clicked_track,columnlabel[clicked_column])
                 if clicked_column in ['#1','#2','#3'] and clicked_track != 'root':
                     if clicked_column == '#3': # ラインカラーかどうか？
@@ -98,7 +101,8 @@ class SubWindow(ttk.Frame):
         self.othertrack_tree.insert("", "end", 'root', text='root', open=True)
         colorix = 0
         for i in self.mainwindow.result.othertrack.data.keys():
-            self.othertrack_tree.insert("root", "end", i, text=i, values=(min(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'], '■■■'),tags=(i,))
+            self.othertrack_tree.insert("root", "end", '\\' if i=='' else i, text=i, values=(min(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'],max(self.mainwindow.result.othertrack.data[i], key=lambda x: x['distance'])['distance'], '■■■'),tags=(i,))
+            # trackkey == '' (空文字列)の場合はidをバックスラッシュに置き換える。（他軌道ツリーのroot要素と重複するため）
             self.othertrack_tree.tag_configure(i,foreground=self.mainwindow.result.othertrack_linecolor[i]['current'])
         #self.subwindow.othertrack_tree.see('root')
         #self.othertrack_tree.configure(yscrollcommand=self.ottree_scrollbar.set)

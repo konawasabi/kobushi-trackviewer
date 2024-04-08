@@ -66,6 +66,9 @@ class Mapplot():
         # 他軌道描画
         if othertrack_list != None:
             for key in othertrack_list:
+                if key == '\\':
+                    key = ''
+                    # 渡された他軌道リストの要素がバックスラッシュなら''に置き換える。othertrack_window.py参照のこと。
                 othertrack = self.environment.othertrack_pos[key]
                 othertrack = othertrack[othertrack[:,0] >= self.environment.othertrack.cp_range[key]['min']]
                 othertrack = othertrack[othertrack[:,0] <= self.environment.othertrack.cp_range[key]['max']]
