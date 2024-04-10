@@ -29,11 +29,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import rcParams
 import matplotlib.gridspec
+import matplotlib.font_manager
 import numpy as np
 
 # https://qiita.com/yniji/items/3fac25c2ffa316990d0c matplotlibで日本語を使う
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Hiragino Sans', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
+
 
 from ._version import __version__
 from . import mapinterpreter as interp
@@ -61,12 +63,13 @@ class Catcher: # tkinter内で起きた例外をキャッチする
                 tk.messagebox.showinfo(message=e)
 
 class mainwindow(ttk.Frame):
-    def __init__(self, master, parser, stepdist = 25):
+    def __init__(self, master, parser, stepdist = 25, font = ''):
         self.dmin = None
         self.dmax = None
         self.result = None
         self.profYlim = None
         self.default_track_interval = stepdist
+        self.font = font
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi trackviewer')
@@ -621,11 +624,21 @@ def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('filepath', metavar='F', type=str, help='input mapfile', nargs='?')
     argparser.add_argument('-s', '--step', help='distance interval for track calculation', type=float, default=25)
+    argparser.add_argument('-f', '--font', help='Font', type=str, default = 'sans-serif')
     args = argparser.parse_args()
+
+    '''
+    font_files = matplotlib.font_manager.findSystemFonts()
+    for font_file in font_files:
+        if '.ttf' in font_file:
+            matplotlib.font_manager.fontManager.addfont(font_file)
+    '''
+    rcParams['font.family'] = args.font
+    
     
     tk.CallWrapper = Catcher
     root = tk.Tk()
-    app = mainwindow(master=root, parser = None, stepdist = args.step)
+    app = mainwindow(master=root, parser = None, stepdist = args.step, font=args.font)
 
     if args.filepath is not None:
         app.open_mapfile(inputdir=args.filepath)
