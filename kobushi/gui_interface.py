@@ -42,6 +42,7 @@ from . import mapinterpreter as interp
 from . import mapplot
 from . import dialog_multifields
 from . import othertrack_window
+from . import font_window
 
 # http://centerwave-callout.com/tkinter内で起きた例外をどうキャッチするか？/
 class Catcher: # tkinter内で起きた例外をキャッチする
@@ -69,7 +70,6 @@ class mainwindow(ttk.Frame):
         self.result = None
         self.profYlim = None
         self.default_track_interval = stepdist
-        self.font = font
         
         super().__init__(master, padding='3 3 3 3')
         self.master.title('Kobushi trackviewer')
@@ -78,6 +78,10 @@ class mainwindow(ttk.Frame):
         self.master.rowconfigure(0, weight=1)
         
         master.protocol('WM_DELETE_WINDOW', self.ask_quit)
+        
+        self.fontctrl = font_window.FontControl(None,self)
+        if font != '':
+            self.fontctrl.set_fontname(font)
         
         self.create_widgets()
         self.create_menubar()
@@ -268,6 +272,7 @@ class mainwindow(ttk.Frame):
         self.menu_option.add_command(label='座標制御点...', command=self.set_arbcpdist)
         self.menu_option.add_command(label='描画可能区間...', command=self.set_plotlimit)
         self.menu_option.add_command(label='断面図y軸範囲...', command=self.set_profYlimit)
+        self.menu_option.add_command(label='Font...', command=self.fontctrl.create_window)
         
         #self.menu_option.add_command(label='customdialog...', command=self.customdialog_test)
         
@@ -485,6 +490,7 @@ class mainwindow(ttk.Frame):
             self.distance_scale.set((self.setdist_entry_val.get()-self.distrange_min)/((self.distrange_max-self.dist_range_arb_val.get()) - self.distrange_min)*100)
     def plot_all(self):
         if(self.result != None):
+            rcParams['font.family'] = self.fontctrl.get_fontname()
             self.draw_planerplot()
             self.draw_profileplot()
     def ask_quit(self, event=None, ask=True):
@@ -626,16 +632,7 @@ def main():
     argparser.add_argument('-s', '--step', help='distance interval for track calculation', type=float, default=25)
     argparser.add_argument('-f', '--font', help='Font', type=str, default = 'sans-serif')
     args = argparser.parse_args()
-
-    '''
-    font_files = matplotlib.font_manager.findSystemFonts()
-    for font_file in font_files:
-        if '.ttf' in font_file:
-            matplotlib.font_manager.fontManager.addfont(font_file)
-    '''
-    rcParams['font.family'] = args.font
-    
-    
+       
     tk.CallWrapper = Catcher
     root = tk.Tk()
     app = mainwindow(master=root, parser = None, stepdist = args.step, font=args.font)
