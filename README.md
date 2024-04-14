@@ -33,6 +33,19 @@ python -m kobushi
 
 `python -m kobushi hoge.txt`として、読み込みたいマップファイルを指定して起動することも可能です。
 
+### オプション引数
+
+- `-h, --help`
+  - ヘルプメッセージを表示して終了
+- `-s STEP, --step STEP`
+  - 軌道座標を計算する距離程間隔をSTEP [m]に設定
+  - Default: 25[m]
+- `-f FONT, --font FONT`
+  - 線路平面図・縦断面図で使用するフォントをFONTに設定
+  - フォント名にスペースが含まれる場合、ダブルクォーテーションで囲むこと
+  - Default: sans-serif
+
+
 ## リファレンス
 
 [こちら](reference.md)を参照

@@ -2,6 +2,12 @@
 
 ## to be implemented
 
+## [1.2.0] - 2024-04-14
+- 線路平面図・縦断面図で使用するフォントの変更に対応
+  - Optionメニュー-> Font...で表示されるリストから選択する
+  - コマンドライン引数(-f)で指定することも可能
+- 依存ライブラリのバージョン条件を追加
+
 ## [1.1.7] - 2024-04-08
 - ASCII文字以外を変数名に用いたマップに対応
 - 空文字列を軌道キーに設定したマップに対応
@@ -68,4 +74,4 @@
 [1.1.5]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.4...ver1.1.5
 [1.1.6]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.5...ver1.1.6
 [1.1.7]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.6...ver1.1.7
-
+[1.2.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.7...ver1.2.0
