@@ -41,16 +41,16 @@ class FontControl():
             self.frame.grid(sticky=(tk.N, tk.W, tk.E, tk.S))
             self.frame.columnconfigure(0,weight=1)
             self.frame.rowconfigure(0,weight=1)
-            self.combobox = ttk.Combobox(self.frame, width=20,values=sorted(self.mat_fonts))
+            self.combobox = ttk.Combobox(self.frame, width=30,values=sorted(self.mat_fonts))
             self.combobox.grid(column=0,row=0)
             self.combobox.set(self.fontname)
 
 
             self.subframe = ttk.Frame(self.frame, padding=5)
             self.subframe.grid(column=0,row=1,sticky=(tk.N, tk.W, tk.E, tk.S))
-            self.ok_button = ttk.Button(self.subframe, text='OK', command=self.ok_close, width=5)
+            self.ok_button = ttk.Button(self.subframe, text='OK', command=self.ok_close)
             self.ok_button.grid(column=0,row=0)
-            self.cancel_button = ttk.Button(self.subframe, text='Cancel', command=self.closewindow, width=5)
+            self.cancel_button = ttk.Button(self.subframe, text='Cancel', command=self.closewindow)
             self.cancel_button.grid(column=1,row=0)
     def closewindow(self):
         self.master.withdraw()
