@@ -1,5 +1,5 @@
 '''
-    Copyright 2021 konawasabi
+    Copyright 2021-2024 konawasabi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 '''
+
 import numpy as np
 from scipy import integrate
 
@@ -158,9 +159,9 @@ class curve():
             if l_intermediate/5 <= dL:
                 dL = l_intermediate/5
             tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
-            tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
-            X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
-            Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
+            tau = integrate.cumulative_trapezoid(K(tau_X,r1,r2,L),tau_X,initial = 0)
+            X = integrate.cumulative_trapezoid(np.cos(tau),tau_X,initial = 0)
+            Y = integrate.cumulative_trapezoid(np.sin(tau),tau_X,initial = 0)
             r_interm = 1/K(l_intermediate,r1,r2,L) if K(l_intermediate,r1,r2,L) != 0 else np.inf
         else:
             X = 0
@@ -251,9 +252,9 @@ class curve_intermediate(curve):
             if l_intermediate/5 <= dL:
                 dL = l_intermediate/5
             tau_X = np.linspace(0,l_intermediate,int((l_intermediate)/dL)+1)
-            tau = integrate.cumtrapz(K(tau_X,r1,r2,L),tau_X,initial = 0)
-            X = integrate.cumtrapz(np.cos(tau),tau_X,initial = 0)
-            Y = integrate.cumtrapz(np.sin(tau),tau_X,initial = 0)
+            tau = integrate.cumulative_trapezoid(K(tau_X,r1,r2,L),tau_X,initial = 0)
+            X = integrate.cumulative_trapezoid(np.cos(tau),tau_X,initial = 0)
+            Y = integrate.cumulative_trapezoid(np.sin(tau),tau_X,initial = 0)
             r_interm = 1/K(l_intermediate,r1,r2,L) if K(l_intermediate,r1,r2,L) != 0 else np.inf
         else:
             X = 0
