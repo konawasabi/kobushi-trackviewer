@@ -1,5 +1,5 @@
 '''
-    Copyright 2021-2023 konawasabi
+    Copyright 2021-2024 konawasabi
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -131,7 +131,11 @@ class ParseMap(Transformer):
     def include_file(self, path): #外部ファイルインクルード
         input = loadheader.joinpath(self.environment.rootpath, path)
         interpreter = ParseMap(self.environment,self.parser)
-        interpreter.load_files(input)
+        try:
+            interpreter.load_files(input)
+        except OSError as e:
+            print('Warning: '+str(e))
+            
     def start(self, *argument):
         if(all(elem == None for elem in argument)):
             return self.environment

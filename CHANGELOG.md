@@ -2,6 +2,10 @@
 
 ## to be implemented
 
+## [1.2.1] - 2024-07-29
+- scipy 1.14.0以降で、integrate.cumtrapz が実行できずエラーとなることに対応
+- include文実行時に対象ファイルがオープンできなかった場合、以降の読み込みを継続するように変更
+
 ## [1.2.0] - 2024-04-14
 - 線路平面図・縦断面図で使用するフォントの変更に対応
   - Optionメニュー-> Font...で表示されるリストから選択する
@@ -75,3 +79,4 @@
 [1.1.6]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.5...ver1.1.6
 [1.1.7]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.6...ver1.1.7
 [1.2.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.7...ver1.2.0
+[1.2.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.2.0...ver1.2.1
