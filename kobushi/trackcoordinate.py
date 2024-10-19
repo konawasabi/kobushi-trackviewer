@@ -361,5 +361,6 @@ class OtherTrack():
         pos_ownt:       座標を求める位置での自軌道の座標情報
         '''
         posrel = np.array([0,self.relative_position(L, radius, ya, yb, l_intermediate)])
-        return posrel + np.array([pos_ownt[1],pos_ownt[3]]) # 計算結果を自軌道座標に加算する
+        return posrel + np.array([pos_ownt[0],pos_ownt[3]]) # 計算結果を自軌道座標に加算する
+        # result_Y: [distance, Yval]なら、第二項は[element[0],element[3]ではないか？
 

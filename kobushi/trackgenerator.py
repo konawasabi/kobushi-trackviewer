@@ -548,7 +548,8 @@ class OtherTrackGenerator():
                                                                 element[0] - self.pos['last']['y.distance'],\
                                                                 element)
             else:
-                temp_result_Y = [0,self.pos['last']['y.position']]+ np.array([element[1],element[3]])
+                temp_result_Y = [0,self.pos['last']['y.position']]+ np.array([element[0],element[3]])
+                # result_Y: [distance, Yval]なら、第二項は[element[0],element[3]ではないか？
                 
             temp_result_cant = cant_gen.process(element[0], self.pos['last']['interpolate_func'])
             

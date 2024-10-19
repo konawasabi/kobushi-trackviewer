@@ -72,7 +72,7 @@ class mainwindow(ttk.Frame):
         self.default_track_interval = stepdist
         
         super().__init__(master, padding='3 3 3 3')
-        self.master.title('Kobushi trackviewer')
+        self.master.title('Kobushi trackviewer ver. {:s}'.format(__version__))
         self.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
