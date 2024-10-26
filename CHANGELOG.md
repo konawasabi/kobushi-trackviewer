@@ -84,3 +84,4 @@
 [1.1.7]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.6...ver1.1.7
 [1.2.0]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.1.7...ver1.2.0
 [1.2.1]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.2.0...ver1.2.1
+[1.2.2]: https://github.com/konawasabi/kobushi-trackviewer/compare/ver1.2.1...ver1.2.2
